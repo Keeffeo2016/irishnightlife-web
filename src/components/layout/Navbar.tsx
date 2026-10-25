@@ -27,11 +27,8 @@ export function Navbar() {
             <Link href="/events" className="text-gray-300 hover:text-white transition">
               Events
             </Link>
-            <Link href="/dashboard" className="text-gray-300 hover:text-white transition">
-              Venue Dashboard
-            </Link>
-            <Link href="/admin" className="text-gray-300 hover:text-white transition">
-              Admin
+            <Link href="/planner" className="text-gray-300 hover:text-white transition">
+              Tonight Planner
             </Link>
             <Link href="/auth/login" className="inline-flex items-center justify-center rounded-md border border-emerald-500 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10 transition">
               Sign In
@@ -59,8 +56,8 @@ export function Navbar() {
             <Link href="/events" className="block py-2 text-gray-300 hover:text-white">
               Events
             </Link>
-            <Link href="/dashboard" className="block py-2 text-gray-300 hover:text-white">
-              Venue Dashboard
+            <Link href="/planner" className="block py-2 text-gray-300 hover:text-white">
+              Tonight Planner
             </Link>
             <div className="flex gap-2 pt-2">
               <Button variant="outline" className="flex-1 border-emerald-500 text-emerald-400">
