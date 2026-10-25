@@ -1,86 +1,159 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { MapPin, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 
 export default function SignupPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [accountType, setAccountType] = useState<'consumer' | 'venue'>('consumer')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    venueName: '',
+    city: '',
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          accountType,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account')
+      }
+
+      setSuccess(data.message)
+      
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        router.push('/auth/login')
+      }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md bg-white/5 border-white/10">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
+      <Card className="w-full max-w-md bg-white border-gray-200">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MapPin className="h-10 w-10 text-emerald-400" />
+            <MapPin className="h-10 w-10 text-emerald-600" />
           </div>
-          <CardTitle className="text-2xl text-white">Create your account</CardTitle>
-          <p className="text-gray-400">Join Ireland's nightlife discovery platform</p>
+          <CardTitle className="text-2xl text-gray-900">Create your account</CardTitle>
+          <p className="text-gray-600">Join Ireland's nightlife discovery platform</p>
         </CardHeader>
         <CardContent>
+          {/* Success Message */}
+          {success && (
+            <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <p className="text-emerald-700 text-sm">{success}</p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
           {/* Account Type Toggle */}
           <div className="flex gap-2 mb-6">
             <button
+              type="button"
               onClick={() => setAccountType('consumer')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'consumer'
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-white/5 text-gray-400 hover:text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               🎉 I'm going out
             </button>
             <button
+              type="button"
               onClick={() => setAccountType('venue')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'venue'
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-white/5 text-gray-400 hover:text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               🏢 I own a venue
             </button>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Full Name</label>
+              <label className="text-sm text-gray-700 mb-1 block font-medium">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="John Murphy"
-                  className="pl-10 bg-white/5 border-white/10 text-white"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  required
                 />
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Email</label>
+              <label className="text-sm text-gray-700 mb-1 block font-medium">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   type="email"
                   placeholder="you@example.com"
-                  className="pl-10 bg-white/5 border-white/10 text-white"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
                 />
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">Password</label>
+              <label className="text-sm text-gray-700 mb-1 block font-medium">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Min 8 characters"
-                  className="pl-10 pr-10 bg-white/5 border-white/10 text-white"
+                  className="pl-10 pr-10 bg-white border-gray-300 text-gray-900"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                  minLength={8}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -91,30 +164,48 @@ export default function SignupPage() {
             {accountType === 'venue' && (
               <>
                 <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Venue Name</label>
+                  <label className="text-sm text-gray-700 mb-1 block font-medium">Venue Name</label>
                   <Input
                     placeholder="The Bleeding Heart"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white border-gray-300 text-gray-900"
+                    value={formData.venueName}
+                    onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400 mb-1 block">City</label>
+                  <label className="text-sm text-gray-700 mb-1 block font-medium">City</label>
                   <Input
                     placeholder="Dublin"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white border-gray-300 text-gray-900"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    required
                   />
                 </div>
               </>
             )}
 
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6" size="lg">
-              {accountType === 'consumer' ? 'Create Account' : 'Register Venue'}
+            <Button 
+              type="submit"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6" 
+              size="lg"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                accountType === 'consumer' ? 'Create Account' : 'Register Venue'
+              )}
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-400">
+          <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-emerald-400 hover:underline">
+            <Link href="/auth/login" className="text-emerald-600 hover:underline font-medium">
               Sign in
             </Link>
           </div>
