@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# seed scripts (temporary)
+seed-*.mjs
+check-*.mjs
+verify-*.mjs
+setup-*.mjs
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -1,0 +1,46 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simplified Ireland map outline -->
+  <path d="M 350 150 
+           Q 320 160, 300 180 
+           Q 280 200, 270 230 
+           Q 260 260, 265 290 
+           Q 270 320, 280 350 
+           Q 290 380, 285 410 
+           Q 280 440, 275 470 
+           Q 270 500, 280 530 
+           Q 290 560, 310 580 
+           Q 330 600, 350 610 
+           Q 370 620, 390 615 
+           Q 410 610, 430 600 
+           Q 450 590, 465 570 
+           Q 480 550, 490 530 
+           Q 500 510, 505 490 
+           Q 510 470, 508 450 
+           Q 506 430, 500 410 
+           Q 494 390, 490 370 
+           Q 486 350, 485 330 
+           Q 484 310, 480 290 
+           Q 476 270, 470 250 
+           Q 464 230, 455 215 
+           Q 446 200, 435 190 
+           Q 424 180, 410 175 
+           Q 396 170, 380 165 
+           Q 364 160, 350 150 Z" 
+        fill="currentColor" 
+        opacity="0.08"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-opacity="0.15"/>
+  
+  <!-- Cork marker -->
+  <circle cx="320" cy="520" r="8" fill="currentColor" opacity="0.3"/>
+  <text x="335" y="525" font-size="16" fill="currentColor" opacity="0.4" font-weight="600">Cork</text>
+  
+  <!-- Dublin marker -->
+  <circle cx="450" cy="380" r="8" fill="currentColor" opacity="0.3"/>
+  <text x="465" y="385" font-size="16" fill="currentColor" opacity="0.4" font-weight="600">Dublin</text>
+  
+  <!-- Galway marker -->
+  <circle cx="340" cy="400" r="8" fill="currentColor" opacity="0.3"/>
+  <text x="355" y="405" font-size="16" fill="currentColor" opacity="0.4" font-weight="600">Galway</text>
+</svg>
