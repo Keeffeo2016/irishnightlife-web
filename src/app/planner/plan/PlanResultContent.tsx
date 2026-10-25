@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MapPin, Clock, Euro, Sparkles, RefreshCw, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import PlanMap from '@/components/PlanMap'
 
 interface Venue {
   id: string
@@ -300,18 +301,28 @@ export default function PlanResultContent() {
             ))}
           </div>
 
-          {/* Map Placeholder */}
-          <Card className="bg-white border-gray-200 mt-8">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Your Route Tonight</h3>
-              <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
-                <p className="text-gray-500">Map view coming soon</p>
+          {/* Map */}
+          <div className="mt-8">
+            <Suspense fallback={
+              <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
+                <div className="text-6xl mb-4">🗺️</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
+                <p className="text-gray-600">Preparing your route</p>
               </div>
-              <p className="text-sm text-gray-600 mt-4">
-                Total walking time: ~15 minutes between all venues
-              </p>
-            </CardContent>
-          </Card>
+            }>
+              <PlanMap 
+                venues={plan.events.map(event => ({
+                  id: event.venues.id,
+                  name: event.venues.name,
+                  slug: event.venues.slug,
+                  address: event.venues.address,
+                  city: event.venues.city,
+                  latitude: event.venues.latitude,
+                  longitude: event.venues.longitude,
+                }))} 
+              />
+            </Suspense>
+          </div>
 
           {/* CTA */}
           <div className="text-center mt-12">
