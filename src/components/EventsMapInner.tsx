@@ -83,12 +83,11 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
     async function fetchVenuesWithEvents() {
       setLoading(true)
 
-      // Get today's date range
+      // Get upcoming events (next 48 hours)
       const now = new Date()
-      const endOfDay = new Date(now)
-      endOfDay.setHours(23, 59, 59, 999)
+      const fortyEightHoursLater = new Date(now.getTime() + 48 * 60 * 60 * 1000)
 
-      // Fetch venues with events happening today
+      // Fetch venues with upcoming events
       let query = supabase
         .from('venues')
         .select(`
@@ -121,18 +120,18 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
         return
       }
 
-      // Filter venues to only those with events today
-      const venuesWithTodayEvents = venuesData
+      // Filter venues to only those with upcoming events
+      const venuesWithUpcomingEvents = venuesData
         ?.map((venue: any) => ({
           ...venue,
           events: venue.events.filter((event: any) => {
             const eventStart = new Date(event.start_time)
-            return eventStart >= now && eventStart <= endOfDay
+            return eventStart >= now && eventStart <= fortyEightHoursLater
           }),
         }))
         .filter((venue: any) => venue.events.length > 0) || []
 
-      setVenues(venuesWithTodayEvents)
+      setVenues(venuesWithUpcomingEvents)
       setLoading(false)
     }
 
@@ -166,14 +165,14 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
     return (
       <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
         <div className="text-6xl mb-4">📍</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">No events today</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">No upcoming events</h3>
         <p className="text-gray-600 mb-4">
           {selectedCounty !== 'All Ireland'
-            ? `No venues with events in ${selectedCounty} today`
-            : 'No venues with events today'}
+            ? `No venues with upcoming events in ${selectedCounty}`
+            : 'No venues with upcoming events'}
         </p>
         <p className="text-sm text-gray-500">
-          Try selecting a different county or check back tomorrow
+          Try selecting a different county or check back later
         </p>
       </div>
     )
@@ -187,7 +186,7 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
           🗺️ Live Events Map
         </h2>
         <p className="text-emerald-50">
-          {venues.length} {venues.length === 1 ? 'venue' : 'venues'} with events today in {selectedCounty}
+          {venues.length} {venues.length === 1 ? 'venue' : 'venues'} with upcoming events in {selectedCounty}
         </p>
       </div>
 

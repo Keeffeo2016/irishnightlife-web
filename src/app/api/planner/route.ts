@@ -141,10 +141,9 @@ export async function POST(request: NextRequest) {
     const context: PlannerContext = await request.json()
     const supabase = await createClient()
 
-    // Get tonight's events (any time today)
+    // Get upcoming events (next 48 hours for better planning)
     const now = new Date()
-    const endOfDay = new Date(now)
-    endOfDay.setHours(23, 59, 59, 999)
+    const fortyEightHoursLater = new Date(now.getTime() + 48 * 60 * 60 * 1000)
 
     const { data: events, error } = await supabase
       .from('events')
@@ -154,8 +153,9 @@ export async function POST(request: NextRequest) {
       `)
       .eq('is_published', true)
       .gte('start_time', now.toISOString())
-      .lte('start_time', endOfDay.toISOString())
+      .lte('start_time', fortyEightHoursLater.toISOString())
       .order('start_time', { ascending: true })
+      .limit(20)
 
     if (error) {
       console.error('Error fetching events:', error)
