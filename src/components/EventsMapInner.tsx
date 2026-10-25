@@ -57,8 +57,14 @@ interface EventsMapInnerProps {
 export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInnerProps) {
   const [venues, setVenues] = useState<VenueWithEvents[]>([])
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
   const [mapZoom, setMapZoom] = useState(13)
+
+  // Ensure component is mounted before rendering map
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // County centers for map positioning
   const countyCenters: Record<string, [number, number]> = {
@@ -165,15 +171,26 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
     return (
       <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
         <div className="text-6xl mb-4">📍</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">No upcoming events</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">No events today</h3>
         <p className="text-gray-600 mb-4">
           {selectedCounty !== 'All Ireland'
-            ? `No venues with upcoming events in ${selectedCounty}`
-            : 'No venues with upcoming events'}
+            ? `No venues with events in ${selectedCounty} today`
+            : 'No venues with events today'}
         </p>
         <p className="text-sm text-gray-500">
-          Try selecting a different county or check back later
+          Try selecting a different county or check back tomorrow
         </p>
+      </div>
+    )
+  }
+
+  // Don't render map during SSR
+  if (!mounted) {
+    return (
+      <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
+        <div className="text-6xl mb-4">🗺️</div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
+        <p className="text-gray-600">Preparing your interactive map</p>
       </div>
     )
   }

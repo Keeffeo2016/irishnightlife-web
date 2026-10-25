@@ -40,8 +40,10 @@ interface PlanMapProps {
 
 export default function PlanMap({ venues }: PlanMapProps) {
   const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     // Calculate center based on venues
     if (venues.length > 0) {
       const avgLat = venues.reduce((sum, v) => sum + v.latitude, 0) / venues.length
@@ -52,6 +54,17 @@ export default function PlanMap({ venues }: PlanMapProps) {
 
   if (venues.length === 0) {
     return null
+  }
+
+  // Don't render map during SSR
+  if (!mounted) {
+    return (
+      <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
+        <div className="text-6xl mb-4">🗺️</div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
+        <p className="text-gray-600">Preparing your route</p>
+      </div>
+    )
   }
 
   return (
