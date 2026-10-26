@@ -20,11 +20,14 @@ export function PageViewTracker() {
     recording.add(path)
 
     const supabase = createClient()
-    void supabase.from('page_views').insert({ path }).then(({ error }) => {
-      recording.delete(path)
-      if (error) return
-      sessionStorage.setItem(storageKey, String(Date.now()))
-    })
+    void supabase
+      .from('page_views')
+      .insert({ path })
+      .then((result: { error: { message: string } | null }) => {
+        recording.delete(path)
+        if (result.error) return
+        sessionStorage.setItem(storageKey, String(Date.now()))
+      })
   }, [pathname])
 
   return null

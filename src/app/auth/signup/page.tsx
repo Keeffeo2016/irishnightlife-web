@@ -82,7 +82,7 @@ function SignupForm() {
             <MapPin className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-2xl text-foreground">Create your account</CardTitle>
-          <p className="text-muted-foreground">Join Ireland's nightlife discovery platform</p>
+          <p className="text-muted-foreground">Join Ireland&apos;s nightlife discovery platform</p>
         </CardHeader>
         <CardContent>
           {/* Success Message */}
@@ -110,7 +110,7 @@ function SignupForm() {
                   : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >
-              🎉 I'm going out
+              🎉 I&apos;m going out
             </button>
             <button
               type="button"
@@ -134,10 +134,14 @@ function SignupForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-foreground/90 mb-1 block font-medium">Full Name</label>
+              <label htmlFor="signup-full-name" className="text-sm text-foreground/90 mb-1 block font-medium">
+                Full Name
+              </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="signup-full-name"
+                  autoComplete="name"
                   placeholder="John Murphy"
                   className="pl-10 bg-card border-border text-foreground"
                   value={formData.fullName}
@@ -147,11 +151,15 @@ function SignupForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-foreground/90 mb-1 block font-medium">Email</label>
+              <label htmlFor="signup-email" className="text-sm text-foreground/90 mb-1 block font-medium">
+                Email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="signup-email"
                   type="email"
+                  autoComplete="email"
                   placeholder="you@example.com"
                   className="pl-10 bg-card border-border text-foreground"
                   value={formData.email}
@@ -161,11 +169,15 @@ function SignupForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-foreground/90 mb-1 block font-medium">Password</label>
+              <label htmlFor="signup-password" className="text-sm text-foreground/90 mb-1 block font-medium">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="signup-password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   placeholder="Min 8 characters"
                   className="pl-10 pr-10 bg-card border-border text-foreground"
                   value={formData.password}
@@ -175,10 +187,12 @@ function SignupForm() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                  className="absolute right-1.5 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>
@@ -189,8 +203,11 @@ function SignupForm() {
                   Your venue stays hidden until a superadmin approves it.
                 </p>
                 <div>
-                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Venue Name</label>
+                  <label htmlFor="signup-venue-name" className="text-sm text-foreground/90 mb-1 block font-medium">
+                    Venue Name
+                  </label>
                   <Input
+                    id="signup-venue-name"
                     placeholder="The Bleeding Heart"
                     className="bg-card border-border text-foreground"
                     value={formData.venueName}
@@ -199,8 +216,12 @@ function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Address</label>
+                  <label htmlFor="signup-address" className="text-sm text-foreground/90 mb-1 block font-medium">
+                    Address
+                  </label>
                   <Input
+                    id="signup-address"
+                    autoComplete="street-address"
                     placeholder="12 Oliver Plunkett Street"
                     className="bg-card border-border text-foreground"
                     value={formData.address}
@@ -209,8 +230,12 @@ function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Eircode</label>
+                  <label htmlFor="signup-eircode" className="text-sm text-foreground/90 mb-1 block font-medium">
+                    Eircode
+                  </label>
                   <Input
+                    id="signup-eircode"
+                    autoComplete="postal-code"
                     placeholder="T12 W8RP"
                     className="bg-card border-border text-foreground uppercase"
                     value={formData.eircode}
@@ -221,8 +246,12 @@ function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-foreground/90 mb-1 block font-medium">City</label>
+                  <label htmlFor="signup-city" className="text-sm text-foreground/90 mb-1 block font-medium">
+                    City
+                  </label>
                   <Input
+                    id="signup-city"
+                    autoComplete="address-level2"
                     placeholder="Cork"
                     className="bg-card border-border text-foreground"
                     value={formData.city}
@@ -231,8 +260,12 @@ function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-foreground/90 mb-1 block font-medium">County</label>
+                  <label htmlFor="signup-county" className="text-sm text-foreground/90 mb-1 block font-medium">
+                    County
+                  </label>
                   <Input
+                    id="signup-county"
+                    autoComplete="address-level1"
                     placeholder="Cork"
                     className="bg-card border-border text-foreground"
                     value={formData.county}

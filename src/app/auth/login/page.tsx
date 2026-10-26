@@ -83,11 +83,15 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-foreground/90 mb-1 block font-medium">Email</label>
+              <label htmlFor="login-email" className="text-sm text-foreground/90 mb-1 block font-medium">
+                Email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="login-email"
                   type="email"
+                  autoComplete="email"
                   placeholder="you@example.com"
                   className="pl-10 bg-card border-border text-foreground"
                   value={email}
@@ -97,11 +101,15 @@ function LoginForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-foreground/90 mb-1 block font-medium">Password</label>
+              <label htmlFor="login-password" className="text-sm text-foreground/90 mb-1 block font-medium">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   className="pl-10 pr-10 bg-card border-border text-foreground"
                   value={password}
@@ -110,10 +118,12 @@ function LoginForm() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                  className="absolute right-1.5 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>
@@ -122,9 +132,9 @@ function LoginForm() {
                 <input type="checkbox" className="rounded border-border" />
                 Remember me
               </label>
-              <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline font-medium">
-                Forgot password?
-              </Link>
+              <span className="text-sm text-muted-foreground/80">
+                Password reset is not available yet
+              </span>
             </div>
             <Button 
               type="submit"
@@ -145,7 +155,7 @@ function LoginForm() {
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" className="text-primary hover:underline font-medium">
               Sign up
             </Link>

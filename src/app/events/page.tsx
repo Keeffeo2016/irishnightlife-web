@@ -38,7 +38,6 @@ import {
   EventsSkeletonGrid,
 } from '@/components/events/EventsEmptyState'
 
-const supabase = createClient()
 const QUERY_CAP = 50
 
 interface RawEventRow {
@@ -211,6 +210,7 @@ function EventsBrowser() {
 
     async function fetchEvents() {
       setLoading(true)
+      const supabase = createClient()
 
       const { startIso, endIso } = resolveDublinDateRangeUtc(filters.date)
 
@@ -568,9 +568,9 @@ function EventsBrowser() {
                         type="button"
                         onClick={() => handleClearSingle(chip.key)}
                         aria-label={`Remove ${chip.label} filter`}
-                        className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-mint/25"
+                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-mint/25"
                       >
-                        <X className="h-3 w-3" aria-hidden="true" />
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
                     </span>
                   ))}

@@ -1,9 +1,16 @@
+import type { Metadata } from 'next'
+import { connection } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { PageHero } from '@/components/layout/PageHero'
+import { viewsSinceIso } from '@/lib/seo'
 import { AdminBoard, type BoardEvent, type BoardUser, type BoardVenue, type BoardView } from './AdminBoard'
 
 export const instant = false
+
+export const metadata: Metadata = {
+  robots: { index: false },
+}
 
 type VenueOwner = {
   full_name: string | null
@@ -39,6 +46,9 @@ function one<T>(value: T | T[] | null | undefined): T | null {
 }
 
 export default async function AdminDashboard() {
+  // Opt into request-time rendering so Date.now() is allowed after I/O.
+  await connection()
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -56,7 +66,9 @@ export default async function AdminDashboard() {
     redirect('/')
   }
 
-  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+  // Server Component after await connection(); purity lint still flags Date.now statically.
+  // eslint-disable-next-line react-hooks/purity -- request-time window bound for page_views query
+  const since = viewsSinceIso(Date.now())
 
   const [usersResult, venuesResult, eventsResult, viewsResult] = await Promise.all([
     supabase

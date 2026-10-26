@@ -1,17 +1,29 @@
+import { type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { pathAfterSignIn, safeNextPath } from '@/lib/auth/redirect'
+import { createAuthUnavailableResponse } from '@/lib/auth/middleware-security'
+import { isSupabaseConfigured, requiresAuth } from '@/lib/auth/middleware-security-pure'
 
 export async function updateSession(request: NextRequest) {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return NextResponse.next({ request })
+  // Fail closed: if Supabase is not configured, reject requests to protected routes
+  if (!isSupabaseConfigured()) {
+    const path = request.nextUrl.pathname
+    
+    // Public routes can proceed without auth
+    if (!requiresAuth(path)) {
+      return NextResponse.next({ request })
+    }
+    
+    // Protected routes fail closed
+    return createAuthUnavailableResponse(request, { failOpenInDev: true })
   }
 
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {

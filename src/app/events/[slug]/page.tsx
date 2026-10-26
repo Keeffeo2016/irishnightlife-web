@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Calendar, Clock, ExternalLink, MapPin } from 'lucide-react'
@@ -13,6 +14,7 @@ import { ShareEventButtons } from '@/components/ShareEventButtons'
 import { EventCard, eventTypeLabel, formatEventPrice, formatEventTime, type EventCardEvent } from '@/components/EventCard'
 import { EventLocationMap } from '@/components/events/EventLocationMap'
 import { buildEventJsonLd } from '@/lib/event-jsonld'
+import { serializeJsonLd } from '@/lib/safe-json-ld'
 import { directionsHref, safeExternalUrl } from '@/lib/safe-external-url'
 import { venueTypeLabel } from '@/lib/venue-profile'
 import { cn } from 'cn'
@@ -308,7 +310,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   return (
     <div className={cn('bg-background', ticketUrl && 'pb-28 md:pb-0')}>
       {jsonLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       ) : null}
       <BackToPlanner href={planHref} />
 
@@ -316,10 +318,13 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
           <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-night via-night-soft to-forest sm:aspect-[21/9]">
             {image ? (
-              <img
+              <Image
                 src={image}
                 alt={event.title}
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
               />
             ) : (
               <div className="absolute inset-0 flex items-end p-6">
@@ -390,11 +395,15 @@ export default async function EventPage({ params, searchParams }: EventPageProps
           <section aria-labelledby="venue-heading" className="rounded-2xl border border-border bg-card p-6 sm:p-8">
             <h2 id="venue-heading" className="text-2xl font-bold text-foreground">Venue</h2>
             {pickImage(null, venue.images) ? (
-              <img
-                src={pickImage(null, venue.images) ?? ''}
-                alt={`${venue.name} photograph`}
-                className="mt-4 aspect-video w-full rounded-xl object-cover"
-              />
+              <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-xl">
+                <Image
+                  src={pickImage(null, venue.images) ?? ''}
+                  alt={`${venue.name} photograph`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  className="object-cover"
+                />
+              </div>
             ) : null}
             <h3 className="mt-4 text-xl font-semibold text-foreground">{venue.name}</h3>
             {place ? <p className="mt-1 text-muted-foreground">{place}</p> : null}

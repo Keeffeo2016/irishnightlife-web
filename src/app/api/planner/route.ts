@@ -89,13 +89,32 @@ interface PlannerContext {
   tomorrow: string
 }
 
+interface PlannerVenue {
+  venue_type?: string | null
+  atmosphere?: string[] | null
+  capacity?: number | null
+  accepts_hen_stag?: boolean | null
+}
+
+interface PlannerEvent {
+  id: string
+  venue_id: string
+  music_genre: string | null
+  is_free: boolean
+  price_min: number | null
+  start_time: string
+  end_time: string
+  is_featured: boolean | null
+  venues: PlannerVenue
+}
+
 interface ScoredEvent {
-  event: any
+  event: PlannerEvent
   score: number
   reasons: string[]
 }
 
-function scoreEvent(event: any, context: PlannerContext): { score: number; reasons: string[] } {
+function scoreEvent(event: PlannerEvent, context: PlannerContext): { score: number; reasons: string[] } {
   let score = 0
   const reasons: string[] = []
 
@@ -103,10 +122,10 @@ function scoreEvent(event: any, context: PlannerContext): { score: number; reaso
   const vibeAtmospheres = VIBE_TO_ATMOSPHERE[context.vibe] || []
   const vibeGenres = VIBE_TO_GENRE[context.vibe] || []
   
-  const atmosphereMatch = event.venues.atmosphere?.some((a: string) => 
+  const atmosphereMatch = event.venues.atmosphere?.some((a) => 
     vibeAtmospheres.includes(a)
   )
-  const genreMatch = vibeGenres.includes(event.music_genre)
+  const genreMatch = event.music_genre ? vibeGenres.includes(event.music_genre) : false
 
   if (atmosphereMatch) {
     score += 40
@@ -125,7 +144,7 @@ function scoreEvent(event: any, context: PlannerContext): { score: number; reaso
       score += 15
       reasons.push(`Great spot for a ${occasion.label}`)
     }
-    if (venue.atmosphere?.some((a: string) => occasion.atmospheres.includes(a))) {
+    if (venue.atmosphere?.some((a) => occasion.atmospheres.includes(a))) {
       score += 15
     }
     if (occasion.minCapacity && venue.capacity && venue.capacity >= occasion.minCapacity) {
@@ -180,7 +199,7 @@ function scoreEvent(event: any, context: PlannerContext): { score: number; reaso
   return { score, reasons }
 }
 
-function generateNarrative(context: PlannerContext, events: any[]): string {
+function generateNarrative(context: PlannerContext, events: PlannerEvent[]): string {
   const vibeDescriptions: Record<string, string> = {
     chill: 'a relaxed evening',
     wild: 'an unforgettable night out',
@@ -248,9 +267,12 @@ export async function POST(request: NextRequest) {
     }
 
     const occasion = context.occasion ? OCCASION_PROFILES[context.occasion] : undefined
+    const plannerEvents = (events as PlannerEvent[]).filter(
+      (event): event is PlannerEvent => Boolean(event?.venues)
+    )
     const eligibleEvents = occasion?.henOrStag
-      ? events.filter(event => event.venues?.accepts_hen_stag !== false)
-      : events
+      ? plannerEvents.filter((event) => event.venues?.accepts_hen_stag !== false)
+      : plannerEvents
 
     if (eligibleEvents.length === 0) {
       return NextResponse.json(
@@ -260,7 +282,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Score all events
-    const scoredEvents: ScoredEvent[] = eligibleEvents.map(event => {
+    const scoredEvents: ScoredEvent[] = eligibleEvents.map((event) => {
       const { score, reasons } = scoreEvent(event, context)
       return { event, score, reasons }
     })

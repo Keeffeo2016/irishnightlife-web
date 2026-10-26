@@ -17,8 +17,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-const supabase = createClient()
-
 const createCustomIcon = (color: string) =>
   new Icon({
     iconUrl: `data:image/svg+xml;base64,${btoa(`
@@ -256,6 +254,7 @@ export default function EventsMapInner({
 
     async function fetchVenuesWithEvents() {
       setInternalLoading(true)
+      const supabase = createClient()
 
       const now = new Date()
       const fortyEightHoursLater = new Date(now.getTime() + 48 * 60 * 60 * 1000)

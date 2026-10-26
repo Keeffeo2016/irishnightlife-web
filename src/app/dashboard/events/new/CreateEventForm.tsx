@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -326,9 +327,12 @@ export function CreateEventForm({
             <div className="flex gap-2.5 overflow-x-auto pb-1">
               {photos.map((url, idx) => (
                 <div key={url} className="relative shrink-0">
-                  <img
+                  {/* Venue photos are Supabase public URLs (not blob: previews). */}
+                  <Image
                     src={url}
                     alt={`${venue.name} photo ${idx + 1}`}
+                    width={112}
+                    height={80}
                     className="h-20 w-28 rounded-lg border border-border object-cover"
                   />
                   {idx === 0 ? (

@@ -288,33 +288,40 @@ function DonutCard({
 }) {
   const radius = 36
   const circumference = 2 * Math.PI * radius
-  let offset = 0
-  const slices = total === 0 ? [] : segments.filter((segment) => segment.value > 0)
+  const slices =
+    total === 0
+      ? []
+      : segments
+          .filter((segment) => segment.value > 0)
+          .reduce<{ label: string; value: number; color: string; length: number; dashOffset: number }[]>(
+            (acc, segment) => {
+              const length = (segment.value / total) * circumference
+              const dashOffset = acc.reduce((sum, item) => sum + item.length, 0)
+              acc.push({ ...segment, length, dashOffset })
+              return acc
+            },
+            []
+          )
 
   return (
     <Card className="bg-card border-border">
       <CardContent className="p-5 flex items-center gap-4">
         <svg viewBox="0 0 100 100" className="size-24 shrink-0" role="img" aria-label={`${title}: ${total}`}>
           <circle cx="50" cy="50" r={radius} fill="none" stroke={CHART_COLORS.stone} strokeWidth="12" />
-          {slices.map((segment) => {
-            const length = (segment.value / total) * circumference
-            const circle = (
-              <circle
-                key={segment.label}
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="none"
-                stroke={segment.color}
-                strokeWidth="12"
-                strokeDasharray={`${length} ${circumference - length}`}
-                strokeDashoffset={-offset}
-                transform="rotate(-90 50 50)"
-              />
-            )
-            offset += length
-            return circle
-          })}
+          {slices.map((segment) => (
+            <circle
+              key={segment.label}
+              cx="50"
+              cy="50"
+              r={radius}
+              fill="none"
+              stroke={segment.color}
+              strokeWidth="12"
+              strokeDasharray={`${segment.length} ${circumference - segment.length}`}
+              strokeDashoffset={-segment.dashOffset}
+              transform="rotate(-90 50 50)"
+            />
+          ))}
           <text x="50" y="55" textAnchor="middle" fontSize="18" fontWeight="700" fill="#f4f7f6">
             {total}
           </text>

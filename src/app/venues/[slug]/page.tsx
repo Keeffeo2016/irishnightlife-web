@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
@@ -28,6 +29,7 @@ import { EventCard, type EventCardEvent } from '@/components/EventCard'
 import { EventLocationMap } from '@/components/events/EventLocationMap'
 import { directionsHref, safeExternalUrl } from '@/lib/safe-external-url'
 import { formatVenueAddress, venueTypeLabel } from '@/lib/venue-profile'
+import { serializeJsonLd } from '@/lib/safe-json-ld'
 import { buildVenueJsonLd } from '@/lib/venue-jsonld'
 
 export const instant = false
@@ -313,7 +315,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
       {jsonLd ? (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       ) : null}
       <BackToPlanner href={planHref} />
@@ -323,10 +325,13 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
         <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
           <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-night via-night-soft to-forest sm:aspect-[21/9]">
             {heroImage ? (
-              <img
+              <Image
                 src={heroImage}
                 alt={venue.name}
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
               />
             ) : (
               <div className="absolute inset-0 flex items-end p-6">
@@ -567,11 +572,12 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                     key={`${src}-${index}`}
                     className="relative aspect-video overflow-hidden rounded-xl border border-border bg-muted"
                   >
-                    <img
+                    <Image
                       src={src}
                       alt={`${venue.name} — photo ${index + 1}`}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-cover"
                     />
                   </div>
                 ))}

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -8,6 +9,10 @@ import { RemoveSaveButton } from './RemoveSaveButton'
 import { SignOutButton } from './SignOutButton'
 
 export const instant = false
+
+export const metadata: Metadata = {
+  robots: { index: false },
+}
 
 function first<T>(value: T | T[] | null | undefined): T | null {
   if (value == null) return null

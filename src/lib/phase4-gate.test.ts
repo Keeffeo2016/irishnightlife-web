@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { dublinWallTimeToUtc, formatDublinDateKey } from './dublin-time.ts'
 import { buildEventJsonLd } from './event-jsonld.ts'
+import { serializeJsonLd } from './safe-json-ld.ts'
 import { shouldCommitFavoritesSnapshot } from './favorites-snapshot.ts'
 import {
   activeMobileNavHref,
@@ -172,6 +173,16 @@ test('event structured data omits offers and ratings', () => {
   assert.equal('offers' in (json ?? {}), false)
   assert.equal('aggregateRating' in (json ?? {}), false)
   assert.equal(buildEventJsonLd({ name: '', startDate: '2026-10-26T20:00:00.000Z', url: 'https://example.com', venueName: 'Sin É' }), null)
+})
+
+test('JSON-LD script serialization escapes HTML-sensitive characters', () => {
+  const payload = { name: 'Night </script><script>alert(1)</script>', '@type': 'Event' }
+  const html = serializeJsonLd(payload)
+  assert.equal(html.includes('</script>'), false)
+  assert.equal(html.includes('<'), false)
+  assert.equal(html.includes('>'), false)
+  assert.ok(html.includes('\\u003c'))
+  assert.deepEqual(JSON.parse(html), payload)
 })
 
 test('venue structured data maps venue_type and never fabricates ratings, reviews, or opening hours', () => {

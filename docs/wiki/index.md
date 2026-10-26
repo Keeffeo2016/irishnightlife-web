@@ -23,6 +23,7 @@ Tribal knowledge for the chief-of-staff session coordinating the UI redesign. Da
 - [phase-8-scope.md](./phase-8-scope.md) — Phase 8 venue owner dashboard audit & scope (approved 2026-10-26).
 - [phase-8-implementation.md](./phase-8-implementation.md) — Phase 8 venue owner dashboard implementation (2026-10-26).
 - [wiki-location.md](./wiki-location.md) — Where this wiki lives.
+- Phase 9 production readiness wiki: [`../phase9-wiki/`](../phase9-wiki/index.md).
 
 ## Subsystems
 

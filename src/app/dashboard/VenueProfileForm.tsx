@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -410,10 +411,13 @@ export function VenueProfileForm({
                 key={url}
                 className="group relative aspect-video overflow-hidden rounded-xl border border-border bg-background"
               >
-                <img
+                {/* Supabase public URLs only (uploaded then listed). Blob object-URL previews are not used here. */}
+                <Image
                   src={url}
                   alt={`${venue.name} photo ${index + 1}`}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                  className="object-cover"
                 />
                 {index === 0 ? (
                   <span className="absolute bottom-2 left-2 rounded-md border border-primary/40 bg-night/90 px-2.5 py-1 text-xs font-semibold text-mint">
