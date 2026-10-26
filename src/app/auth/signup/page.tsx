@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { AuthDivider, SocialAuthButtons } from '@/components/auth/SocialAuthButtons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -123,6 +124,13 @@ function SignupForm() {
             </button>
           </div>
 
+          {accountType === 'consumer' && (
+            <>
+              <SocialAuthButtons intent="signup" nextPath="/" />
+              <AuthDivider label="or use email" />
+            </>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-sm text-gray-700 mb-1 block font-medium">Full Name</label>
@@ -236,6 +244,16 @@ function SignupForm() {
               )}
             </Button>
           </form>
+
+          {accountType === 'venue' && (
+            <>
+              <AuthDivider label="or continue with" />
+              <SocialAuthButtons intent="signup" nextPath="/auth/complete-venue" />
+              <p className="mt-3 text-center text-xs text-gray-500">
+                You will add the venue name and address on the next screen.
+              </p>
+            </>
+          )}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}

@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
+import { syncLeafletView } from '@/lib/leaflet-map'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -24,12 +25,22 @@ const createCustomIcon = (color: string) => {
 
 const venueIcon = createCustomIcon('#10b981')
 
-function MapViewport({ center }: { center: [number, number] }) {
+function MapViewport({
+  center,
+  onUnavailable,
+}: {
+  center: [number, number]
+  onUnavailable: () => void
+}) {
   const map = useMap()
+  const reported = useRef(false)
 
   useEffect(() => {
-    map.setView(center, 13)
-  }, [map, center])
+    if (syncLeafletView(map, center, 13)) return
+    if (reported.current) return
+    reported.current = true
+    onUnavailable()
+  }, [map, center, onUnavailable])
 
   return null
 }
@@ -50,6 +61,10 @@ interface PlanMapProps {
 
 export default function PlanMapInner({ venues }: PlanMapProps) {
   const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
+  const [mapEpoch, setMapEpoch] = useState(0)
+  const rebuildMap = useCallback(() => {
+    setMapEpoch((epoch) => epoch + 1)
+  }, [])
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -92,12 +107,13 @@ export default function PlanMapInner({ venues }: PlanMapProps) {
       {/* Map Container */}
       <div className="relative" style={{ height: '400px' }}>
         <MapContainer
-          center={[51.8985, -8.4736]}
+          key={mapEpoch}
+          center={mapCenter}
           zoom={13}
           scrollWheelZoom={true}
           className="h-full w-full"
         >
-          <MapViewport center={mapCenter} />
+          <MapViewport center={mapCenter} onUnavailable={rebuildMap} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

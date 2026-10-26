@@ -75,7 +75,10 @@ export default async function VenueDashboard() {
             <CardContent>
               {venueList.length === 0 ? (
                 <p className="text-gray-600">
-                  No venue is linked to this account yet. Register one from the signup form.
+                  No venue is linked to this account yet.{' '}
+                  <Link href="/auth/complete-venue" className="text-emerald-700 hover:underline">
+                    Add your venue
+                  </Link>
                 </p>
               ) : (
                 <ul className="space-y-3">

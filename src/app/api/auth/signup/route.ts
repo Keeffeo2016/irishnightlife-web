@@ -1,16 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { slugify } from '@/lib/slug'
 import { NextRequest, NextResponse } from 'next/server'
-
-function slugify(name: string) {
-  const base = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-  const suffix = Math.random().toString(36).slice(2, 6)
-  return `${base || 'venue'}-${suffix}`
-}
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
+import { syncLeafletView } from '@/lib/leaflet-map'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { MapPin, Clock, Euro } from 'lucide-react'
@@ -60,12 +61,24 @@ const COUNTY_CENTERS: Record<string, [number, number]> = {
   'All Ireland': [53.4125, -7.9833],
 }
 
-function MapViewport({ center, zoom }: { center: [number, number]; zoom: number }) {
+function MapViewport({
+  center,
+  zoom,
+  onUnavailable,
+}: {
+  center: [number, number]
+  zoom: number
+  onUnavailable: () => void
+}) {
   const map = useMap()
+  const reported = useRef(false)
 
   useEffect(() => {
-    map.setView(center, zoom)
-  }, [map, center, zoom])
+    if (syncLeafletView(map, center, zoom)) return
+    if (reported.current) return
+    reported.current = true
+    onUnavailable()
+  }, [map, center, zoom, onUnavailable])
 
   return null
 }
@@ -80,6 +93,10 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
   const [mounted, setMounted] = useState(false)
   const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
   const [mapZoom, setMapZoom] = useState(13)
+  const [mapEpoch, setMapEpoch] = useState(0)
+  const rebuildMap = useCallback(() => {
+    setMapEpoch((epoch) => epoch + 1)
+  }, [])
 
   // Ensure component is mounted before rendering map
   useEffect(() => {
@@ -191,12 +208,13 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
 
       <div className="relative" style={{ height: '500px' }}>
         <MapContainer
-          center={COUNTY_CENTERS.Cork}
-          zoom={12}
+          key={mapEpoch}
+          center={mapCenter}
+          zoom={mapZoom}
           scrollWheelZoom={true}
           className="h-full w-full"
         >
-          <MapViewport center={mapCenter} zoom={mapZoom} />
+          <MapViewport center={mapCenter} zoom={mapZoom} onUnavailable={rebuildMap} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

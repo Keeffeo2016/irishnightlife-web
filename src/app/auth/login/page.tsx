@@ -1,20 +1,32 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { AuthDivider, SocialAuthButtons } from '@/components/auth/SocialAuthButtons'
+import { safeNextPath } from '@/lib/auth/redirect'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get('next'))
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(searchParams.get('error'))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,8 +50,7 @@ export default function LoginPage() {
         throw new Error(message)
       }
 
-      const next = new URLSearchParams(window.location.search).get('next')
-      router.push(next && next.startsWith('/') ? next : '/')
+      router.push(nextPath)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -65,6 +76,9 @@ export default function LoginPage() {
               <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
+
+          <SocialAuthButtons intent="signin" nextPath={nextPath} />
+          <AuthDivider label="or use email" />
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
