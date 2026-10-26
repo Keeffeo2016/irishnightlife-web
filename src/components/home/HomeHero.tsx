@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { FormEvent, useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MapPin, Search } from 'lucide-react'
@@ -69,9 +70,16 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-mint">
-            IrishNightlife
-          </p>
+          <div className="mb-3 flex justify-center">
+            <Image
+              src="/brand/wordmark.png"
+              alt="IrishNightlife"
+              width={600}
+              height={160}
+              priority
+              className="h-12 w-auto"
+            />
+          </div>
           <h1 className="mb-4 text-balance text-[clamp(2rem,6vw,3.75rem)] font-bold leading-[1.1] text-white">
             Find Your Next <HeroAccent>Night Out</HeroAccent>
           </h1>
