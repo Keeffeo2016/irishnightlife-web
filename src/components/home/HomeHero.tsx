@@ -1,9 +1,10 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { FormEvent, useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Search } from 'lucide-react'
+import { MapPin, Search, Sparkles } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { HeroAccent } from '@/components/layout/PageHero'
@@ -175,6 +176,16 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
             </div>
           </div>
         </form>
+
+        <div className="mt-6 text-center">
+          <Link
+            href="/planner"
+            className={cn(buttonVariants({ variant: 'brand', size: 'lg' }), 'inline-flex gap-2 px-8')}
+          >
+            <Sparkles className="size-4" aria-hidden="true" />
+            Plan My Night
+          </Link>
+        </div>
       </div>
     </section>
   )
