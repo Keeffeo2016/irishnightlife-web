@@ -13,6 +13,15 @@ Tribal knowledge for the chief-of-staff session coordinating the UI redesign. Da
 - [phase-2-implementation.md](./phase-2-implementation.md) — Phase 2 implementation outcomes (2026-10-26).
 - [phase-3-scope.md](./phase-3-scope.md) — Phase 3 events discovery & EventCard scope (approved 2026-10-26).
 - [phase-3-implementation.md](./phase-3-implementation.md) — Phase 3 implementation outcomes (2026-10-26).
+- [phase-4-implementation.md](./phase-4-implementation.md) — Phase 4 event detail outcomes and the favourites cache gate (2026-10-26).
+- [phase-5-scope.md](./phase-5-scope.md) — Phase 5 venue directory & venue profile scope (approved 2026-10-26).
+- [phase-5-implementation.md](./phase-5-implementation.md) — Phase 5 implementation outcomes (2026-10-26).
+- [phase-6-scope.md](./phase-6-scope.md) — Phase 6 Night Planner redesign scope (approved 2026-10-26).
+- [phase-6-implementation.md](./phase-6-implementation.md) — Phase 6 Night Planner implementation outcomes (2026-10-26).
+- [phase-7-scope.md](./phase-7-scope.md) — Phase 7 mobile bottom navigation scope (approved 2026-10-26).
+- [phase-7-implementation.md](./phase-7-implementation.md) — Phase 7 mobile bottom navigation implementation (2026-10-26).
+- [phase-8-scope.md](./phase-8-scope.md) — Phase 8 venue owner dashboard audit & scope (approved 2026-10-26).
+- [phase-8-implementation.md](./phase-8-implementation.md) — Phase 8 venue owner dashboard implementation (2026-10-26).
 - [wiki-location.md](./wiki-location.md) — Where this wiki lives.
 
 ## Subsystems

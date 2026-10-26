@@ -184,7 +184,7 @@ function shouldShowMusicGenre(eventType: string, musicGenre: string | null | und
   )
 }
 
-export function EventCard({ event }: { event: EventCardEvent }) {
+export function EventCard({ event, href }: { event: EventCardEvent; href?: string }) {
   const price = formatEventPrice(event)
   const imageUrl = resolveCardImage(event)
   const typeLabel = eventTypeLabel(event.event_type)
@@ -283,7 +283,7 @@ export function EventCard({ event }: { event: EventCardEvent }) {
         <div>
           <h3 className="mb-1.5 line-clamp-2 text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary">
             <Link
-              href={`/events/${event.slug}`}
+              href={href ?? `/events/${event.slug}`}
               className="outline-none after:absolute after:inset-0"
             >
               {event.title}

@@ -18,6 +18,22 @@ export interface PlanSummary {
   estimated_duration: string
 }
 
+export const PLANNER_FIELD_KEYS = ['who', 'occasion', 'vibe', 'budget', 'tomorrow'] as const
+export type PlannerFieldKey = (typeof PLANNER_FIELD_KEYS)[number]
+export type PlannerContextValues = Record<PlannerFieldKey, string>
+
+export const PLANNER_OPTION_IDS: Record<PlannerFieldKey, readonly string[]> = {
+  who: ['solo', 'date', 'friends', 'group', 'tourist'],
+  occasion: ['none', 'birthday', 'hen', 'stag', 'anniversary', 'leaving'],
+  vibe: ['chill', 'wild', 'cultural', 'romantic', 'surprise'],
+  budget: ['budget', 'moderate', 'splurge'],
+  tomorrow: ['nothing', 'early', 'hungover'],
+} as const
+
+export function isValidPlannerOption(field: PlannerFieldKey, value: string): boolean {
+  return PLANNER_OPTION_IDS[field].includes(value)
+}
+
 function venueKey(event: StopLike['event']): string {
   return event.venues?.id || event.id
 }
@@ -115,23 +131,77 @@ export function canShuffleStops<T extends StopLike>(catalog: T[], current: T[]):
   return catalog.some(stop => !currentIds.has(stop.event.id))
 }
 
-const PLAN_FIELDS = ['who', 'occasion', 'vibe', 'budget', 'tomorrow'] as const
-
 type SearchValue = string | string[] | undefined
 type SearchRecord = Record<string, SearchValue>
+type SearchGetter = Pick<URLSearchParams, 'get'>
+
+function isSearchGetter(source: SearchGetter | SearchRecord): source is SearchGetter {
+  return typeof (source as SearchGetter).get === 'function'
+}
 
 function searchValue(value: SearchValue): string {
   if (Array.isArray(value)) return value[0] ?? ''
   return value ?? ''
 }
 
-function planFields(source: URLSearchParams | SearchRecord): URLSearchParams {
+function rawFieldValue(source: SearchGetter | SearchRecord, field: PlannerFieldKey): string {
+  if (isSearchGetter(source)) {
+    return source.get(field) ?? ''
+  }
+  return searchValue(source[field])
+}
+
+function planFields(source: SearchGetter | SearchRecord): URLSearchParams {
   const params = new URLSearchParams()
-  for (const field of PLAN_FIELDS) {
-    const value = source instanceof URLSearchParams ? source.get(field) ?? '' : searchValue(source[field])
+  for (const field of PLANNER_FIELD_KEYS) {
+    const value = rawFieldValue(source, field)
     if (value) params.set(field, value)
   }
   return params
+}
+
+export function parsePlannerSearchParams(
+  source: SearchGetter | SearchRecord
+): PlannerContextValues {
+  const parsed: PlannerContextValues = {
+    who: '',
+    occasion: '',
+    vibe: '',
+    budget: '',
+    tomorrow: '',
+  }
+
+  for (const field of PLANNER_FIELD_KEYS) {
+    const raw = rawFieldValue(source, field).trim()
+    parsed[field] = isValidPlannerOption(field, raw) ? raw : ''
+  }
+
+  return parsed
+}
+
+function buildPlannerSearchParams(values: Partial<PlannerContextValues>): URLSearchParams {
+  const params = new URLSearchParams()
+  for (const field of PLANNER_FIELD_KEYS) {
+    const raw = values[field]?.trim() ?? ''
+    if (raw && isValidPlannerOption(field, raw)) {
+      params.set(field, raw)
+    }
+  }
+  return params
+}
+
+export function buildPlannerResultHref(values: Partial<PlannerContextValues>): string {
+  const query = buildPlannerSearchParams(values).toString()
+  return query ? `/planner/plan?${query}` : '/planner/plan'
+}
+
+export function buildPlannerWizardHref(values: Partial<PlannerContextValues>): string {
+  const query = buildPlannerSearchParams(values).toString()
+  return query ? `/planner?${query}` : '/planner'
+}
+
+export function isPlannerComplete(values: PlannerContextValues): boolean {
+  return PLANNER_FIELD_KEYS.every(field => isValidPlannerOption(field, values[field]))
 }
 
 export function detailHrefFromPlan(path: string, planQuery: string): string {

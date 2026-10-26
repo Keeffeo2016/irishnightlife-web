@@ -1,172 +1,322 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
+import { ExternalLink, MapPin } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { syncLeafletView } from '@/lib/leaflet-map'
 import { detailHrefFromPlan } from '@/lib/planner'
-import { MapPin } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 
-// Custom marker icon
-const createCustomIcon = (color: string) => {
+export interface PlanMapVenue {
+  id: string
+  name: string
+  slug: string
+  address?: string | null
+  city?: string | null
+  county?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  stopNumber?: number
+  eventTitle?: string
+  eventSlug?: string
+}
+
+export interface PlanMapProps {
+  venues: PlanMapVenue[]
+  detailQuery?: string
+}
+
+interface MappedPlanVenue extends PlanMapVenue {
+  latitude: number
+  longitude: number
+  resolvedStopNumber: number
+}
+
+const DEFAULT_CORK_CENTER: [number, number] = [51.8985, -8.4736]
+
+function hasValidCoordinates(venue: PlanMapVenue, stopNumber: number): MappedPlanVenue | null {
+  const { latitude, longitude } = venue
+  if (
+    typeof latitude === 'number' &&
+    Number.isFinite(latitude) &&
+    typeof longitude === 'number' &&
+    Number.isFinite(longitude)
+  ) {
+    return {
+      ...venue,
+      latitude,
+      longitude,
+      resolvedStopNumber: stopNumber,
+    }
+  }
+  return null
+}
+
+function createNumberedStopIcon(stopNumber: number): Icon {
+  const safeNum = Math.max(1, Math.min(99, Math.trunc(stopNumber)))
+  const svg = `<svg width="36" height="46" viewBox="0 0 36 46" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 1C8.61 1 1 8.61 1 18c0 12.2 17 26.8 17 26.8S35 30.2 35 18C35 8.61 27.39 1 18 1z" fill="#64f4c2" stroke="#0b1114" stroke-width="2"/>
+    <circle cx="18" cy="18" r="11" fill="#0b1114"/>
+    <text x="18" y="22" text-anchor="middle" fill="#64f4c2" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800">${safeNum}</text>
+  </svg>`
+
   return new Icon({
-    iconUrl: `data:image/svg+xml;base64,${btoa(`
-      <svg width="32" height="42" viewBox="0 0 32 42" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 26 16 26s16-14 16-26C32 7.16 24.84 0 16 0z" fill="${color}"/>
-        <circle cx="16" cy="16" r="8" fill="white"/>
-      </svg>
-    `)}`,
-    iconSize: [32, 42],
-    iconAnchor: [16, 42],
+    iconUrl: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    iconSize: [36, 46],
+    iconAnchor: [18, 46],
     popupAnchor: [0, -42],
   })
 }
 
-const venueIcon = createCustomIcon('#10b981')
+function formatStopLocation(venue: PlanMapVenue): string {
+  const address = venue.address?.trim()
+  const city = venue.city?.trim()
+  const county = venue.county?.trim()
+
+  const parts: string[] = []
+  if (address) parts.push(address)
+  if (city) parts.push(city)
+  if (county && (!city || city.toLowerCase() !== county.toLowerCase())) {
+    parts.push(`Co. ${county}`)
+  }
+
+  return parts.join(', ') || 'Ireland'
+}
+
+function computeRouteViewport(venues: MappedPlanVenue[]): {
+  center: [number, number]
+  zoom: number
+} {
+  if (venues.length === 0) {
+    return { center: DEFAULT_CORK_CENTER, zoom: 13 }
+  }
+
+  if (venues.length === 1) {
+    return {
+      center: [venues[0].latitude, venues[0].longitude],
+      zoom: 14,
+    }
+  }
+
+  let minLat = venues[0].latitude
+  let maxLat = venues[0].latitude
+  let minLng = venues[0].longitude
+  let maxLng = venues[0].longitude
+
+  for (const venue of venues) {
+    if (venue.latitude < minLat) minLat = venue.latitude
+    if (venue.latitude > maxLat) maxLat = venue.latitude
+    if (venue.longitude < minLng) minLng = venue.longitude
+    if (venue.longitude > maxLng) maxLng = venue.longitude
+  }
+
+  const centerLat = (minLat + maxLat) / 2
+  const centerLng = (minLng + maxLng) / 2
+  const span = Math.max(maxLat - minLat, maxLng - minLng)
+
+  let zoom = 13
+  if (span > 1.5) zoom = 7
+  else if (span > 0.5) zoom = 10
+  else if (span > 0.12) zoom = 12
+
+  return {
+    center: [centerLat, centerLng],
+    zoom,
+  }
+}
 
 function MapViewport({
   center,
+  zoom,
   onUnavailable,
 }: {
   center: [number, number]
+  zoom: number
   onUnavailable: () => void
 }) {
   const map = useMap()
   const reported = useRef(false)
 
   useEffect(() => {
-    if (syncLeafletView(map, center, 13)) return
+    if (syncLeafletView(map, center, zoom)) return
     if (reported.current) return
     reported.current = true
     onUnavailable()
-  }, [map, center, onUnavailable])
+  }, [map, center, zoom, onUnavailable])
 
   return null
 }
 
-interface Venue {
-  id: string
-  name: string
-  slug: string
-  address: string
-  city: string
-  latitude: number
-  longitude: number
-}
-
-interface PlanMapProps {
-  venues: Venue[]
-  detailQuery?: string
-}
-
 export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps) {
-  const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
   const [mapEpoch, setMapEpoch] = useState(0)
   const rebuildMap = useCallback(() => {
-    setMapEpoch((epoch) => epoch + 1)
+    setMapEpoch(epoch => epoch + 1)
   }, [])
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    // Calculate center based on venues
-    if (venues.length > 0) {
-      const avgLat = venues.reduce((sum, v) => sum + v.latitude, 0) / venues.length
-      const avgLng = venues.reduce((sum, v) => sum + v.longitude, 0) / venues.length
-      setMapCenter([avgLat, avgLng])
-    }
-  }, [venues])
+  const validVenues = useMemo(
+    () =>
+      venues.flatMap((venue, index) => {
+        const stopNum = venue.stopNumber ?? index + 1
+        const mapped = hasValidCoordinates(venue, stopNum)
+        return mapped ? [mapped] : []
+      }),
+    [venues]
+  )
+
+  const { center: mapCenter, zoom: mapZoom } = useMemo(
+    () => computeRouteViewport(validVenues),
+    [validVenues]
+  )
 
   if (venues.length === 0) {
     return null
   }
 
-  // Don't render map during SSR
-  if (!mounted) {
-    return (
-      <div className="bg-card rounded-2xl border-2 border-border p-8 text-center">
-        <div className="text-6xl mb-4">🗺️</div>
-        <h3 className="text-xl font-bold text-foreground mb-2">Loading map...</h3>
-        <p className="text-muted-foreground">Preparing your route</p>
-      </div>
-    )
-  }
+  const partialCoordinates = validVenues.length > 0 && validVenues.length < venues.length
 
   return (
-    <div className="bg-card rounded-2xl border-2 border-primary/40 overflow-hidden shadow-lg">
+    <section
+      aria-label="Planned route map"
+      className="overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
+    >
       {/* Map Header */}
-      <div className="bg-primary text-primary-foreground p-6">
-        <h3 className="text-2xl font-bold mb-2">
-          🗺️ Your Route Tonight
-        </h3>
-        <p className="text-emerald-50">
-          {venues.length} {venues.length === 1 ? 'venue' : 'venues'} in your plan
-        </p>
-      </div>
-
-      {/* Map Container */}
-      <div className="relative" style={{ height: '400px' }}>
-        <MapContainer
-          key={mapEpoch}
-          center={mapCenter}
-          zoom={13}
-          scrollWheelZoom={true}
-          className="h-full w-full"
-        >
-          <MapViewport center={mapCenter} onUnavailable={rebuildMap} />
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
-          {venues.map((venue, index) => (
-            <Marker
-              key={venue.id}
-              position={[venue.latitude, venue.longitude]}
-              icon={venueIcon}
-            >
-              <Popup>
-                <div className="p-2 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
-                      {index + 1}
-                    </div>
-                    <h4 className="font-bold text-foreground">{venue.name}</h4>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="h-3 w-3 text-primary" />
-                    <span>{venue.address}</span>
-                  </div>
-                  <Link href={detailHrefFromPlan(`/venues/${venue.slug}`, detailQuery)}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-primary text-primary hover:bg-primary/10"
-                    >
-                      View Venue
-                    </Button>
-                  </Link>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
-
-      {/* Map Legend */}
-      <div className="bg-background border-t border-border p-4">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-primary rounded-full"></div>
-            <span className="text-foreground/90">Venue in your plan</span>
-          </div>
-          <div className="text-muted-foreground">
-            Click pins to see venue details
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-gradient-to-r from-night via-night-soft to-forest px-5 py-4">
+        <div>
+          <h2 className="text-lg font-bold text-white">Your Route Tonight</h2>
+          <p className="text-sm text-muted-foreground">
+            {validVenues.length === 0
+              ? 'Map coordinates are not listed for these stops yet — see venue addresses below.'
+              : partialCoordinates
+                ? `Showing ${validVenues.length} of ${venues.length} stops with map coordinates`
+                : `${validVenues.length} ${validVenues.length === 1 ? 'stop' : 'stops'} plotted in itinerary order`}
+          </p>
         </div>
+        {validVenues.length > 0 ? (
+          <div className="inline-flex items-center gap-2 rounded-full border border-mint/25 bg-night/70 px-3 py-1 text-xs font-medium text-mint">
+            <span className="h-2 w-2 rounded-full bg-mint" aria-hidden="true" />
+            <span>Select a numbered pin for details</span>
+          </div>
+        ) : null}
       </div>
-    </div>
+
+      {/* Interactive Map when coordinates are present */}
+      {validVenues.length > 0 ? (
+        <div className="relative h-[380px] w-full sm:h-[420px]">
+          <MapContainer
+            key={mapEpoch}
+            center={mapCenter}
+            zoom={mapZoom}
+            scrollWheelZoom={true}
+            className="h-full w-full"
+          >
+            <MapViewport center={mapCenter} zoom={mapZoom} onUnavailable={rebuildMap} />
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {validVenues.map(venue => {
+              const venueHref = detailHrefFromPlan(`/venues/${venue.slug}`, detailQuery)
+              const eventHref = venue.eventSlug
+                ? detailHrefFromPlan(`/events/${venue.eventSlug}`, detailQuery)
+                : null
+
+              return (
+                <Marker
+                  key={`${venue.id}-${venue.resolvedStopNumber}`}
+                  position={[venue.latitude, venue.longitude]}
+                  icon={createNumberedStopIcon(venue.resolvedStopNumber)}
+                >
+                  <Popup>
+                    <div className="min-w-[220px] max-w-[260px] p-1">
+                      <div className="mb-1.5 flex items-center gap-2">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                          {venue.resolvedStopNumber}
+                        </span>
+                        <h3 className="text-sm font-bold text-foreground">{venue.name}</h3>
+                      </div>
+
+                      {venue.eventTitle ? (
+                        <p className="mb-1.5 text-xs font-semibold text-primary">
+                          {venue.eventTitle}
+                        </p>
+                      ) : null}
+
+                      <div className="mb-3 flex items-start gap-1.5 text-xs text-muted-foreground">
+                        <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{formatStopLocation(venue)}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {eventHref ? (
+                          <Link href={eventHref} className="flex-1">
+                            <Button variant="brand" size="sm" className="w-full text-xs">
+                              Event
+                            </Button>
+                          </Link>
+                        ) : null}
+                        <Link href={venueHref} className="flex-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full border-primary text-xs text-primary hover:bg-primary/10"
+                          >
+                            Venue
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              )
+            })}
+          </MapContainer>
+        </div>
+      ) : null}
+
+      {/* Accessible Text List of Route Stops */}
+      <div className="border-t border-border bg-background/60 p-4 sm:px-5">
+        <p className="mb-2.5 text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+          Route stops &amp; venue locations
+        </p>
+        <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {venues.map((venue, index) => {
+            const stopNumber = venue.stopNumber ?? index + 1
+            const locationText = formatStopLocation(venue)
+            const hasCoords = Boolean(hasValidCoordinates(venue, stopNumber))
+
+            return (
+              <li
+                key={`${venue.id}-${stopNumber}`}
+                className="flex items-start justify-between gap-3 rounded-xl border border-border/80 bg-card p-3 text-xs"
+              >
+                <div className="flex min-w-0 items-start gap-2.5">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint text-[11px] font-bold text-night">
+                    {stopNumber}
+                  </span>
+                  <div className="min-w-0">
+                    <Link
+                      href={detailHrefFromPlan(`/venues/${venue.slug}`, detailQuery)}
+                      className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary"
+                    >
+                      <span className="truncate">{venue.name}</span>
+                      <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    </Link>
+                    <p className="mt-0.5 truncate text-muted-foreground">{locationText}</p>
+                    {!hasCoords ? (
+                      <p className="mt-0.5 text-[11px] text-muted-foreground/80">
+                        Address listed (no map pin)
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </li>
+            )
+          })}
+        </ol>
+      </div>
+    </section>
   )
 }

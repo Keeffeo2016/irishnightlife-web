@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
+import { shouldCommitFavoritesSnapshot } from '@/lib/favorites-snapshot'
 import { createClient } from '@/lib/supabase/client'
 
 export interface FavoriteButtonProps {
@@ -30,6 +31,7 @@ type FavoritesSnapshot = {
 
 let cachedSnapshot: FavoritesSnapshot | null = null
 let inflightSnapshot: Promise<FavoritesSnapshot> | null = null
+let snapshotGeneration = 0
 let authListenerRegistered = false
 const subscribers = new Set<() => void>()
 
@@ -42,6 +44,7 @@ function ensureAuthListener() {
   authListenerRegistered = true
   const supabase = createClient()
   supabase.auth.onAuthStateChange(() => {
+    snapshotGeneration += 1
     cachedSnapshot = null
     inflightSnapshot = null
     notifySubscribers()
@@ -53,6 +56,7 @@ async function fetchFavoritesSnapshot(): Promise<FavoritesSnapshot> {
   if (cachedSnapshot) return cachedSnapshot
   if (inflightSnapshot) return inflightSnapshot
 
+  const startedGeneration = snapshotGeneration
   inflightSnapshot = (async () => {
     const supabase = createClient()
     const {
@@ -67,6 +71,10 @@ async function fetchFavoritesSnapshot(): Promise<FavoritesSnapshot> {
         userId: null,
         byEventId,
         byVenueId,
+      }
+      if (!shouldCommitFavoritesSnapshot(startedGeneration, snapshotGeneration)) {
+        inflightSnapshot = null
+        return cachedSnapshot ?? emptySnapshot
       }
       cachedSnapshot = emptySnapshot
       inflightSnapshot = null
@@ -91,6 +99,10 @@ async function fetchFavoritesSnapshot(): Promise<FavoritesSnapshot> {
       userId: user.id,
       byEventId,
       byVenueId,
+    }
+    if (!shouldCommitFavoritesSnapshot(startedGeneration, snapshotGeneration)) {
+      inflightSnapshot = null
+      return cachedSnapshot ?? resolved
     }
     cachedSnapshot = resolved
     inflightSnapshot = null
@@ -183,12 +195,13 @@ export function FavoriteButton({
         .eq('id', currentFavoriteId)
 
       if (!error) {
-        if (cachedSnapshot) {
+        if (cachedSnapshot?.userId === userId) {
           if (eventId) cachedSnapshot.byEventId.delete(eventId)
           if (venueId && !eventId) cachedSnapshot.byVenueId.delete(venueId)
+          notifySubscribers()
+        } else {
+          setFavoriteId(null)
         }
-        setFavoriteId(null)
-        notifySubscribers()
       }
     } else {
       const { data, error } = await supabase
@@ -202,20 +215,16 @@ export function FavoriteButton({
         .single()
 
       if (!error && data) {
-        if (!cachedSnapshot) {
-          cachedSnapshot = {
-            userId,
-            byEventId: new Map(),
-            byVenueId: new Map(),
+        if (cachedSnapshot?.userId === userId) {
+          if (eventId) {
+            cachedSnapshot.byEventId.set(eventId, data.id)
+          } else if (venueId) {
+            cachedSnapshot.byVenueId.set(venueId, data.id)
           }
+          notifySubscribers()
+        } else {
+          setFavoriteId(data.id)
         }
-        if (eventId) {
-          cachedSnapshot.byEventId.set(eventId, data.id)
-        } else if (venueId) {
-          cachedSnapshot.byVenueId.set(venueId, data.id)
-        }
-        setFavoriteId(data.id)
-        notifySubscribers()
       }
     }
 
