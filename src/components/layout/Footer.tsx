@@ -26,7 +26,7 @@ export function Footer() {
                 alt="IrishNightlife.ie — Discover what's happening tonight"
                 width={832}
                 height={220}
-                className="h-16 w-auto"
+                className="h-[77px] w-auto"
               />
             </Link>
             <p className="text-sm text-muted-foreground">

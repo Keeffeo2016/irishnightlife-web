@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const LINKS = [
+  { href: '/', label: 'Home' },
   { href: '/venues', label: 'Venues' },
   { href: '/events', label: 'Events' },
   { href: '/planner', label: 'Tonight Planner' },
@@ -79,7 +80,7 @@ export function Navbar() {
               width={832}
               height={220}
               priority
-              className="h-11 w-auto"
+              className="h-[53px] w-auto"
             />
           </Link>
 

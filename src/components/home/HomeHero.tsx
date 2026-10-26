@@ -77,7 +77,7 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
               width={600}
               height={160}
               priority
-              className="h-12 w-auto"
+              className="h-[58px] w-auto"
             />
           </div>
           <h1 className="mb-4 text-balance text-[clamp(2rem,6vw,3.75rem)] font-bold leading-[1.1] text-white">
