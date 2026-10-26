@@ -19,7 +19,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
-const fieldClass = 'w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900'
+const fieldClass = 'w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground'
 
 export function CreateEventForm({
   venues,
@@ -168,7 +168,7 @@ export function CreateEventForm({
     <form onSubmit={createEvent} className="space-y-8">
       {venues.length > 1 ? (
         <div>
-          <label htmlFor="event-venue" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="event-venue" className="mb-1 block text-sm font-medium text-foreground/90">
             Venue
           </label>
           <select
@@ -186,26 +186,26 @@ export function CreateEventForm({
         </div>
       ) : null}
 
-      <section className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-        <h2 className="text-lg font-semibold text-gray-900">From your venue</h2>
-        <p className="mt-1 text-sm text-gray-600">
+      <section className="rounded-xl border border-border bg-background p-5">
+        <h2 className="text-lg font-semibold text-foreground">From your venue</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Name, address, price range, and type come from the venue profile. About the venue is included on the event page.
         </p>
 
         <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Name</dt>
-            <dd className="mt-1 font-semibold text-gray-900">{venue.name}</dd>
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Name</dt>
+            <dd className="mt-1 font-semibold text-foreground">{venue.name}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Address</dt>
-            <dd className="mt-1 flex items-start gap-1 text-gray-900">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Address</dt>
+            <dd className="mt-1 flex items-start gap-1 text-foreground">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               {formatVenueAddress(venue)}
             </dd>
           </div>
           <div>
-            <label htmlFor="template-type" className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label htmlFor="template-type" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Type
             </label>
             <select
@@ -224,7 +224,7 @@ export function CreateEventForm({
             </select>
           </div>
           <div>
-            <label htmlFor="template-price" className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label htmlFor="template-price" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Price range
             </label>
             <select
@@ -245,7 +245,7 @@ export function CreateEventForm({
         </dl>
 
         <div className="mt-4">
-          <label htmlFor="template-about" className="mb-1 block text-sm font-medium text-gray-900">
+          <label htmlFor="template-about" className="mb-1 block text-sm font-medium text-foreground">
             About the venue
           </label>
           <Textarea
@@ -255,14 +255,14 @@ export function CreateEventForm({
             maxLength={2000}
             rows={5}
             placeholder="Tell people what this venue is like."
-            className="min-h-28 border-gray-300 bg-white text-gray-900"
+            className="min-h-28 border-border bg-card text-foreground"
             required
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Saved on {venue.name}
             {venueTypeLabel(venueType) ? ` · ${venueTypeLabel(venueType)}` : ''}
             {priceRange ? ` · ${priceRange}` : ''}.{' '}
-            <Link href="/dashboard/profile" className="text-emerald-700 hover:underline">
+            <Link href="/dashboard/profile" className="text-primary hover:underline">
               Edit the full profile
             </Link>
           </p>
@@ -275,9 +275,9 @@ export function CreateEventForm({
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-muted-foreground">
             No venue photos yet.{' '}
-            <Link href="/dashboard/profile" className="text-emerald-700 hover:underline">
+            <Link href="/dashboard/profile" className="text-primary hover:underline">
               Upload them on your profile
             </Link>
             .
@@ -286,9 +286,9 @@ export function CreateEventForm({
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">This event</h2>
+        <h2 className="text-lg font-semibold text-foreground">This event</h2>
         <div>
-          <label htmlFor="event-title" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="event-title" className="mb-1 block text-sm font-medium text-foreground/90">
             Title
           </label>
           <Input
@@ -296,13 +296,13 @@ export function CreateEventForm({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Friday trad session"
-            className="border-gray-300 bg-white text-gray-900"
+            className="border-border bg-card text-foreground"
             required
           />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="event-type" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="event-type" className="mb-1 block text-sm font-medium text-foreground/90">
               Event type
             </label>
             <select
@@ -319,7 +319,7 @@ export function CreateEventForm({
             </select>
           </div>
           <div>
-            <label htmlFor="event-genre" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="event-genre" className="mb-1 block text-sm font-medium text-foreground/90">
               Music genre
             </label>
             <Input
@@ -327,11 +327,11 @@ export function CreateEventForm({
               value={genre}
               onChange={(event) => setGenre(event.target.value)}
               placeholder="Trad, house, indie…"
-              className="border-gray-300 bg-white text-gray-900"
+              className="border-border bg-card text-foreground"
             />
           </div>
           <div>
-            <label htmlFor="event-start" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="event-start" className="mb-1 block text-sm font-medium text-foreground/90">
               Starts
             </label>
             <Input
@@ -339,12 +339,12 @@ export function CreateEventForm({
               type="datetime-local"
               value={startTime}
               onChange={(event) => setStartTime(event.target.value)}
-              className="border-gray-300 bg-white text-gray-900"
+              className="border-border bg-card text-foreground"
               required
             />
           </div>
           <div>
-            <label htmlFor="event-end" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="event-end" className="mb-1 block text-sm font-medium text-foreground/90">
               Ends
             </label>
             <Input
@@ -352,12 +352,12 @@ export function CreateEventForm({
               type="datetime-local"
               value={endTime}
               onChange={(event) => setEndTime(event.target.value)}
-              className="border-gray-300 bg-white text-gray-900"
+              className="border-border bg-card text-foreground"
             />
           </div>
         </div>
         <div>
-          <label htmlFor="event-description" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="event-description" className="mb-1 block text-sm font-medium text-foreground/90">
             What’s on
           </label>
           <Textarea
@@ -367,10 +367,10 @@ export function CreateEventForm({
             maxLength={2000}
             rows={4}
             placeholder="Line-up, door time, anything specific to this night."
-            className="min-h-24 border-gray-300 bg-white text-gray-900"
+            className="min-h-24 border-border bg-card text-foreground"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-sm text-foreground/90">
           <input
             type="checkbox"
             checked={isFree}
@@ -382,7 +382,7 @@ export function CreateEventForm({
         {isFree ? null : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="price-min" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="price-min" className="mb-1 block text-sm font-medium text-foreground/90">
                 Price from (€)
               </label>
               <Input
@@ -392,12 +392,12 @@ export function CreateEventForm({
                 step="0.01"
                 value={priceMin}
                 onChange={(event) => setPriceMin(event.target.value)}
-                className="border-gray-300 bg-white text-gray-900"
+                className="border-border bg-card text-foreground"
                 required
               />
             </div>
             <div>
-              <label htmlFor="price-max" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="price-max" className="mb-1 block text-sm font-medium text-foreground/90">
                 Price to (€)
               </label>
               <Input
@@ -407,13 +407,13 @@ export function CreateEventForm({
                 step="0.01"
                 value={priceMax}
                 onChange={(event) => setPriceMax(event.target.value)}
-                className="border-gray-300 bg-white text-gray-900"
+                className="border-border bg-card text-foreground"
               />
             </div>
           </div>
         )}
         <div>
-          <label htmlFor="ticket-url" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="ticket-url" className="mb-1 block text-sm font-medium text-foreground/90">
             Ticket link
           </label>
           <Input
@@ -422,10 +422,10 @@ export function CreateEventForm({
             value={ticketUrl}
             onChange={(event) => setTicketUrl(event.target.value)}
             placeholder="https://"
-            className="border-gray-300 bg-white text-gray-900"
+            className="border-border bg-card text-foreground"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-sm text-foreground/90">
           <input
             type="checkbox"
             checked={publish}
@@ -434,7 +434,7 @@ export function CreateEventForm({
           />
           Publish this event
         </label>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           A draft stays visible to you. It appears on the public site once the event is published and the venue is approved.
         </p>
       </section>

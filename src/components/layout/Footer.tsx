@@ -12,7 +12,7 @@ export function Footer() {
   }, [])
 
   return (
-    <footer className="bg-night text-white mt-auto border-t border-white/10">
+    <footer className="bg-night text-white mt-auto border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -25,35 +25,35 @@ export function Footer() {
                 className="h-16 w-auto"
               />
             </Link>
-            <p className="text-gray-300 text-sm">
+            <p className="text-muted-foreground text-sm">
               Ireland&apos;s nightlife discovery platform. Find the perfect night out.
             </p>
           </div>
           <div>
             <h3 className="font-semibold text-mint mb-3">Explore</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/events" className="text-gray-300 hover:text-mint">Events</Link></li>
-              <li><Link href="/venues" className="text-gray-300 hover:text-mint">Venues</Link></li>
-              <li><Link href="/planner" className="text-gray-300 hover:text-mint">Tonight Planner</Link></li>
+              <li><Link href="/events" className="text-muted-foreground hover:text-mint">Events</Link></li>
+              <li><Link href="/venues" className="text-muted-foreground hover:text-mint">Venues</Link></li>
+              <li><Link href="/planner" className="text-muted-foreground hover:text-mint">Tonight Planner</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold text-mint mb-3">For Venues</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/for-venues" className="text-gray-300 hover:text-mint">List Your Venue</Link></li>
-              <li><Link href="/auth/signup" className="text-gray-300 hover:text-mint">Create an account</Link></li>
-              <li><Link href="/dashboard" className="text-gray-300 hover:text-mint">Dashboard</Link></li>
+              <li><Link href="/for-venues" className="text-muted-foreground hover:text-mint">List Your Venue</Link></li>
+              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-mint">Create an account</Link></li>
+              <li><Link href="/dashboard" className="text-muted-foreground hover:text-mint">Dashboard</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold text-mint mb-3">Account</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/auth/login" className="text-gray-300 hover:text-mint">Sign in</Link></li>
-              <li><Link href="/auth/signup" className="text-gray-300 hover:text-mint">Get started</Link></li>
+              <li><Link href="/auth/login" className="text-muted-foreground hover:text-mint">Sign in</Link></li>
+              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-mint">Get started</Link></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/10 pt-6 text-center text-sm text-gray-400">
+        <div className="border-t border-border pt-6 text-center text-sm text-muted-foreground">
           © {year} IrishNightlife. All rights reserved.
         </div>
       </div>

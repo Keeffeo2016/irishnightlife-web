@@ -52,13 +52,13 @@ export function HenStagSelect({ venueId, value }: { venueId: string; value: bool
   }
 
   return (
-    <label className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+    <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
       Hen &amp; stag parties:
       <select
         value={choice}
         onChange={(e) => update(e.target.value as Choice)}
         disabled={saving}
-        className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900"
+        className="rounded-md border border-border bg-card px-2 py-1 text-sm text-foreground"
       >
         <option value="unset">Not set</option>
         <option value="yes">Welcome</option>

@@ -29,7 +29,7 @@ export function PageHero({
   return (
     <section
       className={cn(
-        'relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-night via-night-soft to-forest',
+        'relative overflow-hidden border-b border-border bg-gradient-to-br from-night via-night-soft to-forest',
         className
       )}
     >
@@ -70,7 +70,7 @@ export function PageHero({
             >
               {title}
             </h1>
-            {subtitle && <p className="text-lg text-gray-300 md:text-xl">{subtitle}</p>}
+            {subtitle && <p className="text-lg text-muted-foreground md:text-xl">{subtitle}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
         </div>

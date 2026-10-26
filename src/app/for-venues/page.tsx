@@ -6,7 +6,7 @@ import { PageHero, HeroAccent } from '@/components/layout/PageHero'
 
 export default function ForVenuesPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <PageHero
         title={<>List Your Venue on <HeroAccent>IrishNightlife</HeroAccent></>}
         subtitle="Reach thousands of nightlife enthusiasts across Ireland. Get discovered, drive footfall, and grow your business."
@@ -29,31 +29,31 @@ export default function ForVenuesPage() {
       {/* Benefits Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Why List Your Venue?</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Why List Your Venue?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6 text-center">
-                <MapPin className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Get Discovered</h3>
-                <p className="text-gray-600">
+                <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Get Discovered</h3>
+                <p className="text-muted-foreground">
                   Reach thousands of potential customers actively looking for places to go tonight.
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6 text-center">
-                <Users className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Drive Footfall</h3>
-                <p className="text-gray-600">
+                <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Drive Footfall</h3>
+                <p className="text-muted-foreground">
                   Convert online searches into real customers walking through your door.
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6 text-center">
-                <TrendingUp className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Grow Your Business</h3>
-                <p className="text-gray-600">
+                <TrendingUp className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Grow Your Business</h3>
+                <p className="text-muted-foreground">
                   Track analytics, manage events, and build your brand on Ireland's nightlife platform.
                 </p>
               </CardContent>
@@ -63,53 +63,53 @@ export default function ForVenuesPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">What You Get</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">What You Get</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Venue Profile</h3>
-                  <p className="text-gray-600">Custom profile with photos, description, and contact info</p>
+                  <h3 className="text-lg font-bold text-foreground">Venue Profile</h3>
+                  <p className="text-muted-foreground">Custom profile with photos, description, and contact info</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Event Management</h3>
-                  <p className="text-gray-600">Create and manage events, gigs, and special nights</p>
+                  <h3 className="text-lg font-bold text-foreground">Event Management</h3>
+                  <p className="text-muted-foreground">Create and manage events, gigs, and special nights</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Analytics Dashboard</h3>
-                  <p className="text-gray-600">Track views, clicks, and customer engagement</p>
+                  <h3 className="text-lg font-bold text-foreground">Analytics Dashboard</h3>
+                  <p className="text-muted-foreground">Track views, clicks, and customer engagement</p>
                 </div>
               </div>
             </div>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Map Integration</h3>
-                  <p className="text-gray-600">Show your venue on our interactive map with pins</p>
+                  <h3 className="text-lg font-bold text-foreground">Map Integration</h3>
+                  <p className="text-muted-foreground">Show your venue on our interactive map with pins</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">AI Planner Integration</h3>
-                  <p className="text-gray-600">Get recommended by our AI-powered Tonight Planner</p>
+                  <h3 className="text-lg font-bold text-foreground">AI Planner Integration</h3>
+                  <p className="text-muted-foreground">Get recommended by our AI-powered Tonight Planner</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Verification Badge</h3>
-                  <p className="text-gray-600">Stand out with a verified venue badge</p>
+                  <h3 className="text-lg font-bold text-foreground">Verification Badge</h3>
+                  <p className="text-muted-foreground">Stand out with a verified venue badge</p>
                 </div>
               </div>
             </div>
@@ -118,29 +118,29 @@ export default function ForVenuesPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-16 bg-gray-50">
+      <section id="pricing" className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Simple Pricing</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Simple Pricing</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free Tier */}
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Basic</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-foreground mb-2">Basic</h3>
+                <div className="text-4xl font-bold text-foreground mb-4">
                   Free
-                  <span className="text-lg text-gray-500 font-normal">/month</span>
+                  <span className="text-lg text-muted-foreground font-normal">/month</span>
                 </div>
                 <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Venue profile
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Up to 5 events/month
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Basic analytics
                   </li>
                 </ul>
@@ -153,35 +153,35 @@ export default function ForVenuesPage() {
             </Card>
 
             {/* Premium Tier */}
-            <Card className="bg-white border-2 border-emerald-500 relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+            <Card className="bg-card border-2 border-primary relative">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
                 Most Popular
               </div>
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Premium</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-foreground mb-2">Premium</h3>
+                <div className="text-4xl font-bold text-foreground mb-4">
                   €29
-                  <span className="text-lg text-gray-500 font-normal">/month</span>
+                  <span className="text-lg text-muted-foreground font-normal">/month</span>
                 </div>
                 <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Everything in Basic
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Unlimited events
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Advanced analytics
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Verified badge
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Featured in AI Planner
                   </li>
                 </ul>
@@ -194,27 +194,27 @@ export default function ForVenuesPage() {
             </Card>
 
             {/* Enterprise Tier */}
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
-                <div className="text-4xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-foreground mb-2">Enterprise</h3>
+                <div className="text-4xl font-bold text-foreground mb-4">
                   Custom
                 </div>
                 <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Everything in Premium
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Multiple venues
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Priority support
                   </li>
-                  <li className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     Custom integrations
                   </li>
                 </ul>
@@ -233,7 +233,7 @@ export default function ForVenuesPage() {
       <section className="py-16 bg-gradient-to-br from-night via-night-soft to-forest text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Business?</h2>
-          <p className="text-xl mb-8 text-gray-300">
+          <p className="text-xl mb-8 text-muted-foreground">
             Join hundreds of venues across Ireland already using IrishNightlife to drive footfall.
           </p>
           <Link href="/auth/signup?role=venue">

@@ -49,11 +49,11 @@ export default async function VenueDashboard() {
   const heading = venueList[0]?.name ?? profile?.full_name ?? 'Your venue'
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero align="left" compact showMap={false} title="Venue dashboard" subtitle={heading} />
       <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
         {pendingVenues.length > 0 ? (
-          <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="mb-8 rounded-lg border border-amber-500/40 bg-amber-500/15 px-4 py-3 text-sm text-amber-200">
             {pendingVenues.map((venue) => venue.name).join(', ')}{' '}
             {pendingVenues.length === 1 ? 'is' : 'are'} awaiting approval, so{' '}
             {pendingVenues.length === 1 ? 'it stays' : 'they stay'} off the public site for now.
@@ -61,33 +61,33 @@ export default async function VenueDashboard() {
         ) : null}
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500">Your venues</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{venueList.length}</p>
+              <p className="text-sm text-muted-foreground">Your venues</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{venueList.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500">Upcoming events</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{upcoming.length}</p>
+              <p className="text-sm text-muted-foreground">Upcoming events</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{upcoming.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500">Venue page views</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{venueViews.toLocaleString('en-IE')}</p>
+              <p className="text-sm text-muted-foreground">Venue page views</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{venueViews.toLocaleString('en-IE')}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500">Event page views</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{eventViews.toLocaleString('en-IE')}</p>
+              <p className="text-sm text-muted-foreground">Event page views</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{eventViews.toLocaleString('en-IE')}</p>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="bg-white border-gray-200">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <CardTitle>Upcoming events</CardTitle>
@@ -96,20 +96,20 @@ export default async function VenueDashboard() {
                   Create event
                 </Link>
               ) : venueList.length > 0 ? (
-                <AwaitingApprovalNotice className="max-w-xs text-right text-sm text-amber-800" />
+                <AwaitingApprovalNotice className="max-w-xs text-right text-sm text-amber-200" />
               ) : null}
             </div>
           </CardHeader>
           <CardContent>
             {upcoming.length === 0 ? (
-              <p className="text-gray-600">No upcoming events for your venues.</p>
+              <p className="text-muted-foreground">No upcoming events for your venues.</p>
             ) : (
               <ul className="space-y-3">
                 {upcoming.map((event) => (
                   <li key={event.id} className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-gray-900">{event.title}</p>
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                      <p className="font-semibold text-foreground">{event.title}</p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(event.start_time).toLocaleString('en-IE', {
                             weekday: 'short',
@@ -119,11 +119,11 @@ export default async function VenueDashboard() {
                             minute: '2-digit',
                           })}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {(viewCounts.get(`/events/${event.slug}`) ?? 0).toLocaleString('en-IE')} views
                         </p>
                     </div>
-                    <Link href={`/events/${event.slug}`} className="text-sm text-emerald-700 hover:underline">
+                    <Link href={`/events/${event.slug}`} className="text-sm text-primary hover:underline">
                       {event.is_published ? 'Published' : 'Draft'}
                     </Link>
                   </li>

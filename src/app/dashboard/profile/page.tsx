@@ -18,7 +18,7 @@ export default async function VenueProfilePage() {
   const heading = venues[0]?.name ?? profile?.full_name ?? 'Your venue'
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
         align="left"
         compact
@@ -28,15 +28,15 @@ export default async function VenueProfilePage() {
         actions={<SignOutButton />}
       />
       <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
-        <Card className="bg-white border-gray-200">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Your venues</CardTitle>
           </CardHeader>
           <CardContent>
             {venues.length === 0 ? (
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 No venue is linked to this account yet.{' '}
-                <Link href="/auth/complete-venue" className="text-emerald-700 hover:underline">
+                <Link href="/auth/complete-venue" className="text-primary hover:underline">
                   Add your venue
                 </Link>
               </p>

@@ -1,23 +1,42 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { MapPin } from 'lucide-react'
+import type { EventCardEvent } from '@/components/EventCard'
 
-// Dynamically import the map component with SSR disabled
 const EventsMapDynamic = dynamic(() => import('./EventsMapInner'), {
   ssr: false,
   loading: () => (
-    <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
-      <div className="text-6xl mb-4">🗺️</div>
-      <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
-      <p className="text-gray-600">Finding venues with events today</p>
+    <div
+      className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-border bg-card p-8 text-center"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-mint/20 bg-mint/10">
+        <MapPin className="h-6 w-6 text-mint" aria-hidden="true" />
+      </div>
+      <h3 className="mb-1 text-lg font-bold text-foreground">Loading interactive map…</h3>
+      <p className="text-sm text-muted-foreground">Preparing venue pins and event details</p>
     </div>
   ),
 })
 
-interface EventsMapProps {
+export interface EventsMapProps {
   selectedCounty?: string
+  events?: EventCardEvent[]
+  loading?: boolean
 }
 
-export default function EventsMap({ selectedCounty = 'Cork' }: EventsMapProps) {
-  return <EventsMapDynamic selectedCounty={selectedCounty} />
+export default function EventsMap({
+  selectedCounty = 'Cork',
+  events,
+  loading,
+}: EventsMapProps) {
+  return (
+    <EventsMapDynamic
+      selectedCounty={selectedCounty}
+      events={events}
+      loading={loading}
+    />
+  )
 }

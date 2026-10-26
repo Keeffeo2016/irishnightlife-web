@@ -116,12 +116,12 @@ export function PlannerLoading() {
   }, [])
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <main className="flex flex-1 items-center justify-center py-24">
         <div className="text-center">
-          <Sparkles className="mx-auto mb-4 h-16 w-16 animate-pulse text-emerald-600" />
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Crafting your perfect night...</h2>
-          <p className="text-gray-600">{LOADING_LINES[index]}</p>
+          <Sparkles className="mx-auto mb-4 h-16 w-16 animate-pulse text-primary" />
+          <h2 className="mb-2 text-2xl font-bold text-foreground">Crafting your perfect night...</h2>
+          <p className="text-muted-foreground">{LOADING_LINES[index]}</p>
         </div>
       </main>
     </div>
@@ -273,11 +273,11 @@ export default function PlanResultContent() {
 
   if (error) {
     return (
-      <div className="flex flex-col bg-gray-50">
+      <div className="flex flex-col bg-background">
         <main className="flex-1 flex items-center justify-center py-24">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Oops! Something went wrong</h2>
+            <p className="text-muted-foreground mb-4">{error}</p>
             <Button onClick={() => window.location.reload()} variant="brand">
               Try Again
             </Button>
@@ -289,11 +289,11 @@ export default function PlanResultContent() {
 
   if (stops.length === 0) {
     return (
-      <div className="flex flex-col bg-gray-50">
+      <div className="flex flex-col bg-background">
         <main className="flex-1 flex items-center justify-center py-24">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nothing lined up</h2>
-            <p className="text-gray-600 mb-4">No events matched this night. Start over and try a different vibe.</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Nothing lined up</h2>
+            <p className="text-muted-foreground mb-4">No events matched this night. Start over and try a different vibe.</p>
             <Link href="/planner">
               <Button variant="brand">Start Over</Button>
             </Link>
@@ -308,13 +308,13 @@ export default function PlanResultContent() {
   const nightSorted = stops.every(stop => checkedIds.includes(stop.event.id))
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
         eyebrow={<Sparkles className="h-10 w-10 text-mint mx-auto" />}
         title={<>Your Perfect <HeroAccent>Night</HeroAccent></>}
         subtitle={<span className="italic">&ldquo;{narrative}&rdquo;</span>}
       >
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300 mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground mb-6">
           <div className="flex items-center gap-2">
             <Euro className="h-4 w-4 text-mint" />
             <span>Estimated cost: {totals.total_cost}</span>
@@ -348,7 +348,7 @@ export default function PlanResultContent() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <ol className="relative space-y-6">
             {stops.length > 1 && (
-              <div aria-hidden className="absolute top-10 bottom-10 left-5 w-px -translate-x-1/2 bg-emerald-200" />
+              <div aria-hidden className="absolute top-10 bottom-10 left-5 w-px -translate-x-1/2 bg-primary/40" />
             )}
             {stops.map((stop, index) => {
               const event = stop.event
@@ -362,8 +362,8 @@ export default function PlanResultContent() {
                   <div
                     className={`relative z-10 mt-6 flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
                       checked
-                        ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-600'
-                        : 'bg-emerald-600 text-white'
+                        ? 'bg-primary/15 text-primary ring-2 ring-primary'
+                        : 'bg-primary text-primary-foreground'
                     }`}
                   >
                     {index + 1}
@@ -372,8 +372,8 @@ export default function PlanResultContent() {
                   <Card
                     className={`relative min-w-0 flex-1 transition-all ${
                       checked
-                        ? 'border-emerald-200 bg-emerald-50/60 opacity-80'
-                        : 'border-gray-200 bg-white hover:border-emerald-500'
+                        ? 'border-primary/40 bg-primary/10/60 opacity-80'
+                        : 'border-border bg-card hover:border-primary'
                     }`}
                   >
                     <CardContent className="p-6">
@@ -381,16 +381,16 @@ export default function PlanResultContent() {
                         <div className="mb-2 flex items-start justify-between gap-3">
                           <div>
                             <div className="mb-1 flex flex-wrap items-center gap-2">
-                              <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
+                              <h3 className="text-xl font-bold text-foreground">{event.title}</h3>
                               {checked && (
-                                <span className="rotate-[-8deg] rounded-md border-2 border-emerald-600 px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                                <span className="rotate-[-8deg] rounded-md border-2 border-primary px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-primary">
                                   Sorted
                                 </span>
                               )}
                             </div>
                             <Link
                               href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}
-                              className="font-medium text-emerald-600 hover:text-emerald-700"
+                              className="font-medium text-primary hover:text-primary"
                             >
                               {event.venues.name}
                             </Link>
@@ -402,8 +402,8 @@ export default function PlanResultContent() {
                             onClick={() => toggleChecked(event.id)}
                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                               checked
-                                ? 'border-emerald-600 bg-emerald-600 text-white'
-                                : 'border-gray-300 bg-white text-gray-400 hover:border-emerald-400 hover:text-emerald-600'
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-primary'
                             }`}
                           >
                             <Check className="h-5 w-5" />
@@ -411,12 +411,12 @@ export default function PlanResultContent() {
                         </div>
 
                         {event.music_genre && (
-                          <Badge className="mb-3 bg-emerald-100 text-emerald-700">{event.music_genre}</Badge>
+                          <Badge className="mb-3 bg-primary/15 text-primary">{event.music_genre}</Badge>
                         )}
 
-                        <p className="mb-4 text-gray-600">{event.description}</p>
+                        <p className="mb-4 text-muted-foreground">{event.description}</p>
 
-                        <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             <span>{formatRange(event.start_time, event.end_time)}</span>
@@ -433,7 +433,7 @@ export default function PlanResultContent() {
 
                         <div className="mb-4 flex flex-wrap gap-2">
                           {(event.venues.atmosphere ?? []).slice(0, 3).map(atm => (
-                            <Badge key={atm} variant="outline" className="border-gray-300 text-gray-700">
+                            <Badge key={atm} variant="outline" className="border-border text-foreground/90">
                               {atm}
                             </Badge>
                           ))}
@@ -442,7 +442,7 @@ export default function PlanResultContent() {
                         {whyOpen && (
                           <div className="mb-4 flex animate-in fade-in-0 flex-wrap gap-2">
                             {reasons.map(reason => (
-                              <Badge key={reason} className="bg-emerald-50 text-emerald-800">
+                              <Badge key={reason} className="bg-primary/10 text-mint-light">
                                 {reason}
                               </Badge>
                             ))}
@@ -455,7 +455,7 @@ export default function PlanResultContent() {
                           </Button>
                           <Button
                             variant="outline"
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                            className="border-border text-foreground/90 hover:bg-background"
                             disabled={!replacement}
                             onClick={() => {
                               const next = swapStop(catalog, stops, index)
@@ -468,7 +468,7 @@ export default function PlanResultContent() {
                             <Button variant="brand-outline">View Event Details</Button>
                           </Link>
                           <Link href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}>
-                            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                            <Button variant="outline" className="border-border text-foreground/90 hover:bg-background">
                               View Venue
                             </Button>
                           </Link>
@@ -482,15 +482,15 @@ export default function PlanResultContent() {
           </ol>
 
           {nightSorted && (
-            <p className="mt-8 text-center text-lg font-medium text-emerald-700">That&apos;s the night, sorted.</p>
+            <p className="mt-8 text-center text-lg font-medium text-primary">That&apos;s the night, sorted.</p>
           )}
 
           <div className="mt-8">
             <Suspense fallback={
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
+              <div className="bg-card rounded-2xl border-2 border-border p-8 text-center">
                 <div className="text-6xl mb-4">🗺️</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
-                <p className="text-gray-600">Preparing your route</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Loading map...</h3>
+                <p className="text-muted-foreground">Preparing your route</p>
               </div>
             }>
               <PlanMap venues={mapVenues} detailQuery={queryKey} />
@@ -498,8 +498,8 @@ export default function PlanResultContent() {
           </div>
 
           <div className="text-center mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Not quite right?</h2>
-            <p className="text-gray-600 mb-6">Shuffle a new route, draw again, or start over</p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Not quite right?</h2>
+            <p className="text-muted-foreground mb-6">Shuffle a new route, draw again, or start over</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Button
                 onClick={() => setStops(current => shuffleStops(catalog, current))}

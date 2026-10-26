@@ -125,15 +125,15 @@ function ChoiceGrid({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onSelect(option.id)}
-            className={`rounded-2xl border-2 p-6 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+            className={`rounded-2xl border-2 p-6 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               active
-                ? 'scale-[1.02] border-emerald-600 bg-emerald-50 shadow-md'
-                : 'border-gray-200 bg-white hover:-translate-y-0.5 hover:border-emerald-300'
+                ? 'scale-[1.02] border-primary bg-primary/10 shadow-md'
+                : 'border-border bg-card hover:-translate-y-0.5 hover:border-primary/60'
             }`}
           >
             <div className="mb-3 text-4xl">{option.icon}</div>
-            <h3 className="mb-1 text-xl font-bold text-gray-900">{option.label}</h3>
-            <p className="text-sm text-gray-600">{option.description}</p>
+            <h3 className="mb-1 text-xl font-bold text-foreground">{option.label}</h3>
+            <p className="text-sm text-muted-foreground">{option.description}</p>
           </button>
         )
       })}
@@ -211,7 +211,7 @@ export default function PlannerPage() {
   const Icon = current.icon
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
         title={<>Plan My <HeroAccent>Night</HeroAccent></>}
         subtitle="Five quick questions and we'll build your evening"
@@ -231,7 +231,7 @@ export default function PlannerPage() {
                     disabled={!clickable}
                     onClick={() => jumpTo(item.id)}
                     className={`flex w-full flex-col items-center gap-2 rounded-xl px-1 py-1 disabled:opacity-100 ${
-                      clickable ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'
+                      clickable ? 'cursor-pointer hover:bg-foreground/5' : 'cursor-default'
                     }`}
                   >
                     <span
@@ -240,12 +240,12 @@ export default function PlannerPage() {
                           ? 'bg-mint text-night ring-2 ring-mint/40'
                           : done
                             ? 'bg-mint/25 text-mint'
-                            : 'bg-white/10 text-gray-400'
+                            : 'bg-card/10 text-muted-foreground'
                       }`}
                     >
                       {item.id}
                     </span>
-                    <span className={`text-[11px] leading-tight sm:text-xs ${isCurrent ? 'font-medium text-white' : 'text-gray-400'}`}>
+                    <span className={`text-[11px] leading-tight sm:text-xs ${isCurrent ? 'font-medium text-white' : 'text-muted-foreground'}`}>
                       {item.label}
                     </span>
                   </button>
@@ -265,7 +265,7 @@ export default function PlannerPage() {
                 const previous = STEPS[step - 2]
                 if (previous) jumpTo(previous.id)
               }}
-              className="mb-6 flex items-center gap-2 text-gray-600 hover:text-emerald-600"
+              className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back</span>
@@ -293,8 +293,8 @@ export default function PlannerPage() {
                       }}
                       className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                         isCurrent
-                          ? 'border-emerald-600 bg-emerald-50 font-medium text-emerald-800'
-                          : 'border-emerald-200 bg-white text-gray-800 hover:border-emerald-400'
+                          ? 'border-primary bg-primary/10 font-medium text-mint-light'
+                          : 'border-primary/40 bg-card text-foreground hover:border-primary'
                       }`}
                     >
                       <span className="mr-1">{option.icon}</span>
@@ -306,13 +306,13 @@ export default function PlannerPage() {
             )}
 
             <div className="mb-8 text-center">
-              <Icon className="mx-auto mb-4 h-12 w-12 text-emerald-600" />
-              <h2 className="mb-2 text-3xl font-bold text-gray-900">{current.title}</h2>
-              <p className="text-gray-600">{current.subtitle}</p>
+              <Icon className="mx-auto mb-4 h-12 w-12 text-primary" />
+              <h2 className="mb-2 text-3xl font-bold text-foreground">{current.title}</h2>
+              <p className="text-muted-foreground">{current.subtitle}</p>
               {reaction && (
                 <p
                   aria-live="polite"
-                  className="mx-auto mt-4 max-w-md animate-in fade-in-0 zoom-in-95 rounded-full bg-emerald-50 px-4 py-2 text-base font-medium text-emerald-800"
+                  className="mx-auto mt-4 max-w-md animate-in fade-in-0 zoom-in-95 rounded-full bg-primary/10 px-4 py-2 text-base font-medium text-mint-light"
                 >
                   {reaction}
                 </p>
@@ -329,8 +329,8 @@ export default function PlannerPage() {
             {step === TOTAL_STEPS && (
               <div className="mt-8">
                 {recap && (
-                  <p className="mb-4 text-center text-gray-700">
-                    <span className="font-medium text-gray-900">Tonight: </span>
+                  <p className="mb-4 text-center text-foreground/90">
+                    <span className="font-medium text-foreground">Tonight: </span>
                     {recap}
                   </p>
                 )}

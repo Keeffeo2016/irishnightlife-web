@@ -80,14 +80,14 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
   }
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <BackToPlanner href={planHref} />
       <PageHero
         align="left"
         showMap={false}
         eyebrow={
           venue.is_verified && (
-            <Badge className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
+            <Badge className="bg-primary text-primary-foreground shadow-md">
               Verified Venue
             </Badge>
           )
@@ -106,7 +106,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl ring-1 ring-foreground/10 p-8 mb-6">
+            <div className="bg-card rounded-2xl ring-1 ring-border p-8 mb-6">
               {venue.images?.length ? (
                 <div className="mb-6 grid grid-cols-2 gap-3">
                   {venue.images.map((src: string) => (
@@ -119,28 +119,28 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                   ))}
                 </div>
               ) : null}
-              <p className="text-gray-700 text-lg mb-6">
+              <p className="text-foreground/90 text-lg mb-6">
                 {venue.description || 'This venue has not added a description yet.'}
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Music className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Music className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Type</p>
-                    <p className="font-semibold text-gray-900">{venue.venue_type?.replaceAll('_', ' ') ?? 'Venue'}</p>
+                    <p className="text-sm text-muted-foreground">Type</p>
+                    <p className="font-semibold text-foreground">{venue.venue_type?.replaceAll('_', ' ') ?? 'Venue'}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Star className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Star className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Price Range</p>
-                    <p className="font-semibold text-gray-900">{venue.price_range}</p>
+                    <p className="text-sm text-muted-foreground">Price Range</p>
+                    <p className="font-semibold text-foreground">{venue.price_range}</p>
                   </div>
                 </div>
               </div>
@@ -148,10 +148,10 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               {/* Music Genres */}
               {venue.music_genres && venue.music_genres.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Music Genres</h3>
+                  <h3 className="font-semibold text-foreground mb-3">Music Genres</h3>
                   <div className="flex flex-wrap gap-2">
                     {venue.music_genres.map((genre: string, idx: number) => (
-                      <Badge key={idx} variant="outline" className="border-emerald-600 text-emerald-700">
+                      <Badge key={idx} variant="outline" className="border-primary text-primary">
                         {genre}
                       </Badge>
                     ))}
@@ -162,10 +162,10 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               {/* Atmosphere */}
               {venue.atmosphere && venue.atmosphere.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Atmosphere</h3>
+                  <h3 className="font-semibold text-foreground mb-3">Atmosphere</h3>
                   <div className="flex flex-wrap gap-2">
                     {venue.atmosphere.map((atm: string, idx: number) => (
-                      <Badge key={idx} variant="outline" className="border-gray-300 text-gray-700">
+                      <Badge key={idx} variant="outline" className="border-border text-foreground/90">
                         {atm}
                       </Badge>
                     ))}
@@ -174,19 +174,19 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               )}
 
               {/* Contact Info */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Contact Information</h3>
+              <div className="border-t border-border pt-6">
+                <h3 className="font-semibold text-foreground mb-3">Contact Information</h3>
                 <div className="space-y-2">
                   {venue.phone && (
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Phone className="h-4 w-4" />
-                      <a href={`tel:${venue.phone}`} className="hover:text-emerald-600">{venue.phone}</a>
+                      <a href={`tel:${venue.phone}`} className="hover:text-primary">{venue.phone}</a>
                     </div>
                   )}
                   {venue.website && (
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Globe className="h-4 w-4" />
-                      <a href={venue.website} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600">
+                      <a href={venue.website} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                         {venue.website}
                       </a>
                     </div>
@@ -196,35 +196,35 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             </div>
 
             {/* Upcoming Events */}
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Upcoming Events</h2>
                 {upcomingEvents.length > 0 ? (
                   <div className="space-y-4">
                     {upcomingEvents.map((event: any) => (
                       <Link key={event.id} href={preservePlannerOrigin(`/events/${event.slug}`, query)}>
-                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-emerald-500 transition-colors">
+                        <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:border-primary transition-colors">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-1">{event.title}</h3>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <h3 className="font-semibold text-foreground mb-1">{event.title}</h3>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Clock className="h-4 w-4" />
                                 {formatDate(event.start_time)} at {formatTime(event.start_time)}
                               </span>
-                              <Badge className="bg-emerald-100 text-emerald-700">
+                              <Badge className="bg-primary/15 text-primary">
                                 {event.music_genre}
                               </Badge>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-bold text-gray-900">{formatPrice(event)}</p>
+                            <p className="text-lg font-bold text-foreground">{formatPrice(event)}</p>
                           </div>
                         </div>
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-center py-8">No upcoming events at this venue.</p>
+                  <p className="text-muted-foreground text-center py-8">No upcoming events at this venue.</p>
                 )}
               </CardContent>
             </Card>
@@ -232,9 +232,9 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="bg-white border-gray-200 sticky top-24">
+            <Card className="bg-card border-border sticky top-24">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">Quick Actions</h3>
                 <div className="space-y-3">
                   {venue.website && (
                     <a href={venue.website} target="_blank" rel="noopener noreferrer">
@@ -255,8 +255,8 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                   </Button>
                 </div>
 
-                <div className="border-t border-gray-200 mt-6 pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Share this venue</h4>
+                <div className="border-t border-border mt-6 pt-6">
+                  <h4 className="font-semibold text-foreground mb-3">Share this venue</h4>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1">
                       Facebook

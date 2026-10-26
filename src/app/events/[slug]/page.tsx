@@ -68,13 +68,13 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   }
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <BackToPlanner href={planHref} />
       <PageHero
         align="left"
         showMap={false}
         eyebrow={
-          <Badge className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
+          <Badge className="bg-primary text-primary-foreground shadow-md">
             {event.music_genre}
           </Badge>
         }
@@ -101,56 +101,56 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl ring-1 ring-foreground/10 p-8 mb-6">
-              <p className="text-gray-700 text-lg mb-6">{event.description}</p>
+            <div className="bg-card rounded-2xl ring-1 ring-border p-8 mb-6">
+              <p className="text-foreground/90 text-lg mb-6">{event.description}</p>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Date</p>
-                    <p className="font-semibold text-gray-900">{formatDate(event.start_time)}</p>
+                    <p className="text-sm text-muted-foreground">Date</p>
+                    <p className="font-semibold text-foreground">{formatDate(event.start_time)}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Time</p>
-                    <p className="font-semibold text-gray-900">{formatTime(event.start_time)}</p>
+                    <p className="text-sm text-muted-foreground">Time</p>
+                    <p className="font-semibold text-foreground">{formatTime(event.start_time)}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Euro className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Euro className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Price</p>
-                    <p className="font-semibold text-gray-900">{formatPrice()}</p>
+                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="font-semibold text-foreground">{formatPrice()}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <Music className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center">
+                    <Music className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Genre</p>
-                    <p className="font-semibold text-gray-900">{event.music_genre}</p>
+                    <p className="text-sm text-muted-foreground">Genre</p>
+                    <p className="font-semibold text-foreground">{event.music_genre}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Venue Info */}
-            <Card className="bg-white border-gray-200">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">About the venue</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-4">About the venue</h2>
                 {event.venues.images?.[0] ? (
                   <img
                     src={event.venues.images[0]}
@@ -160,22 +160,22 @@ export default async function EventPage({ params, searchParams }: EventPageProps
                 ) : null}
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.venues.name}</h3>
-                    <div className="flex items-center gap-2 text-gray-600 mb-3">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{event.venues.name}</h3>
+                    <div className="flex items-center gap-2 text-muted-foreground mb-3">
                       <MapPin className="h-4 w-4" />
                       <span>{event.venues.address}, {event.venues.city}, {event.venues.county}{event.venues.postcode ? `, ${event.venues.postcode}` : ''}</span>
                     </div>
-                    <div className="mb-4 flex flex-wrap gap-4 text-sm text-gray-700">
+                    <div className="mb-4 flex flex-wrap gap-4 text-sm text-foreground/90">
                       <span>
-                        <span className="text-gray-500">Type </span>
+                        <span className="text-muted-foreground">Type </span>
                         {event.venues.venue_type?.replaceAll('_', ' ') || 'Venue'}
                       </span>
                       <span>
-                        <span className="text-gray-500">Price range </span>
+                        <span className="text-muted-foreground">Price range </span>
                         {event.venues.price_range || 'Not set'}
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-muted-foreground mb-4">
                       {event.venues.description || 'This venue has not added a description yet.'}
                     </p>
                     <Link href={preservePlannerOrigin(`/venues/${event.venues.slug}`, query)}>
@@ -191,24 +191,24 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="bg-white border-gray-200 sticky top-24">
+            <Card className="bg-card border-border sticky top-24">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Get Tickets</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">Get Tickets</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Price</span>
-                    <span className="text-2xl font-bold text-gray-900">{formatPrice()}</span>
+                    <span className="text-muted-foreground">Price</span>
+                    <span className="text-2xl font-bold text-foreground">{formatPrice()}</span>
                   </div>
                   <Button variant="brand" className="w-full py-6 text-lg">
                     Get Tickets
                   </Button>
-                  <p className="text-sm text-gray-500 text-center">
+                  <p className="text-sm text-muted-foreground text-center">
                     Secure checkout • Instant confirmation
                   </p>
                 </div>
 
-                <div className="border-t border-gray-200 mt-6 pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Share this event</h4>
+                <div className="border-t border-border mt-6 pt-6">
+                  <h4 className="font-semibold text-foreground mb-3">Share this event</h4>
                   <ShareEventButtons
                     title={event.title}
                     venueName={event.venues.name}

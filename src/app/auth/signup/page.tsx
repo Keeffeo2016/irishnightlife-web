@@ -76,26 +76,26 @@ function SignupForm() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-night via-night-soft to-forest">
-      <Card className="w-full max-w-md bg-white border-gray-200 shadow-2xl shadow-mint/10">
+      <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-mint/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MapPin className="h-10 w-10 text-emerald-600" />
+            <MapPin className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-gray-900">Create your account</CardTitle>
-          <p className="text-gray-600">Join Ireland's nightlife discovery platform</p>
+          <CardTitle className="text-2xl text-foreground">Create your account</CardTitle>
+          <p className="text-muted-foreground">Join Ireland's nightlife discovery platform</p>
         </CardHeader>
         <CardContent>
           {/* Success Message */}
           {success && (
-            <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <p className="text-emerald-700 text-sm">{success}</p>
+            <div className="mb-4 p-4 bg-primary/10 border border-primary/40 rounded-lg">
+              <p className="text-primary text-sm">{success}</p>
             </div>
           )}
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-4 p-4 bg-destructive/10 border border-destructive/40 rounded-lg">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           )}
 
@@ -107,7 +107,7 @@ function SignupForm() {
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'consumer'
                   ? 'bg-mint text-night font-semibold'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >
               🎉 I'm going out
@@ -118,7 +118,7 @@ function SignupForm() {
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'venue'
                   ? 'bg-mint text-night font-semibold'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >
               🏢 I own a venue
@@ -134,12 +134,12 @@ function SignupForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-gray-700 mb-1 block font-medium">Full Name</label>
+              <label className="text-sm text-foreground/90 mb-1 block font-medium">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="John Murphy"
-                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 bg-card border-border text-foreground"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
@@ -147,13 +147,13 @@ function SignupForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-700 mb-1 block font-medium">Email</label>
+              <label className="text-sm text-foreground/90 mb-1 block font-medium">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="email"
                   placeholder="you@example.com"
-                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 bg-card border-border text-foreground"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -161,13 +161,13 @@ function SignupForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-700 mb-1 block font-medium">Password</label>
+              <label className="text-sm text-foreground/90 mb-1 block font-medium">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Min 8 characters"
-                  className="pl-10 pr-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 pr-10 bg-card border-border text-foreground"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
@@ -175,7 +175,7 @@ function SignupForm() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -185,34 +185,34 @@ function SignupForm() {
 
             {accountType === 'venue' && (
               <>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Your venue stays hidden until a superadmin approves it.
                 </p>
                 <div>
-                  <label className="text-sm text-gray-700 mb-1 block font-medium">Venue Name</label>
+                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Venue Name</label>
                   <Input
                     placeholder="The Bleeding Heart"
-                    className="bg-white border-gray-300 text-gray-900"
+                    className="bg-card border-border text-foreground"
                     value={formData.venueName}
                     onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-700 mb-1 block font-medium">Address</label>
+                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Address</label>
                   <Input
                     placeholder="12 Oliver Plunkett Street"
-                    className="bg-white border-gray-300 text-gray-900"
+                    className="bg-card border-border text-foreground"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-700 mb-1 block font-medium">Eircode</label>
+                  <label className="text-sm text-foreground/90 mb-1 block font-medium">Eircode</label>
                   <Input
                     placeholder="T12 W8RP"
-                    className="bg-white border-gray-300 text-gray-900 uppercase"
+                    className="bg-card border-border text-foreground uppercase"
                     value={formData.eircode}
                     onChange={(e) => setFormData({ ...formData, eircode: e.target.value.toUpperCase() })}
                     required
@@ -221,20 +221,20 @@ function SignupForm() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-700 mb-1 block font-medium">City</label>
+                  <label className="text-sm text-foreground/90 mb-1 block font-medium">City</label>
                   <Input
                     placeholder="Cork"
-                    className="bg-white border-gray-300 text-gray-900"
+                    className="bg-card border-border text-foreground"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-700 mb-1 block font-medium">County</label>
+                  <label className="text-sm text-foreground/90 mb-1 block font-medium">County</label>
                   <Input
                     placeholder="Cork"
-                    className="bg-white border-gray-300 text-gray-900"
+                    className="bg-card border-border text-foreground"
                     value={formData.county}
                     onChange={(e) => setFormData({ ...formData, county: e.target.value })}
                     required
@@ -261,9 +261,9 @@ function SignupForm() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-emerald-600 hover:underline font-medium">
+            <Link href="/auth/login" className="text-primary hover:underline font-medium">
               Sign in
             </Link>
           </div>

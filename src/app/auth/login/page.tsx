@@ -62,19 +62,19 @@ function LoginForm() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-night via-night-soft to-forest">
-      <Card className="w-full max-w-md bg-white border-gray-200 shadow-2xl shadow-mint/10">
+      <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-mint/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MapPin className="h-10 w-10 text-emerald-600" />
+            <MapPin className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-gray-900">Welcome back</CardTitle>
-          <p className="text-gray-600">Sign in to your IrishNightlife account</p>
+          <CardTitle className="text-2xl text-foreground">Welcome back</CardTitle>
+          <p className="text-muted-foreground">Sign in to your IrishNightlife account</p>
         </CardHeader>
         <CardContent>
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-4 p-4 bg-destructive/10 border border-destructive/40 rounded-lg">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           )}
 
@@ -83,13 +83,13 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-gray-700 mb-1 block font-medium">Email</label>
+              <label className="text-sm text-foreground/90 mb-1 block font-medium">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="email"
                   placeholder="you@example.com"
-                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 bg-card border-border text-foreground"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -97,20 +97,20 @@ function LoginForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-700 mb-1 block font-medium">Password</label>
+              <label className="text-sm text-foreground/90 mb-1 block font-medium">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="pl-10 pr-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 pr-10 bg-card border-border text-foreground"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -118,11 +118,11 @@ function LoginForm() {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-gray-600">
-                <input type="checkbox" className="rounded border-gray-300" />
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input type="checkbox" className="rounded border-border" />
                 Remember me
               </label>
-              <Link href="/auth/forgot-password" className="text-sm text-emerald-600 hover:underline font-medium">
+              <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline font-medium">
                 Forgot password?
               </Link>
             </div>
@@ -144,16 +144,16 @@ function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
-            <Link href="/auth/signup" className="text-emerald-600 hover:underline font-medium">
+            <Link href="/auth/signup" className="text-primary hover:underline font-medium">
               Sign up
             </Link>
           </div>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Own a venue?{' '}
-            <Link href="/auth/signup?role=venue" className="text-emerald-600 hover:underline font-medium">
+            <Link href="/auth/signup?role=venue" className="text-primary hover:underline font-medium">
               Register your venue
             </Link>
           </div>

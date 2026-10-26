@@ -86,18 +86,18 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
   // Don't render map during SSR
   if (!mounted) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
+      <div className="bg-card rounded-2xl border-2 border-border p-8 text-center">
         <div className="text-6xl mb-4">🗺️</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
-        <p className="text-gray-600">Preparing your route</p>
+        <h3 className="text-xl font-bold text-foreground mb-2">Loading map...</h3>
+        <p className="text-muted-foreground">Preparing your route</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-emerald-200 overflow-hidden shadow-lg">
+    <div className="bg-card rounded-2xl border-2 border-primary/40 overflow-hidden shadow-lg">
       {/* Map Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white p-6">
+      <div className="bg-primary text-primary-foreground p-6">
         <h3 className="text-2xl font-bold mb-2">
           🗺️ Your Route Tonight
         </h3>
@@ -130,20 +130,20 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
               <Popup>
                 <div className="p-2 min-w-[200px]">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">
+                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
                       {index + 1}
                     </div>
-                    <h4 className="font-bold text-gray-900">{venue.name}</h4>
+                    <h4 className="font-bold text-foreground">{venue.name}</h4>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                    <MapPin className="h-3 w-3 text-emerald-600" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                    <MapPin className="h-3 w-3 text-primary" />
                     <span>{venue.address}</span>
                   </div>
                   <Link href={detailHrefFromPlan(`/venues/${venue.slug}`, detailQuery)}>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                      className="w-full border-primary text-primary hover:bg-primary/10"
                     >
                       View Venue
                     </Button>
@@ -156,13 +156,13 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
       </div>
 
       {/* Map Legend */}
-      <div className="bg-gray-50 border-t border-gray-200 p-4">
+      <div className="bg-background border-t border-border p-4">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
-            <span className="text-gray-700">Venue in your plan</span>
+            <div className="w-4 h-4 bg-primary rounded-full"></div>
+            <span className="text-foreground/90">Venue in your plan</span>
           </div>
-          <div className="text-gray-600">
+          <div className="text-muted-foreground">
             Click pins to see venue details
           </div>
         </div>

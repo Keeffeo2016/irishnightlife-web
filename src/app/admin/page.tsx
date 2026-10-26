@@ -122,7 +122,7 @@ export default async function AdminDashboard() {
   })
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
         align="left"
         compact
@@ -132,7 +132,7 @@ export default async function AdminDashboard() {
       />
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
         {loadError ? (
-          <div className="mb-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-8 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {loadError}. If the charts look empty, run supabase/admin-overview.sql and supabase/page-views.sql in the Supabase SQL editor.
           </div>
         ) : null}

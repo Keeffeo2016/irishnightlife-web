@@ -106,7 +106,7 @@ export function ShareEventButtons({ title, venueName, slug }: ShareEventButtonsP
         </Button>
       </div>
       {message ? (
-        <p className="mt-2 text-sm text-gray-500" role="status">
+        <p className="mt-2 text-sm text-muted-foreground" role="status">
           {message}
         </p>
       ) : null}

@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { AwaitingApprovalNotice } from '@/components/AwaitingApprovalNotice'
 import { HenStagSelect } from './HenStagSelect'
 
-const fieldClass = 'w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900'
+const fieldClass = 'w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground'
 
 export function VenueProfileForm({
   venue,
@@ -159,28 +159,28 @@ export function VenueProfileForm({
     <form onSubmit={saveProfile} className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{venue.name}</h3>
-          <p className="mt-1 flex items-start gap-1 text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-foreground">{venue.name}</h3>
+          <p className="mt-1 flex items-start gap-1 text-sm text-muted-foreground">
             <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             {formatVenueAddress(venue)}
           </p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             {viewCount.toLocaleString('en-IE')} profile {viewCount === 1 ? 'view' : 'views'}
           </p>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          <Link href={`/venues/${venue.slug}`} className="text-emerald-700 hover:underline">
+          <Link href={`/venues/${venue.slug}`} className="text-primary hover:underline">
             View page
           </Link>
           {venue.is_verified ? (
             <Link
               href={`/dashboard/events/new?venue=${venue.id}`}
-              className="text-emerald-700 hover:underline"
+              className="text-primary hover:underline"
             >
               Create event
             </Link>
           ) : (
-            <AwaitingApprovalNotice className="max-w-xs text-right text-sm text-amber-800" />
+            <AwaitingApprovalNotice className="max-w-xs text-right text-sm text-amber-200" />
           )}
         </div>
       </div>
@@ -188,7 +188,7 @@ export function VenueProfileForm({
       <HenStagSelect venueId={venue.id} value={venue.accepts_hen_stag} />
 
       <div>
-        <label htmlFor={`about-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor={`about-${venue.id}`} className="mb-1 block text-sm font-medium text-foreground/90">
           About the venue
         </label>
         <Textarea
@@ -198,14 +198,14 @@ export function VenueProfileForm({
           maxLength={2000}
           rows={5}
           placeholder="What should people know before they come? Music, atmosphere, food, who it's for."
-          className="min-h-28 border-gray-300 bg-white text-gray-900"
+          className="min-h-28 border-border bg-card text-foreground"
           required
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor={`type-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor={`type-${venue.id}`} className="mb-1 block text-sm font-medium text-foreground/90">
             Type
           </label>
           <select
@@ -224,7 +224,7 @@ export function VenueProfileForm({
           </select>
         </div>
         <div>
-          <label htmlFor={`price-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor={`price-${venue.id}`} className="mb-1 block text-sm font-medium text-foreground/90">
             Price range
           </label>
           <select
@@ -245,7 +245,7 @@ export function VenueProfileForm({
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">Photos</p>
+        <p className="mb-2 text-sm font-medium text-foreground/90">Photos</p>
         {images.length > 0 ? (
           <ul className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((url) => (
@@ -254,7 +254,7 @@ export function VenueProfileForm({
                 <button
                   type="button"
                   onClick={() => removePhoto(url)}
-                  className="absolute right-2 top-2 rounded-md bg-white/90 p-1 text-gray-700 shadow-sm hover:text-red-600"
+                  className="absolute right-2 top-2 rounded-md bg-card/90 p-1 text-foreground/90 shadow-sm hover:text-red-600"
                   aria-label="Remove photo"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -263,9 +263,9 @@ export function VenueProfileForm({
             ))}
           </ul>
         ) : (
-          <p className="mb-3 text-sm text-gray-500">No photos yet. These show on your venue page and on events.</p>
+          <p className="mb-3 text-sm text-muted-foreground">No photos yet. These show on your venue page and on events.</p>
         )}
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-background">
           {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
           {uploading ? 'Uploading…' : 'Upload photos'}
           <input
@@ -280,11 +280,11 @@ export function VenueProfileForm({
             }}
           />
         </label>
-        <p className="mt-2 text-xs text-gray-500">Up to {MAX_VENUE_IMAGES} photos, 5 MB each.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Up to {MAX_VENUE_IMAGES} photos, 5 MB each.</p>
       </div>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
+      {message ? <p className="text-sm text-primary">{message}</p> : null}
 
       <Button type="submit" variant="brand" disabled={saving}>
         {saving ? (

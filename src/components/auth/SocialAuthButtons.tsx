@@ -48,14 +48,14 @@ export function SocialAuthButtons({
   return (
     <div className="space-y-3">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
+        <div className="p-4 bg-destructive/10 border border-destructive/40 rounded-lg">
+          <p className="text-destructive text-sm">{error}</p>
         </div>
       )}
       <Button
         type="button"
         variant="outline"
-        className="w-full py-6 bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+        className="w-full py-6 bg-card text-foreground border-border hover:bg-background"
         size="lg"
         disabled={pending !== null}
         onClick={() => start('google')}
@@ -90,10 +90,10 @@ export function AuthDivider({ label }: { label: string }) {
   return (
     <div className="relative my-6">
       <div className="absolute inset-0 flex items-center">
-        <span className="w-full border-t border-gray-200" />
+        <span className="w-full border-t border-border" />
       </div>
       <div className="relative flex justify-center text-xs uppercase tracking-wide">
-        <span className="bg-white px-2 text-gray-500">{label}</span>
+        <span className="bg-card px-2 text-muted-foreground">{label}</span>
       </div>
     </div>
   )
