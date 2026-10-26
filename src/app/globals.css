@@ -54,11 +54,11 @@
   Legacy night/mint/forest utilities remain for Navbar, Footer, and PageHero.
 */
 @theme {
-  --color-night: #0b1114;
-  --color-night-soft: #152124;
+  --color-night: #1a2428;
+  --color-night-soft: #243035;
   --color-mint: #64f4c2;
   --color-mint-light: #49d9a7;
-  --color-forest: #0f2a2e;
+  --color-forest: #1a3438;
 
   --color-emerald-50: #ebfdf5;
   --color-emerald-100: #cdfae8;
@@ -97,22 +97,22 @@
   - disabled uses opacity-50; avoid relying on muted mint for small disabled labels
 */
 :root {
-  --background: #0b1114;
+  --background: #1a2428;
   --foreground: #f4f7f6;
-  --card: #152124;
+  --card: #243035;
   --card-foreground: #f4f7f6;
-  --popover: #152124;
+  --popover: #243035;
   --popover-foreground: #f4f7f6;
   --primary: #64f4c2;
-  --primary-foreground: #0b1114;
-  --secondary: #1c2c30;
+  --primary-foreground: #1a2428;
+  --secondary: #2d3d42;
   --secondary-foreground: #f4f7f6;
-  --muted: #1c2c30;
-  --muted-foreground: #9aabb0;
-  --accent: #1c2c30;
+  --muted: #2d3d42;
+  --muted-foreground: #b8c5c9;
+  --accent: #2d3d42;
   --accent-foreground: #f4f7f6;
   --destructive: #f07178;
-  --border: #283a3d;
+  --border: #3a4f55;
   /* Input borders need ~3:1 non-text contrast on night surfaces (WCAG 2.2 AA) */
   --input: #4a6368;
   --ring: #64f4c2;
@@ -120,15 +120,15 @@
   --chart-2: #9aabb0;
   --chart-3: #49d9a7;
   --chart-4: #5eeab8;
-  --chart-5: #283a3d;
+  --chart-5: #3a4f55;
   --radius: 0.625rem;
-  --sidebar: #152124;
+  --sidebar: #243035;
   --sidebar-foreground: #f4f7f6;
   --sidebar-primary: #64f4c2;
-  --sidebar-primary-foreground: #0b1114;
-  --sidebar-accent: #1c2c30;
+  --sidebar-primary-foreground: #1a2428;
+  --sidebar-accent: #2d3d42;
   --sidebar-accent-foreground: #f4f7f6;
-  --sidebar-border: #283a3d;
+  --sidebar-border: #3a4f55;
   --sidebar-ring: #64f4c2;
 
   /* Type scale (Geist via --font-sans) */
@@ -142,36 +142,36 @@
 }
 
 .dark {
-  --background: #0b1114;
+  --background: #1a2428;
   --foreground: #f4f7f6;
-  --card: #152124;
+  --card: #243035;
   --card-foreground: #f4f7f6;
-  --popover: #152124;
+  --popover: #243035;
   --popover-foreground: #f4f7f6;
   --primary: #64f4c2;
-  --primary-foreground: #0b1114;
-  --secondary: #1c2c30;
+  --primary-foreground: #1a2428;
+  --secondary: #2d3d42;
   --secondary-foreground: #f4f7f6;
-  --muted: #1c2c30;
-  --muted-foreground: #9aabb0;
-  --accent: #1c2c30;
+  --muted: #2d3d42;
+  --muted-foreground: #b8c5c9;
+  --accent: #2d3d42;
   --accent-foreground: #f4f7f6;
   --destructive: #f07178;
-  --border: #283a3d;
+  --border: #3a4f55;
   --input: #4a6368;
   --ring: #64f4c2;
   --chart-1: #64f4c2;
   --chart-2: #9aabb0;
   --chart-3: #49d9a7;
   --chart-4: #5eeab8;
-  --chart-5: #283a3d;
-  --sidebar: #152124;
+  --chart-5: #3a4f55;
+  --sidebar: #243035;
   --sidebar-foreground: #f4f7f6;
   --sidebar-primary: #64f4c2;
-  --sidebar-primary-foreground: #0b1114;
-  --sidebar-accent: #1c2c30;
+  --sidebar-primary-foreground: #1a2428;
+  --sidebar-accent: #2d3d42;
   --sidebar-accent-foreground: #f4f7f6;
-  --sidebar-border: #283a3d;
+  --sidebar-border: #3a4f55;
   --sidebar-ring: #64f4c2;
 }
 

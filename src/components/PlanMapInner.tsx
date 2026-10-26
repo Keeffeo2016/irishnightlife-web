@@ -57,8 +57,8 @@ function hasValidCoordinates(venue: PlanMapVenue, stopNumber: number): MappedPla
 function createNumberedStopIcon(stopNumber: number): Icon {
   const safeNum = Math.max(1, Math.min(99, Math.trunc(stopNumber)))
   const svg = `<svg width="36" height="46" viewBox="0 0 36 46" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18 1C8.61 1 1 8.61 1 18c0 12.2 17 26.8 17 26.8S35 30.2 35 18C35 8.61 27.39 1 18 1z" fill="#64f4c2" stroke="#0b1114" stroke-width="2"/>
-    <circle cx="18" cy="18" r="11" fill="#0b1114"/>
+    <path d="M18 1C8.61 1 1 8.61 1 18c0 12.2 17 26.8 17 26.8S35 30.2 35 18C35 8.61 27.39 1 18 1z" fill="#64f4c2" stroke="#1a2428" stroke-width="2"/>
+    <circle cx="18" cy="18" r="11" fill="#1a2428"/>
     <text x="18" y="22" text-anchor="middle" fill="#64f4c2" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800">${safeNum}</text>
   </svg>`
 
