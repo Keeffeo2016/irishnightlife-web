@@ -219,9 +219,9 @@ export default function HomePage() {
   return (
     <div className="flex flex-col bg-gray-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-night via-night-soft to-forest border-b border-white/10 overflow-hidden">
+      <section className="relative z-20 bg-gradient-to-br from-night via-night-soft to-forest border-b border-white/10">
         {/* Ireland Map Background */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none overflow-hidden">
           <div
             aria-hidden
             className="w-full h-full max-w-4xl bg-mint"

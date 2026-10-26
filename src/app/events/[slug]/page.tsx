@@ -8,6 +8,7 @@ export const instant = false
 import { MapPin, Calendar, Clock, Euro, Music, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FavoriteButton } from '@/components/FavoriteButton'
+import { ShareEventButtons } from '@/components/ShareEventButtons'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
@@ -208,14 +209,11 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
                 <div className="border-t border-gray-200 mt-6 pt-6">
                   <h4 className="font-semibold text-gray-900 mb-3">Share this event</h4>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      Facebook
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      Twitter
-                    </Button>
-                  </div>
+                  <ShareEventButtons
+                    title={event.title}
+                    venueName={event.venues.name}
+                    slug={event.slug}
+                  />
                 </div>
               </CardContent>
             </Card>
