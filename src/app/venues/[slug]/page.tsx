@@ -1,10 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+
+export const instant = false
 import { MapPin, Clock, Phone, Globe, Star, Music } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
+import { PageHero } from '@/components/layout/PageHero'
 
 interface VenuePageProps {
   params: Promise<{ slug: string }>
@@ -46,7 +50,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   const formatPrice = (event: any) => {
     if (event.is_free) return 'Free'
-    if (event.price_min === event.price_max) return `€${event.price_min}`
+    if (event.price_max == null || event.price_min === event.price_max) return `€${event.price_min}`
     return `€${event.price_min} - €${event.price_max}`
   }
 
@@ -66,41 +70,32 @@ export default async function VenuePage({ params }: VenuePageProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/events" className="text-gray-700 hover:text-emerald-600 font-medium">Events</Link>
-              <Link href="/venues" className="text-emerald-600 font-medium">Venues</Link>
-              <Link href="/for-venues" className="text-gray-700 hover:text-emerald-600 font-medium">For Venues</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col bg-gray-50">
+      <PageHero
+        align="left"
+        showMap={false}
+        eyebrow={
+          venue.is_verified && (
+            <Badge className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
+              Verified Venue
+            </Badge>
+          )
+        }
+        title={venue.name}
+        subtitle={
+          <span className="inline-flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-mint" />
+            {venue.address}, {venue.city}, {venue.county}
+          </span>
+        }
+        actions={<FavoriteButton venueId={venue.id} />}
+      />
 
-      {/* Venue Details */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Venue Header */}
-            <div className="bg-white rounded-2xl p-8 mb-6">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  {venue.is_verified && (
-                    <Badge className="bg-emerald-100 text-emerald-700 mb-4">Verified Venue</Badge>
-                  )}
-                  <h1 className="text-4xl font-bold text-gray-900 mb-2">{venue.name}</h1>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="h-5 w-5" />
-                    <span className="text-lg">{venue.address}, {venue.city}, {venue.county}</span>
-                  </div>
-                </div>
-              </div>
-
+            <div className="bg-white rounded-2xl ring-1 ring-foreground/10 p-8 mb-6">
               <p className="text-gray-700 text-lg mb-6">{venue.description}</p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -110,7 +105,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Type</p>
-                    <p className="font-semibold text-gray-900">{venue.venue_type.replace('_', ' ')}</p>
+                    <p className="font-semibold text-gray-900">{venue.venue_type?.replaceAll('_', ' ') ?? 'Venue'}</p>
                   </div>
                 </div>
 
@@ -218,14 +213,14 @@ export default async function VenuePage({ params }: VenuePageProps) {
                 <div className="space-y-3">
                   {venue.website && (
                     <a href={venue.website} target="_blank" rel="noopener noreferrer">
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                      <Button variant="brand" className="w-full">
                         Visit Website
                       </Button>
                     </a>
                   )}
                   {venue.phone && (
                     <a href={`tel:${venue.phone}`}>
-                      <Button variant="outline" className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                      <Button variant="brand-outline" className="w-full">
                         Call Venue
                       </Button>
                     </a>

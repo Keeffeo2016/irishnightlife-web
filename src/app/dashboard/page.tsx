@@ -1,227 +1,135 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
-import { useState } from 'react'
+export const instant = false
 import Link from 'next/link'
-import {
-  LayoutDashboard, Calendar, Plus, BarChart3, Settings, Users,
-  MapPin, Clock, TrendingUp, Eye, Edit, Trash2, Music, Ticket
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Calendar, MapPin } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { PageHero } from '@/components/layout/PageHero'
+import { HenStagSelect } from './HenStagSelect'
 
-// Mock data for venue dashboard
-const VENUE_STATS = {
-  totalEvents: 24,
-  upcomingEvents: 5,
-  totalViews: 12450,
-  totalBookings: 187,
-  avgRating: 4.6,
-}
+export default async function VenueDashboard() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-const UPCOMING_EVENTS = [
-  { id: '1', title: 'Friday Night Live', date: '2026-10-30', time: '21:00', tickets_sold: 45, capacity: 120, status: 'published' },
-  { id: '2', title: 'Jazz Sunday', date: '2026-11-01', time: '19:00', tickets_sold: 23, capacity: 80, status: 'published' },
-  { id: '3', title: 'Halloween Special', date: '2026-10-31', time: '20:00', tickets_sold: 89, capacity: 150, status: 'published' },
-  { id: '4', title: 'Quiz Night', date: '2026-11-03', time: '20:30', tickets_sold: 0, capacity: 60, status: 'draft' },
-  { id: '5', title: 'Live Trad Session', date: '2026-11-05', time: '21:00', tickets_sold: 12, capacity: 50, status: 'published' },
-]
+  if (!user) {
+    redirect('/auth/login?next=/dashboard')
+  }
 
-const RECENT_ACTIVITY = [
-  { id: '1', type: 'booking', message: 'New booking for Friday Night Live (2 tickets)', time: '5 min ago' },
-  { id: '2', type: 'view', message: 'Venue profile viewed 23 times today', time: '1 hour ago' },
-  { id: '3', type: 'review', message: 'New 5-star review from Sarah M.', time: '3 hours ago' },
-  { id: '4', type: 'booking', message: 'New booking for Jazz Sunday (4 tickets)', time: '5 hours ago' },
-]
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role, full_name')
+    .eq('id', user.id)
+    .single()
 
-export default function VenueDashboard() {
-  const [activeTab, setActiveTab] = useState('overview')
+  if (profile?.role !== 'venue_owner' && profile?.role !== 'admin') {
+    redirect('/for-venues')
+  }
+
+  const { data: venues } = await supabase
+    .from('venues')
+    .select('id, name, slug, city, county, address, accepts_hen_stag')
+    .eq('owner_id', user.id)
+    .order('name')
+
+  const venueList = venues ?? []
+  const venueIds = venueList.map((venue) => venue.id)
+
+  const { data: events } = venueIds.length
+    ? await supabase
+        .from('events')
+        .select('id, title, slug, start_time, is_published, venue_id')
+        .in('venue_id', venueIds)
+        .gte('start_time', new Date().toISOString())
+        .order('start_time', { ascending: true })
+    : { data: [] }
+
+  const upcoming = events ?? []
+  const heading = venueList[0]?.name ?? profile?.full_name ?? 'Your venue'
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Venue Dashboard</h1>
-          <p className="text-gray-400">The Bleeding Heart Pub — Dublin</p>
+    <div className="flex flex-col bg-gray-50">
+      <PageHero align="left" compact showMap={false} title="Venue dashboard" subtitle={heading} />
+      <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <Card className="bg-white border-gray-200">
+            <CardContent className="p-6">
+              <p className="text-sm text-gray-500">Your venues</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">{venueList.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white border-gray-200">
+            <CardContent className="p-6">
+              <p className="text-sm text-gray-500">Upcoming events</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">{upcoming.length}</p>
+            </CardContent>
+          </Card>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Event
-        </Button>
-      </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex gap-2 mb-8 border-b border-white/10 pb-4">
-        {[
-          { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-          { id: 'events', label: 'Events', icon: Calendar },
-          { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-          { id: 'reviews', label: 'Reviews', icon: Users },
-          { id: 'settings', label: 'Settings', icon: Settings },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-              activeTab === tab.id
-                ? 'bg-emerald-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white/5 border-white/10">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Upcoming Events</p>
-                <p className="text-3xl font-bold text-white mt-1">{VENUE_STATS.upcomingEvents}</p>
-              </div>
-              <Calendar className="h-8 w-8 text-emerald-400" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/5 border-white/10">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Profile Views</p>
-                <p className="text-3xl font-bold text-white mt-1">{VENUE_STATS.totalViews.toLocaleString()}</p>
-              </div>
-              <Eye className="h-8 w-8 text-blue-400" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/5 border-white/10">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Total Bookings</p>
-                <p className="text-3xl font-bold text-white mt-1">{VENUE_STATS.totalBookings}</p>
-              </div>
-              <Ticket className="h-8 w-8 text-purple-400" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/5 border-white/10">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Avg Rating</p>
-                <p className="text-3xl font-bold text-white mt-1">{VENUE_STATS.avgRating} ⭐</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-amber-400" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Upcoming Events */}
-        <div className="lg:col-span-2">
-          <Card className="bg-white/5 border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Upcoming Events</span>
-                <Link href="/dashboard/events" className="text-sm text-emerald-400 hover:underline">
-                  View All
-                </Link>
-              </CardTitle>
+              <CardTitle>Venues</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {UPCOMING_EVENTS.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                        <Music className="h-6 w-6 text-emerald-400" />
-                      </div>
+              {venueList.length === 0 ? (
+                <p className="text-gray-600">
+                  No venue is linked to this account yet. Register one from the signup form.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {venueList.map((venue) => (
+                    <li key={venue.id} className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="font-semibold text-white">{event.title}</h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" /> {event.date}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> {event.time}
-                          </span>
-                        </div>
+                        <p className="font-semibold text-gray-900">{venue.name}</p>
+                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {venue.address}, {venue.city}, {venue.county}
+                        </p>
+                        <HenStagSelect venueId={venue.id} value={venue.accepts_hen_stag} />
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm text-gray-400">Tickets</p>
-                        <p className="font-semibold text-white">{event.tickets_sold}/{event.capacity}</p>
-                      </div>
-                      <Badge className={event.status === 'published' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}>
-                        {event.status}
-                      </Badge>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" className="text-gray-400 hover:text-white">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="text-gray-400 hover:text-red-400">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                      <Link href={`/venues/${venue.slug}`} className="text-sm text-emerald-700 hover:underline">
+                        View
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* Recent Activity */}
-        <div>
-          <Card className="bg-white/5 border-white/10">
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Upcoming events</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {RECENT_ACTIVITY.map((activity) => (
-                  <div key={activity.id} className="flex gap-3">
-                    <div className={`h-2 w-2 rounded-full mt-2 ${
-                      activity.type === 'booking' ? 'bg-emerald-400' :
-                      activity.type === 'view' ? 'bg-blue-400' :
-                      'bg-amber-400'
-                    }`} />
-                    <div>
-                      <p className="text-sm text-white">{activity.message}</p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="bg-white/5 border-white/10 mt-6">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5">
-                <Plus className="h-4 w-4 mr-2" /> Add New Event
-              </Button>
-              <Button variant="outline" className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5">
-                <TrendingUp className="h-4 w-4 mr-2" /> Post Live Update
-              </Button>
-              <Button variant="outline" className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5">
-                <Ticket className="h-4 w-4 mr-2" /> Create Special Offer
-              </Button>
-              <Button variant="outline" className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5">
-                <MapPin className="h-4 w-4 mr-2" /> Update Venue Info
-              </Button>
+              {upcoming.length === 0 ? (
+                <p className="text-gray-600">No upcoming events for your venues.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {upcoming.map((event) => (
+                    <li key={event.id} className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-gray-900">{event.title}</p>
+                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(event.start_time).toLocaleString('en-IE', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      <Link href={`/events/${event.slug}`} className="text-sm text-emerald-700 hover:underline">
+                        {event.is_published ? 'Published' : 'Draft'}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </CardContent>
           </Card>
         </div>

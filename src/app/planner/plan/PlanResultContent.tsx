@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import PlanMap from '@/components/PlanMap'
+import { PageHero, HeroAccent } from '@/components/layout/PageHero'
 
 interface Venue {
   id: string
@@ -32,7 +33,7 @@ interface Event {
   start_time: string
   end_time: string
   price_min: number
-  price_max: number
+  price_max: number | null
   is_free: boolean
   music_genre: string
   atmosphere: string
@@ -54,6 +55,7 @@ export default function PlanResultContent() {
 
   const context = {
     who: searchParams.get('who') || '',
+    occasion: searchParams.get('occasion') || '',
     vibe: searchParams.get('vibe') || '',
     budget: searchParams.get('budget') || '',
     tomorrow: searchParams.get('tomorrow') || '',
@@ -69,11 +71,12 @@ export default function PlanResultContent() {
           body: JSON.stringify(context),
         })
 
+        const data = await response.json().catch(() => null)
+
         if (!response.ok) {
-          throw new Error('Failed to generate plan')
+          throw new Error(data?.error || 'Failed to generate plan')
         }
 
-        const data = await response.json()
         setPlan(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
@@ -93,8 +96,11 @@ export default function PlanResultContent() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(context),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          throw new Error(data?.error || 'Failed to generate plan')
+        }
         setPlan(data)
         setLoading(false)
       })
@@ -119,21 +125,14 @@ export default function PlanResultContent() {
 
   const formatPrice = (event: Event) => {
     if (event.is_free) return 'Free'
-    if (event.price_min === event.price_max) return `€${event.price_min}`
+    if (event.price_max == null || event.price_min === event.price_max) return `€${event.price_min}`
     return `€${event.price_min}-€${event.price_max}`
   }
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 flex items-center justify-center">
+      <div className="flex flex-col bg-gray-50">
+        <main className="flex-1 flex items-center justify-center py-24">
           <div className="text-center">
             <Sparkles className="h-16 w-16 text-emerald-600 mx-auto mb-4 animate-pulse" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Crafting your perfect night...</h2>
@@ -146,19 +145,12 @@ export default function PlanResultContent() {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 flex items-center justify-center">
+      <div className="flex flex-col bg-gray-50">
+        <main className="flex-1 flex items-center justify-center py-24">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={() => window.location.reload()} variant="brand">
               Try Again
             </Button>
           </div>
@@ -172,60 +164,36 @@ export default function PlanResultContent() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/events" className="text-gray-700 hover:text-emerald-600 font-medium">Events</Link>
-              <Link href="/venues" className="text-gray-700 hover:text-emerald-600 font-medium">Venues</Link>
-              <Link href="/planner" className="text-emerald-600 font-medium">Tonight Planner</Link>
-            </nav>
+    <div className="flex flex-col bg-gray-50">
+      <PageHero
+        eyebrow={<Sparkles className="h-10 w-10 text-mint mx-auto" />}
+        title={<>Your Perfect <HeroAccent>Night</HeroAccent></>}
+        subtitle={<span className="italic">&ldquo;{plan.narrative}&rdquo;</span>}
+      >
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300 mb-6">
+          <div className="flex items-center gap-2">
+            <Euro className="h-4 w-4 text-mint" />
+            <span>Estimated cost: {plan.total_cost}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-mint" />
+            <span>Duration: {plan.estimated_duration}</span>
           </div>
         </div>
-      </header>
+        <div className="flex items-center justify-center gap-4">
+          <Button onClick={handleRegenerate} variant="brand">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Regenerate Plan
+          </Button>
+          <Button onClick={handleShare} variant="brand-outline-dark">
+            <Share2 className="mr-2 h-4 w-4" />
+            Share Plan
+          </Button>
+        </div>
+      </PageHero>
 
-      {/* Main Content */}
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Plan Header */}
-          <div className="text-center mb-8">
-            <Sparkles className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Perfect Night</h1>
-            <p className="text-xl text-gray-600 italic mb-6">"{plan.narrative}"</p>
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Euro className="h-4 w-4" />
-                <span>Estimated cost: {plan.total_cost}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>Duration: {plan.estimated_duration}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <Button
-              onClick={handleRegenerate}
-              variant="outline"
-              className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Regenerate Plan
-            </Button>
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share Plan
-            </Button>
-          </div>
 
           {/* Timeline */}
           <div className="space-y-6">
@@ -284,7 +252,7 @@ export default function PlanResultContent() {
 
                       <div className="flex items-center gap-3">
                         <Link href={`/events/${event.slug}`}>
-                          <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                          <Button variant="brand-outline">
                             View Event Details
                           </Button>
                         </Link>
@@ -329,15 +297,12 @@ export default function PlanResultContent() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Not quite right?</h2>
             <p className="text-gray-600 mb-6">Try regenerating or start over with different preferences</p>
             <div className="flex items-center justify-center gap-4">
-              <Button
-                onClick={handleRegenerate}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
+              <Button onClick={handleRegenerate} variant="brand">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Regenerate
               </Button>
               <Link href="/planner">
-                <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                <Button variant="brand-outline">
                   Start Over
                 </Button>
               </Link>

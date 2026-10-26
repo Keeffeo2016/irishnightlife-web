@@ -18,6 +18,54 @@ const VIBE_TO_GENRE: Record<string, string[]> = {
   surprise: ['Indie', 'Eclectic', 'Experimental', 'World', 'Fusion'],
 }
 
+interface OccasionProfile {
+  label: string
+  narrative: string
+  venueTypes: string[]
+  atmospheres: string[]
+  minCapacity?: number
+  henOrStag?: boolean
+}
+
+const OCCASION_PROFILES: Record<string, OccasionProfile> = {
+  birthday: {
+    label: 'birthday',
+    narrative: 'your birthday celebration',
+    venueTypes: ['bar', 'club', 'pub'],
+    atmospheres: ['Lively', 'Social', 'Party', 'Energetic'],
+    minCapacity: 60,
+  },
+  hen: {
+    label: 'hen party',
+    narrative: 'the hen party',
+    venueTypes: ['club', 'bar', 'live_music_venue'],
+    atmospheres: ['Lively', 'Party', 'Energetic', 'High-energy', 'Social'],
+    minCapacity: 100,
+    henOrStag: true,
+  },
+  stag: {
+    label: 'stag party',
+    narrative: 'the stag',
+    venueTypes: ['pub', 'club', 'bar'],
+    atmospheres: ['Lively', 'Party', 'Energetic', 'High-energy', 'Social'],
+    minCapacity: 100,
+    henOrStag: true,
+  },
+  anniversary: {
+    label: 'anniversary',
+    narrative: 'your anniversary',
+    venueTypes: ['restaurant', 'bar'],
+    atmospheres: ['Romantic', 'Intimate', 'Sophisticated', 'Cozy'],
+  },
+  leaving: {
+    label: 'leaving do',
+    narrative: 'the leaving do',
+    venueTypes: ['pub', 'bar'],
+    atmospheres: ['Social', 'Lively', 'Relaxed', 'Traditional'],
+    minCapacity: 60,
+  },
+}
+
 const BUDGET_TO_PRICE: Record<string, { min: number; max: number }> = {
   budget: { min: 0, max: 20 },
   moderate: { min: 20, max: 50 },
@@ -32,6 +80,7 @@ const TOMORROW_TO_END_TIME: Record<string, number> = {
 
 interface PlannerContext {
   who: string
+  occasion?: string
   vibe: string
   budget: string
   tomorrow: string
@@ -63,6 +112,27 @@ function scoreEvent(event: any, context: PlannerContext): { score: number; reaso
   if (genreMatch) {
     score += 20
     reasons.push(`${event.music_genre} fits your vibe`)
+  }
+
+  // Occasion matching
+  const occasion = context.occasion ? OCCASION_PROFILES[context.occasion] : undefined
+  if (occasion) {
+    const venue = event.venues
+    if (venue.venue_type && occasion.venueTypes.includes(venue.venue_type)) {
+      score += 15
+      reasons.push(`Great spot for a ${occasion.label}`)
+    }
+    if (venue.atmosphere?.some((a: string) => occasion.atmospheres.includes(a))) {
+      score += 15
+    }
+    if (occasion.minCapacity && venue.capacity && venue.capacity >= occasion.minCapacity) {
+      score += 10
+      reasons.push('Room for the whole crew')
+    }
+    if (occasion.henOrStag && venue.accepts_hen_stag === true) {
+      score += 10
+      reasons.push('Hen & stag friendly')
+    }
   }
 
   // Budget matching (30% weight)
@@ -125,7 +195,8 @@ function generateNarrative(context: PlannerContext, events: any[]): string {
   }
 
   const vibe = vibeDescriptions[context.vibe] || 'a great night'
-  const who = whoDescriptions[context.who] || 'your night'
+  const occasion = context.occasion ? OCCASION_PROFILES[context.occasion] : undefined
+  const who = occasion?.narrative || whoDescriptions[context.who] || 'your night'
 
   const narratives = [
     `Tonight's vibe: ${vibe} tailored perfectly for ${who}. We've found ${events.length} amazing spots that match your style.`,
@@ -172,8 +243,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const occasion = context.occasion ? OCCASION_PROFILES[context.occasion] : undefined
+    const eligibleEvents = occasion?.henOrStag
+      ? events.filter(event => event.venues?.accepts_hen_stag !== false)
+      : events
+
+    if (eligibleEvents.length === 0) {
+      return NextResponse.json(
+        { error: `No venues welcoming a ${occasion?.label} tonight. Try again tomorrow!` },
+        { status: 404 }
+      )
+    }
+
     // Score all events
-    const scoredEvents: ScoredEvent[] = events.map(event => {
+    const scoredEvents: ScoredEvent[] = eligibleEvents.map(event => {
       const { score, reasons } = scoreEvent(event, context)
       return { event, score, reasons }
     })

@@ -31,11 +31,15 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to sign in')
+        const message = typeof data.error === 'string' ? data.error : 'Failed to sign in'
+        if (/email not confirmed/i.test(message)) {
+          throw new Error('Email not confirmed. Check your inbox and confirm your address, then sign in again.')
+        }
+        throw new Error(message)
       }
 
-      // Redirect to dashboard or home page after successful login
-      router.push('/')
+      const next = new URLSearchParams(window.location.search).get('next')
+      router.push(next && next.startsWith('/') ? next : '/')
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -45,8 +49,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
-      <Card className="w-full max-w-md bg-white border-gray-200">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-night via-night-soft to-forest">
+      <Card className="w-full max-w-md bg-white border-gray-200 shadow-2xl shadow-mint/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <MapPin className="h-10 w-10 text-emerald-600" />
@@ -109,7 +113,8 @@ export default function LoginPage() {
             </div>
             <Button 
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6" 
+              variant="brand"
+              className="w-full py-6"
               size="lg"
               disabled={loading}
             >

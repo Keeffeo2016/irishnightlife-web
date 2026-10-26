@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -48,6 +48,40 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Brand palette: emerald is the logo mint, cyan the logo forest green.
+   Shades 600+ are used as text on white, so keep them at >= 3:1 contrast. */
+@theme {
+  --color-night: #010302;
+  --color-night-soft: #0a1410;
+  --color-mint: #13e09d;
+  --color-mint-light: #54f2b5;
+  --color-forest: #003025;
+
+  --color-emerald-50: #ebfdf5;
+  --color-emerald-100: #cdfae8;
+  --color-emerald-200: #9ff3d3;
+  --color-emerald-300: #5eeab8;
+  --color-emerald-400: #2ee3a6;
+  --color-emerald-500: #10c98c;
+  --color-emerald-600: #079468;
+  --color-emerald-700: #067553;
+  --color-emerald-800: #075c43;
+  --color-emerald-900: #063f30;
+  --color-emerald-950: #01241b;
+
+  --color-cyan-50: #e8f7f1;
+  --color-cyan-100: #c6ebdd;
+  --color-cyan-200: #93d8bf;
+  --color-cyan-300: #57bd9b;
+  --color-cyan-400: #2a9c7a;
+  --color-cyan-500: #13805f;
+  --color-cyan-600: #0b6a4f;
+  --color-cyan-700: #085641;
+  --color-cyan-800: #064434;
+  --color-cyan-900: #033328;
+  --color-cyan-950: #01211a;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -55,7 +89,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #079468;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -66,7 +100,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #13e09d;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -50,6 +50,26 @@ interface VenueWithEvents {
   }>
 }
 
+const COUNTY_CENTERS: Record<string, [number, number]> = {
+  Cork: [51.8985, -8.4736],
+  Dublin: [53.3498, -6.2603],
+  Galway: [53.2707, -9.0568],
+  Limerick: [52.6638, -8.6267],
+  Waterford: [52.2593, -7.1101],
+  Kilkenny: [52.6541, -7.2448],
+  'All Ireland': [53.4125, -7.9833],
+}
+
+function MapViewport({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap()
+
+  useEffect(() => {
+    map.setView(center, zoom)
+  }, [map, center, zoom])
+
+  return null
+}
+
 interface EventsMapInnerProps {
   selectedCounty?: string
 }
@@ -66,21 +86,10 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
     setMounted(true)
   }, [])
 
-  // County centers for map positioning
-  const countyCenters: Record<string, [number, number]> = {
-    'Cork': [51.8985, -8.4736],
-    'Dublin': [53.3498, -6.2603],
-    'Galway': [53.2707, -9.0568],
-    'Limerick': [52.6638, -8.6267],
-    'Waterford': [52.2593, -7.1101],
-    'Kilkenny': [52.6541, -7.2448],
-    'All Ireland': [53.4125, -7.9833],
-  }
-
   useEffect(() => {
-    // Update map center when county changes
-    if (countyCenters[selectedCounty]) {
-      setMapCenter(countyCenters[selectedCounty])
+    const center = COUNTY_CENTERS[selectedCounty]
+    if (center) {
+      setMapCenter(center)
       setMapZoom(selectedCounty === 'All Ireland' ? 7 : 12)
     }
   }, [selectedCounty])
@@ -153,38 +162,10 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
 
   const formatPrice = (event: any) => {
     if (event.is_free) return 'Free'
-    if (event.price_min === event.price_max) return `€${event.price_min}`
+    if (event.price_max == null || event.price_min === event.price_max) return `€${event.price_min}`
     return `€${event.price_min}-€${event.price_max}`
   }
 
-  if (loading) {
-    return (
-      <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
-        <div className="text-6xl mb-4">🗺️</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
-        <p className="text-gray-600">Finding venues with events today</p>
-      </div>
-    )
-  }
-
-  if (venues.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
-        <div className="text-6xl mb-4">📍</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">No events today</h3>
-        <p className="text-gray-600 mb-4">
-          {selectedCounty !== 'All Ireland'
-            ? `No venues with events in ${selectedCounty} today`
-            : 'No venues with events today'}
-        </p>
-        <p className="text-sm text-gray-500">
-          Try selecting a different county or check back tomorrow
-        </p>
-      </div>
-    )
-  }
-
-  // Don't render map during SSR
   if (!mounted) {
     return (
       <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
@@ -197,24 +178,25 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
 
   return (
     <div className="bg-white rounded-2xl border-2 border-emerald-200 overflow-hidden shadow-lg">
-      {/* Map Header */}
       <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white p-6">
         <h2 className="text-2xl font-bold mb-2">
-          🗺️ Live Events Map
+          Live Events Map
         </h2>
         <p className="text-emerald-50">
-          {venues.length} {venues.length === 1 ? 'venue' : 'venues'} with upcoming events in {selectedCounty}
+          {loading
+            ? 'Finding venues with events in the next 48 hours'
+            : `${venues.length} ${venues.length === 1 ? 'venue' : 'venues'} with upcoming events in ${selectedCounty}`}
         </p>
       </div>
 
-      {/* Map Container */}
       <div className="relative" style={{ height: '500px' }}>
         <MapContainer
-          center={mapCenter}
-          zoom={mapZoom}
+          center={COUNTY_CENTERS.Cork}
+          zoom={12}
           scrollWheelZoom={true}
           className="h-full w-full"
         >
+          <MapViewport center={mapCenter} zoom={mapZoom} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -281,7 +263,17 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
         </MapContainer>
       </div>
 
-      {/* Map Legend */}
+      {!loading && venues.length === 0 && (
+        <div className="border-t border-gray-200 p-6 text-center">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">No events in the next 48 hours</h3>
+          <p className="text-gray-600 text-sm">
+            {selectedCounty !== 'All Ireland'
+              ? `No venues with upcoming events in ${selectedCounty}.`
+              : 'No venues with upcoming events.'}
+          </p>
+        </div>
+      )}
+
       <div className="bg-gray-50 border-t border-gray-200 p-4">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">

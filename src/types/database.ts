@@ -29,6 +29,7 @@ export interface Venue {
   music_genres: string[] | null
   atmosphere: string[] | null
   age_restriction: string | null
+  accepts_hen_stag: boolean | null
   website: string | null
   phone: string | null
   email: string | null

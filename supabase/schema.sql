@@ -38,6 +38,7 @@ CREATE TABLE public.venues (
   music_genres TEXT[], -- array of genres
   atmosphere TEXT[], -- lively, relaxed, romantic, etc.
   age_restriction TEXT, -- 18+, 21+, all ages
+  accepts_hen_stag BOOLEAN, -- NULL means the venue hasn't said
   website TEXT,
   phone TEXT,
   email TEXT,
@@ -166,7 +167,15 @@ CREATE POLICY "Venues are publicly readable" ON public.venues
 
 -- Venue owners can manage their venues
 CREATE POLICY "Venue owners can update own venues" ON public.venues
-  FOR UPDATE USING (auth.uid() = owner_id);
+  FOR UPDATE
+  TO authenticated
+  USING ((select auth.uid()) = owner_id)
+  WITH CHECK ((select auth.uid()) = owner_id);
+
+CREATE POLICY "Venue owners can insert own venues" ON public.venues
+  FOR INSERT
+  TO authenticated
+  WITH CHECK ((select auth.uid()) = owner_id);
 
 -- Events are publicly readable when published
 CREATE POLICY "Published events are publicly readable" ON public.events
@@ -218,11 +227,15 @@ CREATE POLICY "Venue owners can create live updates" ON public.live_updates
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, full_name)
+  INSERT INTO public.users (id, email, full_name, role)
   VALUES (
     NEW.id,
     NEW.email,
-    NEW.raw_user_meta_data->>'full_name'
+    NEW.raw_user_meta_data->>'full_name',
+    CASE
+      WHEN NEW.raw_user_meta_data->>'account_type' = 'venue' THEN 'venue_owner'::public.user_role
+      ELSE 'consumer'::public.user_role
+    END
   );
   RETURN NEW;
 END;

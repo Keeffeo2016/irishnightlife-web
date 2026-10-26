@@ -1,32 +1,30 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { CheckCircle, MapPin, Users, TrendingUp, Calendar, DollarSign } from 'lucide-react'
+import { CheckCircle, MapPin, Users, TrendingUp } from 'lucide-react'
+import { PageHero, HeroAccent } from '@/components/layout/PageHero'
 
 export default function ForVenuesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-emerald-600 to-cyan-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">List Your Venue on IrishNightlife</h1>
-          <p className="text-xl mb-8 text-emerald-50">
-            Reach thousands of nightlife enthusiasts across Ireland. Get discovered, drive footfall, and grow your business.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/auth/signup">
-              <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8 py-6 text-lg">
+      <PageHero
+        title={<>List Your Venue on <HeroAccent>IrishNightlife</HeroAccent></>}
+        subtitle="Reach thousands of nightlife enthusiasts across Ireland. Get discovered, drive footfall, and grow your business."
+        actions={
+          <>
+            <Link href="/auth/signup?role=venue">
+              <Button variant="brand" size="lg" className="px-8 py-6 text-lg">
                 Get Started Free
               </Button>
             </Link>
             <Link href="#pricing">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg">
+              <Button variant="brand-outline-dark" size="lg" className="px-8 py-6 text-lg">
                 View Pricing
               </Button>
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Benefits Section */}
       <section className="py-16">
@@ -146,8 +144,8 @@ export default function ForVenuesPage() {
                     Basic analytics
                   </li>
                 </ul>
-                <Link href="/auth/signup">
-                  <Button className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                <Link href="/auth/signup?role=venue">
+                  <Button variant="brand-outline" className="w-full">
                     Get Started
                   </Button>
                 </Link>
@@ -187,8 +185,8 @@ export default function ForVenuesPage() {
                     Featured in AI Planner
                   </li>
                 </ul>
-                <Link href="/auth/signup">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Link href="/auth/signup?role=venue">
+                  <Button variant="brand" className="w-full">
                     Start Premium
                   </Button>
                 </Link>
@@ -221,7 +219,7 @@ export default function ForVenuesPage() {
                   </li>
                 </ul>
                 <Link href="/contact">
-                  <Button className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                  <Button variant="brand-outline" className="w-full">
                     Contact Sales
                   </Button>
                 </Link>
@@ -232,14 +230,14 @@ export default function ForVenuesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-emerald-600 to-cyan-600 text-white">
+      <section className="py-16 bg-gradient-to-br from-night via-night-soft to-forest text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Business?</h2>
-          <p className="text-xl mb-8 text-emerald-50">
+          <p className="text-xl mb-8 text-gray-300">
             Join hundreds of venues across Ireland already using IrishNightlife to drive footfall.
           </p>
-          <Link href="/auth/signup">
-            <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 px-8 py-6 text-lg">
+          <Link href="/auth/signup?role=venue">
+            <Button variant="brand" size="lg" className="px-8 py-6 text-lg">
               List Your Venue Now
             </Button>
           </Link>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,9 +9,20 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
+  )
+}
+
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
-  const [accountType, setAccountType] = useState<'consumer' | 'venue'>('consumer')
+  const [accountType, setAccountType] = useState<'consumer' | 'venue'>(
+    searchParams.get('role') === 'venue' ? 'venue' : 'consumer'
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -21,7 +32,9 @@ export default function SignupPage() {
     email: '',
     password: '',
     venueName: '',
+    address: '',
     city: '',
+    county: '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,8 +73,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
-      <Card className="w-full max-w-md bg-white border-gray-200">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-night via-night-soft to-forest">
+      <Card className="w-full max-w-md bg-white border-gray-200 shadow-2xl shadow-mint/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <MapPin className="h-10 w-10 text-emerald-600" />
@@ -91,7 +104,7 @@ export default function SignupPage() {
               onClick={() => setAccountType('consumer')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'consumer'
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-mint text-night font-semibold'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -102,7 +115,7 @@ export default function SignupPage() {
               onClick={() => setAccountType('venue')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'venue'
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-mint text-night font-semibold'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -174,12 +187,32 @@ export default function SignupPage() {
                   />
                 </div>
                 <div>
+                  <label className="text-sm text-gray-700 mb-1 block font-medium">Address</label>
+                  <Input
+                    placeholder="12 Oliver Plunkett Street"
+                    className="bg-white border-gray-300 text-gray-900"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
                   <label className="text-sm text-gray-700 mb-1 block font-medium">City</label>
                   <Input
-                    placeholder="Dublin"
+                    placeholder="Cork"
                     className="bg-white border-gray-300 text-gray-900"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-700 mb-1 block font-medium">County</label>
+                  <Input
+                    placeholder="Cork"
+                    className="bg-white border-gray-300 text-gray-900"
+                    value={formData.county}
+                    onChange={(e) => setFormData({ ...formData, county: e.target.value })}
                     required
                   />
                 </div>
@@ -188,7 +221,8 @@ export default function SignupPage() {
 
             <Button 
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6" 
+              variant="brand"
+              className="w-full py-6"
               size="lg"
               disabled={loading}
             >

@@ -2,7 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  // Skip Supabase middleware if credentials are not configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next({ request })
   }
@@ -10,8 +9,8 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -30,7 +29,46 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  const path = request.nextUrl.pathname
+  const needsOwner = path.startsWith('/dashboard')
+  const needsAdmin = path.startsWith('/admin')
+
+  if (needsOwner || needsAdmin) {
+    const redirectTo = (pathname: string) => {
+      const url = request.nextUrl.clone()
+      url.pathname = pathname
+      url.search = ''
+      if (pathname === '/auth/login') {
+        url.searchParams.set('next', path)
+      }
+      const redirectResponse = NextResponse.redirect(url)
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie)
+      })
+      return redirectResponse
+    }
+
+    if (!user) {
+      return redirectTo('/auth/login')
+    }
+
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const role = profile?.role
+
+    if (needsAdmin && role !== 'admin') {
+      return redirectTo('/')
+    }
+
+    if (needsOwner && role !== 'venue_owner' && role !== 'admin') {
+      return redirectTo('/for-venues')
+    }
+  }
 
   return supabaseResponse
 }

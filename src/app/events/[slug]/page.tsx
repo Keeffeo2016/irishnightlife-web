@@ -1,10 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { MapPin, Calendar, Clock, Euro, Music, Share2, Heart } from 'lucide-react'
+
+export const instant = false
+import { MapPin, Calendar, Clock, Euro, Music, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
+import { PageHero } from '@/components/layout/PageHero'
 
 interface EventPageProps {
   params: Promise<{ slug: string }>
@@ -33,7 +37,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const formatPrice = () => {
     if (event.is_free) return 'Free Entry'
-    if (event.price_min === event.price_max) return `€${event.price_min}`
+    if (event.price_max == null || event.price_min === event.price_max) return `€${event.price_min}`
     return `€${event.price_min} - €${event.price_max}`
   }
 
@@ -54,46 +58,39 @@ export default async function EventPage({ params }: EventPageProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/events" className="text-emerald-600 font-medium">Events</Link>
-              <Link href="/venues" className="text-gray-700 hover:text-emerald-600 font-medium">Venues</Link>
-              <Link href="/for-venues" className="text-gray-700 hover:text-emerald-600 font-medium">For Venues</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col bg-gray-50">
+      <PageHero
+        align="left"
+        showMap={false}
+        eyebrow={
+          <Badge className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
+            {event.music_genre}
+          </Badge>
+        }
+        title={event.title}
+        subtitle={
+          <>
+            at{' '}
+            <Link href={`/venues/${event.venues.slug}`} className="text-mint hover:text-mint-light">
+              {event.venues.name}
+            </Link>
+          </>
+        }
+        actions={
+          <>
+            <FavoriteButton eventId={event.id} venueId={event.venues.id} />
+            <Button variant="outline" size="icon" aria-label="Share">
+              <Share2 className="h-5 w-5" />
+            </Button>
+          </>
+        }
+      />
 
-      {/* Event Details */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Event Header */}
-            <div className="bg-white rounded-2xl p-8 mb-6">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <Badge className="bg-emerald-100 text-emerald-700 mb-4">
-                    {event.music_genre}
-                  </Badge>
-                  <h1 className="text-4xl font-bold text-gray-900 mb-2">{event.title}</h1>
-                  <p className="text-gray-600 text-lg">at {event.venues.name}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Share2 className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-
+            <div className="bg-white rounded-2xl ring-1 ring-foreground/10 p-8 mb-6">
               <p className="text-gray-700 text-lg mb-6">{event.description}</p>
 
               <div className="grid grid-cols-2 gap-4">
@@ -152,7 +149,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     </div>
                     <p className="text-gray-600 mb-4">{event.venues.description}</p>
                     <Link href={`/venues/${event.venues.slug}`}>
-                      <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                      <Button variant="brand-outline">
                         View Venue
                       </Button>
                     </Link>
@@ -172,7 +169,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     <span className="text-gray-600">Price</span>
                     <span className="text-2xl font-bold text-gray-900">{formatPrice()}</span>
                   </div>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg">
+                  <Button variant="brand" className="w-full py-6 text-lg">
                     Get Tickets
                   </Button>
                   <p className="text-sm text-gray-500 text-center">

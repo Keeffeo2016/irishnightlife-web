@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, MapPin, Star } from 'lucide-react'
+import { Search, MapPin, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { IRISH_COUNTIES, PROVINCES } from '@/lib/counties'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { PageHero, HeroAccent } from '@/components/layout/PageHero'
 
 const supabase = createClient()
 
@@ -50,7 +51,7 @@ export default function VenuesPage() {
       }
 
       if (selectedType !== 'All') {
-        query = query.eq('venue_type', selectedType.toLowerCase().replace(' ', '_'))
+        query = query.eq('venue_type', selectedType.toLowerCase().replace(/\s+/g, '_'))
       }
 
       if (searchQuery) {
@@ -72,82 +73,58 @@ export default function VenuesPage() {
   }, [selectedCounty, selectedType, searchQuery])
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-2xl font-bold text-emerald-600">IrishNightlife</Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/events" className="text-gray-700 hover:text-emerald-600 font-medium">Events</Link>
-              <Link href="/venues" className="text-emerald-600 font-medium">Venues</Link>
-              <Link href="/for-venues" className="text-gray-700 hover:text-emerald-600 font-medium">For Venues</Link>
-            </nav>
-          </div>
+    <div className="flex flex-col bg-gray-50">
+      <PageHero
+        title={<>Venues Across <HeroAccent>Ireland</HeroAccent></>}
+        subtitle="Discover the best bars, clubs, and live music venues"
+      >
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            placeholder="Search venues or towns..."
+            className="pl-12 pr-4 py-6 text-lg bg-white text-gray-900 border-gray-300 rounded-xl"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-      </header>
 
-      {/* Hero */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-              Venues Across Ireland
-            </h1>
-            <p className="text-xl text-gray-600">
-              Discover the best bars, clubs, and live music venues
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-xl hover:border-emerald-500 transition-colors">
+            <MapPin className="h-5 w-5 text-emerald-600" />
+            <span className="sr-only">County</span>
+            <select
+              value={selectedCounty}
+              onChange={(e) => setSelectedCounty(e.target.value)}
+              className="flex-1 bg-transparent border-none outline-none font-medium text-gray-900 cursor-pointer"
+            >
+              <option value="All Ireland">All Ireland</option>
+              {PROVINCES.map(province => (
+                <optgroup key={province} label={province}>
+                  {IRISH_COUNTIES
+                    .filter(county => county.province === province)
+                    .map(county => (
+                      <option key={county.name} value={county.name}>{county.name}</option>
+                    ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
 
-          {/* Search and Filters */}
-          <div className="max-w-4xl mx-auto">
-            <div className="relative mb-4">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                placeholder="Search venues..."
-                className="pl-12 pr-4 py-6 text-lg border-gray-300 rounded-xl"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">County</label>
-                <select
-                  value={selectedCounty}
-                  onChange={(e) => setSelectedCounty(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl font-medium text-gray-900"
-                >
-                  <option value="All Ireland">All Ireland</option>
-                  {PROVINCES.map(province => (
-                    <optgroup key={province} label={province}>
-                      {IRISH_COUNTIES
-                        .filter(county => county.province === province)
-                        .map(county => (
-                          <option key={county.name} value={county.name}>{county.name}</option>
-                        ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Venue Type</label>
-                <select
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl font-medium text-gray-900"
-                >
-                  {VENUE_TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
+          <label className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-300 rounded-xl hover:border-emerald-500 transition-colors">
+            <Filter className="h-5 w-5 text-emerald-600" />
+            <span className="sr-only">Venue type</span>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="flex-1 bg-transparent border-none outline-none font-medium text-gray-900 cursor-pointer"
+            >
+              {VENUE_TYPES.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </label>
         </div>
-      </section>
+      </PageHero>
 
       {/* Venues Grid */}
       <section className="flex-1">
@@ -167,13 +144,13 @@ export default function VenuesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {venues.map((venue) => (
                 <Link key={venue.id} href={`/venues/${venue.slug}`}>
-                  <Card className="bg-white border-gray-200 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer h-full">
+                  <Card className="bg-white border-2 border-gray-200 hover:border-emerald-500 hover:shadow-2xl transition-all cursor-pointer h-full group">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-1">{venue.name}</h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">{venue.name}</h3>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="h-4 w-4" />
+                            <MapPin className="h-4 w-4 text-emerald-600" />
                             <span>{venue.city}, {venue.county}</span>
                           </div>
                         </div>
@@ -188,7 +165,7 @@ export default function VenuesPage() {
 
                       <div className="flex flex-wrap gap-2 mb-4">
                         <Badge variant="outline" className="border-gray-300 text-gray-700">
-                          {venue.venue_type.replace('_', ' ')}
+                          {venue.venue_type?.replaceAll('_', ' ')}
                         </Badge>
                         <Badge variant="outline" className="border-gray-300 text-gray-700">
                           {venue.price_range}
