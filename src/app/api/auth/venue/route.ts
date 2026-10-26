@@ -1,15 +1,24 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeEircode } from '@/lib/eircode'
 import { slugify } from '@/lib/slug'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { venueName, city, county, address } = await request.json()
+    const { venueName, city, county, address, eircode } = await request.json()
+    const postcode = normalizeEircode(typeof eircode === 'string' ? eircode : '')
 
-    if (!venueName || !city || !county || !address) {
+    if (!venueName || !city || !county || !address || !String(eircode ?? '').trim()) {
       return NextResponse.json(
-        { error: 'Venue name, address, city, and county are required.' },
+        { error: 'Venue name, address, Eircode, city, and county are required.' },
+        { status: 400 }
+      )
+    }
+
+    if (!postcode) {
+      return NextResponse.json(
+        { error: 'Enter a valid Eircode, such as T12 W8RP.' },
         { status: 400 }
       )
     }
@@ -85,6 +94,7 @@ export async function POST(request: NextRequest) {
       address,
       city,
       county,
+      postcode,
       venue_type: 'pub',
       subscription_tier: 'free',
       subscription_status: 'active',

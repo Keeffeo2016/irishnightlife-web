@@ -1,15 +1,24 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeEircode } from '@/lib/eircode'
 import { slugify } from '@/lib/slug'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, fullName, accountType, venueName, city, county, address } = await request.json()
+    const { email, password, fullName, accountType, venueName, city, county, address, eircode } = await request.json()
+    const postcode = accountType === 'venue' ? normalizeEircode(typeof eircode === 'string' ? eircode : '') : null
 
-    if (accountType === 'venue' && (!venueName || !city || !county || !address)) {
+    if (accountType === 'venue' && (!venueName || !city || !county || !address || !String(eircode ?? '').trim())) {
       return NextResponse.json(
-        { error: 'Venue name, address, city, and county are required.' },
+        { error: 'Venue name, address, Eircode, city, and county are required.' },
+        { status: 400 }
+      )
+    }
+
+    if (accountType === 'venue' && !postcode) {
+      return NextResponse.json(
+        { error: 'Enter a valid Eircode, such as T12 W8RP.' },
         { status: 400 }
       )
     }
@@ -50,6 +59,7 @@ export async function POST(request: NextRequest) {
         address,
         city,
         county,
+        postcode,
         venue_type: 'pub',
         subscription_tier: 'free',
         subscription_status: 'active',
@@ -78,7 +88,7 @@ export async function POST(request: NextRequest) {
         email: authData.user.email,
       },
       message: accountType === 'venue'
-        ? 'Venue registered. Check your email to confirm, then sign in to open the dashboard.'
+        ? 'Venue registered. It stays hidden until a superadmin approves it. Check your email to confirm, then sign in.'
         : 'Account created. Check your email to confirm, then sign in.',
     })
   } catch (error) {

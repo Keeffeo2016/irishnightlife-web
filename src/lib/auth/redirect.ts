@@ -4,3 +4,8 @@ export function safeNextPath(value: string | null, fallback = '/') {
   }
   return value
 }
+
+export function pathAfterSignIn(role: string | null | undefined, next: string) {
+  if (role === 'venue_owner') return '/dashboard'
+  return next
+}

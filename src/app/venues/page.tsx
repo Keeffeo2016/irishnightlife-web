@@ -44,6 +44,7 @@ export default function VenuesPage() {
       let query = supabase
         .from('venues')
         .select('*')
+        .eq('is_verified', true)
         .order('name', { ascending: true })
 
       if (selectedCounty !== 'All Ireland') {

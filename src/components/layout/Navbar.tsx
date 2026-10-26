@@ -14,32 +14,57 @@ const LINKS = [
   { href: '/for-venues', label: 'For Venues' },
 ]
 
+const VENUE_LINKS = [
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard/events', label: 'Events' },
+  { href: '/dashboard/profile', label: 'Profile' },
+]
+
+function isVenueLinkActive(pathname: string, href: string) {
+  if (href === '/dashboard') return pathname === '/dashboard'
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
 export function Navbar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [signedIn, setSignedIn] = useState<boolean | null>(null)
+  const [role, setRole] = useState<string | null>(null)
 
   const close = () => setIsOpen(false)
-
-  useEffect(() => {
-    const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSignedIn(Boolean(session?.user))
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+  const links = role === 'venue_owner' ? VENUE_LINKS : LINKS
+  const isVenue = role === 'venue_owner'
 
   useEffect(() => {
     const supabase = createClient()
     let active = true
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (active) setSignedIn(Boolean(data.user))
+    async function loadSession() {
+      const { data } = await supabase.auth.getUser()
+      if (!active) return
+      if (!data.user) {
+        setSignedIn(false)
+        setRole(null)
+        return
+      }
+      setSignedIn(true)
+      const { data: profile } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle()
+      if (active) setRole(profile?.role ?? null)
+    }
+
+    loadSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      loadSession()
     })
 
     return () => {
       active = false
+      subscription.unsubscribe()
     }
   }, [pathname])
 
@@ -59,23 +84,37 @@ export function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            {LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-gray-300 hover:text-mint font-medium transition"
-              >
-                {link.label}
+            {links.map((link) => {
+              const active = isVenue && isVenueLinkActive(pathname, link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={
+                    active
+                      ? 'text-mint font-medium'
+                      : 'text-gray-300 hover:text-mint font-medium transition'
+                  }
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+            {role === 'admin' ? (
+              <Link href="/admin" className="text-gray-300 hover:text-mint font-medium transition">
+                Admin
               </Link>
-            ))}
-            {signedIn === null ? null : signedIn ? (
+            ) : null}
+            {!isVenue && signedIn === true ? (
               <Link
                 href="/profile"
                 className="inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10 transition"
               >
                 Profile
               </Link>
-            ) : (
+            ) : null}
+            {!isVenue && signedIn === false ? (
               <>
                 <Link
                   href="/auth/login"
@@ -90,7 +129,7 @@ export function Navbar() {
                   Get Started
                 </Link>
               </>
-            )}
+            ) : null}
           </div>
 
           <button
@@ -105,18 +144,27 @@ export function Navbar() {
 
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            {LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block py-2 text-gray-300 hover:text-mint"
-                onClick={close}
-              >
-                {link.label}
+            {links.map((link) => {
+              const active = isVenue && isVenueLinkActive(pathname, link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`block py-2 ${active ? 'text-mint font-medium' : 'text-gray-300 hover:text-mint'}`}
+                  onClick={close}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+            {role === 'admin' ? (
+              <Link href="/admin" className="block py-2 text-gray-300 hover:text-mint" onClick={close}>
+                Admin
               </Link>
-            ))}
-            <div className="flex gap-2 pt-2">
-              {signedIn === null ? null : signedIn ? (
+            ) : null}
+            {!isVenue && signedIn === true ? (
+              <div className="flex gap-2 pt-2">
                 <Link
                   href="/profile"
                   onClick={close}
@@ -124,25 +172,26 @@ export function Navbar() {
                 >
                   Profile
                 </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/auth/login"
-                    onClick={close}
-                    className="flex-1 inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/signup"
-                    onClick={close}
-                    className="flex-1 inline-flex items-center justify-center rounded-md bg-mint px-4 py-2 text-sm font-semibold text-night hover:bg-mint-light"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
+              </div>
+            ) : null}
+            {!isVenue && signedIn === false ? (
+              <div className="flex gap-2 pt-2">
+                <Link
+                  href="/auth/login"
+                  onClick={close}
+                  className="flex-1 inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  onClick={close}
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-mint px-4 py-2 text-sm font-semibold text-night hover:bg-mint-light"
+                >
+                  Get Started
+                </Link>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

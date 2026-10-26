@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { AuthDivider, SocialAuthButtons } from '@/components/auth/SocialAuthButtons'
-import { safeNextPath } from '@/lib/auth/redirect'
+import { pathAfterSignIn, safeNextPath } from '@/lib/auth/redirect'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,7 +50,8 @@ function LoginForm() {
         throw new Error(message)
       }
 
-      router.push(nextPath)
+      const role = typeof data.role === 'string' ? data.role : null
+      router.push(pathAfterSignIn(role, nextPath))
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

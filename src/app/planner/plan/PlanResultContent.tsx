@@ -1,14 +1,23 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { MapPin, Clock, Euro, Sparkles, RefreshCw, Share2 } from 'lucide-react'
+import { MapPin, Clock, Euro, Sparkles, RefreshCw, Share2, Check, Shuffle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import PlanMap from '@/components/PlanMap'
 import { PageHero, HeroAccent } from '@/components/layout/PageHero'
+import {
+  bestAlternate,
+  canShuffleStops,
+  detailHrefFromPlan,
+  shuffleStops,
+  summarizeEvents,
+  sortStopsByStart,
+  swapStop,
+} from '@/lib/planner'
 
 interface Venue {
   id: string
@@ -40,87 +49,218 @@ interface Event {
   venues: Venue
 }
 
-interface PlanResult {
-  narrative: string
-  events: Event[]
-  total_cost: string
-  estimated_duration: string
+interface ScoredStop {
+  event: Event
+  reasons: string[]
+}
+
+type ShareState = 'idle' | 'copied' | 'failed'
+
+const LOADING_LINES = [
+  "Checking who's on tonight…",
+  'Leaving room for a late one…',
+  'Matching the vibe to the room…',
+  'Keeping tomorrow morning in mind…',
+]
+
+function checksKey(query: string): string {
+  return `irishnightlife:planner-checks:${query}`
+}
+
+function readChecks(query: string): string[] {
+  try {
+    const raw = window.localStorage.getItem(checksKey(query))
+    if (!raw) return []
+    const parsed: unknown = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((item): item is string => typeof item === 'string')
+  } catch {
+    return []
+  }
+}
+
+function withReasons(stops: ScoredStop[] | undefined): ScoredStop[] {
+  if (!Array.isArray(stops)) return []
+  return stops.flatMap(stop => {
+    if (!stop?.event?.id) return []
+    const reasons = Array.isArray(stop.reasons)
+      ? stop.reasons.filter((reason): reason is string => typeof reason === 'string')
+      : []
+    return [{ event: stop.event, reasons }]
+  })
+}
+
+function shareLabel(state: ShareState): string {
+  switch (state) {
+    case 'idle':
+      return 'Share Plan'
+    case 'copied':
+      return 'Copied'
+    case 'failed':
+      return "Couldn't copy"
+    default: {
+      const unexpected: never = state
+      return unexpected
+    }
+  }
+}
+
+export function PlannerLoading() {
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setIndex(current => (current + 1) % LOADING_LINES.length)
+    }, 1600)
+    return () => window.clearInterval(id)
+  }, [])
+
+  return (
+    <div className="flex flex-col bg-gray-50">
+      <main className="flex flex-1 items-center justify-center py-24">
+        <div className="text-center">
+          <Sparkles className="mx-auto mb-4 h-16 w-16 animate-pulse text-emerald-600" />
+          <h2 className="mb-2 text-2xl font-bold text-gray-900">Crafting your perfect night...</h2>
+          <p className="text-gray-600">{LOADING_LINES[index]}</p>
+        </div>
+      </main>
+    </div>
+  )
 }
 
 export default function PlanResultContent() {
   const searchParams = useSearchParams()
-  const [plan, setPlan] = useState<PlanResult | null>(null)
+  const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [narrative, setNarrative] = useState('')
+  const [catalog, setCatalog] = useState<ScoredStop[]>([])
+  const [stops, setStops] = useState<ScoredStop[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [openWhyId, setOpenWhyId] = useState<string | null>(null)
+  const [checkedIds, setCheckedIds] = useState<string[]>([])
+  const [shareState, setShareState] = useState<ShareState>('idle')
 
-  const context = {
-    who: searchParams.get('who') || '',
-    occasion: searchParams.get('occasion') || '',
-    vibe: searchParams.get('vibe') || '',
-    budget: searchParams.get('budget') || '',
-    tomorrow: searchParams.get('tomorrow') || '',
-  }
+  const who = searchParams.get('who') || ''
+  const occasion = searchParams.get('occasion') || ''
+  const vibe = searchParams.get('vibe') || ''
+  const budget = searchParams.get('budget') || ''
+  const tomorrow = searchParams.get('tomorrow') || ''
+  const queryKey = searchParams.toString()
+
+  const fetchPlan = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/planner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ who, occasion, vibe, budget, tomorrow }),
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to generate plan')
+      }
+
+      const nextStops = withReasons(data?.stops)
+      const nextAlternates = withReasons(data?.alternates)
+      setNarrative(typeof data?.narrative === 'string' ? data.narrative : '')
+      setCatalog([...nextStops, ...nextAlternates])
+      setStops(sortStopsByStart(nextStops))
+      setOpenWhyId(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }, [who, occasion, vibe, budget, tomorrow])
 
   useEffect(() => {
-    async function fetchPlan() {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/planner', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(context),
-        })
+    void fetchPlan()
+  }, [fetchPlan])
 
-        const data = await response.json().catch(() => null)
+  useEffect(() => {
+    setCheckedIds(readChecks(queryKey))
+  }, [queryKey])
 
-        if (!response.ok) {
-          throw new Error(data?.error || 'Failed to generate plan')
-        }
-
-        setPlan(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setLoading(false)
-      }
+  useEffect(() => {
+    return () => {
+      if (shareTimer.current) clearTimeout(shareTimer.current)
     }
-
-    fetchPlan()
   }, [])
 
-  const handleRegenerate = () => {
-    setLoading(true)
-    setPlan(null)
-    fetch('/api/planner', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(context),
+  const mapVenues = useMemo(
+    () =>
+      stops.map(stop => ({
+        id: stop.event.venues.id,
+        name: stop.event.venues.name,
+        slug: stop.event.venues.slug,
+        address: stop.event.venues.address,
+        city: stop.event.venues.city,
+        latitude: stop.event.venues.latitude,
+        longitude: stop.event.venues.longitude,
+      })),
+    [stops]
+  )
+
+  const toggleChecked = (eventId: string) => {
+    setCheckedIds(current => {
+      const next = current.includes(eventId)
+        ? current.filter(id => id !== eventId)
+        : [...current, eventId]
+      try {
+        window.localStorage.setItem(checksKey(queryKey), JSON.stringify(next))
+      } catch {
+        // The stamp still updates if storage is unavailable.
+      }
+      return next
     })
-      .then(async res => {
-        const data = await res.json().catch(() => null)
-        if (!res.ok) {
-          throw new Error(data?.error || 'Failed to generate plan')
-        }
-        setPlan(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err.message)
-        setLoading(false)
-      })
   }
 
-  const handleShare = () => {
-    const url = window.location.href
-    navigator.clipboard.writeText(url)
-    alert('Plan link copied to clipboard!')
+  const handleShare = async () => {
+    if (shareTimer.current) clearTimeout(shareTimer.current)
+    try {
+      const wrote = navigator.clipboard.writeText(window.location.href)
+      const timedOut = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('clipboard timeout')), 1500)
+      })
+      await Promise.race([wrote, timedOut])
+      setShareState('copied')
+    } catch {
+      setShareState('failed')
+    }
+    shareTimer.current = setTimeout(() => setShareState('idle'), 2000)
   }
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-IE', {
+  const formatWhen = (dateString: string) => {
+    const date = new Date(dateString)
+    const time = date.toLocaleTimeString('en-IE', {
       hour: '2-digit',
       minute: '2-digit',
     })
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const day = new Date(date)
+    day.setHours(0, 0, 0, 0)
+    const dayOffset = Math.round((day.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    if (dayOffset === 0) return time
+    if (dayOffset === 1) return `Tomorrow ${time}`
+    if (dayOffset === -1) return `Yesterday ${time}`
+    return `${date.toLocaleDateString('en-IE', { weekday: 'short' })} ${time}`
+  }
+
+  const formatRange = (start: string, end: string) => {
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    const sameDay = startDate.toDateString() === endDate.toDateString()
+    if (sameDay) {
+      const startLabel = formatWhen(start)
+      const endTime = endDate.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })
+      return `${startLabel} - ${endTime}`
+    }
+    return `${formatWhen(start)} - ${formatWhen(end)}`
   }
 
   const formatPrice = (event: Event) => {
@@ -129,19 +269,7 @@ export default function PlanResultContent() {
     return `€${event.price_min}-€${event.price_max}`
   }
 
-  if (loading) {
-    return (
-      <div className="flex flex-col bg-gray-50">
-        <main className="flex-1 flex items-center justify-center py-24">
-          <div className="text-center">
-            <Sparkles className="h-16 w-16 text-emerald-600 mx-auto mb-4 animate-pulse" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Crafting your perfect night...</h2>
-            <p className="text-gray-600">Finding the best venues and events for you</p>
-          </div>
-        </main>
-      </div>
-    )
-  }
+  if (loading) return <PlannerLoading />
 
   if (error) {
     return (
@@ -159,117 +287,204 @@ export default function PlanResultContent() {
     )
   }
 
-  if (!plan) {
-    return null
+  if (stops.length === 0) {
+    return (
+      <div className="flex flex-col bg-gray-50">
+        <main className="flex-1 flex items-center justify-center py-24">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nothing lined up</h2>
+            <p className="text-gray-600 mb-4">No events matched this night. Start over and try a different vibe.</p>
+            <Link href="/planner">
+              <Button variant="brand">Start Over</Button>
+            </Link>
+          </div>
+        </main>
+      </div>
+    )
   }
+
+  const totals = summarizeEvents(stops.map(stop => stop.event))
+  const shuffleReady = canShuffleStops(catalog, stops)
+  const nightSorted = stops.every(stop => checkedIds.includes(stop.event.id))
 
   return (
     <div className="flex flex-col bg-gray-50">
       <PageHero
         eyebrow={<Sparkles className="h-10 w-10 text-mint mx-auto" />}
         title={<>Your Perfect <HeroAccent>Night</HeroAccent></>}
-        subtitle={<span className="italic">&ldquo;{plan.narrative}&rdquo;</span>}
+        subtitle={<span className="italic">&ldquo;{narrative}&rdquo;</span>}
       >
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300 mb-6">
           <div className="flex items-center gap-2">
             <Euro className="h-4 w-4 text-mint" />
-            <span>Estimated cost: {plan.total_cost}</span>
+            <span>Estimated cost: {totals.total_cost}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-mint" />
-            <span>Duration: {plan.estimated_duration}</span>
+            <span>Duration: {totals.estimated_duration}</span>
           </div>
         </div>
-        <div className="flex items-center justify-center gap-4">
-          <Button onClick={handleRegenerate} variant="brand">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Regenerate Plan
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Button
+            onClick={() => setStops(current => shuffleStops(catalog, current))}
+            variant="brand"
+            disabled={!shuffleReady}
+          >
+            <Shuffle className="mr-2 h-4 w-4" />
+            Shuffle the night
           </Button>
-          <Button onClick={handleShare} variant="brand-outline-dark">
+          <Button onClick={() => void fetchPlan()} variant="brand-outline-dark">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Fresh draw
+          </Button>
+          <Button onClick={() => void handleShare()} variant="brand-outline-dark">
             <Share2 className="mr-2 h-4 w-4" />
-            Share Plan
+            {shareLabel(shareState)}
           </Button>
         </div>
       </PageHero>
 
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <ol className="relative space-y-6">
+            {stops.length > 1 && (
+              <div aria-hidden className="absolute top-10 bottom-10 left-5 w-px -translate-x-1/2 bg-emerald-200" />
+            )}
+            {stops.map((stop, index) => {
+              const event = stop.event
+              const checked = checkedIds.includes(event.id)
+              const replacement = bestAlternate(catalog, stops, index)
+              const whyOpen = openWhyId === event.id
+              const reasons = stop.reasons.length > 0 ? stop.reasons : ['It lined up with your night.']
 
-          {/* Timeline */}
-          <div className="space-y-6">
-            {plan.events.map((event, index) => (
-              <Card key={event.id} className="bg-white border-gray-200 hover:border-emerald-500 transition-all">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    {/* Timeline Number */}
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
-                        {index + 1}
-                      </div>
-                    </div>
+              return (
+                <li key={event.id} className="relative flex gap-3 sm:gap-4">
+                  <div
+                    className={`relative z-10 mt-6 flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
+                      checked
+                        ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-600'
+                        : 'bg-emerald-600 text-white'
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
 
-                    {/* Event Details */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-1">{event.title}</h3>
-                          <Link
-                            href={`/venues/${event.venues.slug}`}
-                            className="text-emerald-600 hover:text-emerald-700 font-medium"
+                  <Card
+                    className={`relative min-w-0 flex-1 transition-all ${
+                      checked
+                        ? 'border-emerald-200 bg-emerald-50/60 opacity-80'
+                        : 'border-gray-200 bg-white hover:border-emerald-500'
+                    }`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="animate-in fade-in-0 duration-300" key={event.id}>
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                          <div>
+                            <div className="mb-1 flex flex-wrap items-center gap-2">
+                              <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
+                              {checked && (
+                                <span className="rotate-[-8deg] rounded-md border-2 border-emerald-600 px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                                  Sorted
+                                </span>
+                              )}
+                            </div>
+                            <Link
+                              href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}
+                              className="font-medium text-emerald-600 hover:text-emerald-700"
+                            >
+                              {event.venues.name}
+                            </Link>
+                          </div>
+                          <button
+                            type="button"
+                            aria-pressed={checked}
+                            aria-label={checked ? 'Mark this stop as not sorted' : 'Mark this stop as sorted'}
+                            onClick={() => toggleChecked(event.id)}
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                              checked
+                                ? 'border-emerald-600 bg-emerald-600 text-white'
+                                : 'border-gray-300 bg-white text-gray-400 hover:border-emerald-400 hover:text-emerald-600'
+                            }`}
                           >
-                            {event.venues.name}
+                            <Check className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        {event.music_genre && (
+                          <Badge className="mb-3 bg-emerald-100 text-emerald-700">{event.music_genre}</Badge>
+                        )}
+
+                        <p className="mb-4 text-gray-600">{event.description}</p>
+
+                        <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{formatRange(event.start_time, event.end_time)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{event.venues.address}, {event.venues.city}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Euro className="h-4 w-4" />
+                            <span>{formatPrice(event)}</span>
+                          </div>
+                        </div>
+
+                        <div className="mb-4 flex flex-wrap gap-2">
+                          {(event.venues.atmosphere ?? []).slice(0, 3).map(atm => (
+                            <Badge key={atm} variant="outline" className="border-gray-300 text-gray-700">
+                              {atm}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        {whyOpen && (
+                          <div className="mb-4 flex animate-in fade-in-0 flex-wrap gap-2">
+                            {reasons.map(reason => (
+                              <Badge key={reason} className="bg-emerald-50 text-emerald-800">
+                                {reason}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-3">
+                          <Button variant="brand-outline" onClick={() => setOpenWhyId(whyOpen ? null : event.id)}>
+                            {whyOpen ? 'Hide why' : 'Why this'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                            disabled={!replacement}
+                            onClick={() => {
+                              const next = swapStop(catalog, stops, index)
+                              if (next) setStops(next)
+                            }}
+                          >
+                            {replacement ? 'Swap' : "That's the only match"}
+                          </Button>
+                          <Link href={detailHrefFromPlan(`/events/${event.slug}`, queryKey)}>
+                            <Button variant="brand-outline">View Event Details</Button>
+                          </Link>
+                          <Link href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}>
+                            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                              View Venue
+                            </Button>
                           </Link>
                         </div>
-                        <Badge className="bg-emerald-100 text-emerald-700">
-                          {event.music_genre}
-                        </Badge>
                       </div>
+                    </CardContent>
+                  </Card>
+                </li>
+              )
+            })}
+          </ol>
 
-                      <p className="text-gray-600 mb-4">{event.description}</p>
+          {nightSorted && (
+            <p className="mt-8 text-center text-lg font-medium text-emerald-700">That&apos;s the night, sorted.</p>
+          )}
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{formatTime(event.start_time)} - {formatTime(event.end_time)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          <span>{event.venues.address}, {event.venues.city}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Euro className="h-4 w-4" />
-                          <span>{formatPrice(event)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {event.venues.atmosphere.slice(0, 3).map((atm, idx) => (
-                          <Badge key={idx} variant="outline" className="border-gray-300 text-gray-700">
-                            {atm}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Link href={`/events/${event.slug}`}>
-                          <Button variant="brand-outline">
-                            View Event Details
-                          </Button>
-                        </Link>
-                        <Link href={`/venues/${event.venues.slug}`}>
-                          <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                            View Venue
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Map */}
           <div className="mt-8">
             <Suspense fallback={
               <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
@@ -278,33 +493,28 @@ export default function PlanResultContent() {
                 <p className="text-gray-600">Preparing your route</p>
               </div>
             }>
-              <PlanMap 
-                venues={plan.events.map(event => ({
-                  id: event.venues.id,
-                  name: event.venues.name,
-                  slug: event.venues.slug,
-                  address: event.venues.address,
-                  city: event.venues.city,
-                  latitude: event.venues.latitude,
-                  longitude: event.venues.longitude,
-                }))} 
-              />
+              <PlanMap venues={mapVenues} detailQuery={queryKey} />
             </Suspense>
           </div>
 
-          {/* CTA */}
           <div className="text-center mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Not quite right?</h2>
-            <p className="text-gray-600 mb-6">Try regenerating or start over with different preferences</p>
-            <div className="flex items-center justify-center gap-4">
-              <Button onClick={handleRegenerate} variant="brand">
+            <p className="text-gray-600 mb-6">Shuffle a new route, draw again, or start over</p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Button
+                onClick={() => setStops(current => shuffleStops(catalog, current))}
+                variant="brand"
+                disabled={!shuffleReady}
+              >
+                <Shuffle className="mr-2 h-4 w-4" />
+                Shuffle
+              </Button>
+              <Button onClick={() => void fetchPlan()} variant="brand-outline">
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Regenerate
+                Fresh draw
               </Button>
               <Link href="/planner">
-                <Button variant="brand-outline">
-                  Start Over
-                </Button>
+                <Button variant="brand-outline">Start Over</Button>
               </Link>
             </div>
           </div>

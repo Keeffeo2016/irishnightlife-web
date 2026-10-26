@@ -1,5 +1,8 @@
+import { summarizeEvents } from '@/lib/planner'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+
+const ALTERNATE_LIMIT = 8
 
 // Context to atmosphere/vibe mapping
 const VIBE_TO_ATMOSPHERE: Record<string, string[]> = {
@@ -223,6 +226,7 @@ export async function POST(request: NextRequest) {
         venues (*)
       `)
       .eq('is_published', true)
+      .eq('venues.is_verified', true)
       .gte('start_time', now.toISOString())
       .lte('start_time', fortyEightHoursLater.toISOString())
       .order('start_time', { ascending: true })
@@ -266,45 +270,57 @@ export async function POST(request: NextRequest) {
 
     // Select 2-3 events for the plan
     // Ensure variety: don't pick two events at the same venue
-    const selectedEvents: any[] = []
+    const selected: ScoredEvent[] = []
     const usedVenues = new Set<string>()
 
     for (const scored of scoredEvents) {
-      if (selectedEvents.length >= 3) break
+      if (selected.length >= 3) break
       if (usedVenues.has(scored.event.venue_id)) continue
-      
-      selectedEvents.push(scored.event)
+
+      selected.push(scored)
       usedVenues.add(scored.event.venue_id)
     }
 
     // If we don't have enough events, allow same venue
-    if (selectedEvents.length < 2) {
+    if (selected.length < 2) {
       for (const scored of scoredEvents) {
-        if (selectedEvents.length >= 2) break
-        if (!selectedEvents.includes(scored.event)) {
-          selectedEvents.push(scored.event)
-        }
+        if (selected.length >= 2) break
+        if (selected.some(item => item.event.id === scored.event.id)) continue
+
+        selected.push(scored)
+        if (scored.event.venue_id) usedVenues.add(scored.event.venue_id)
       }
     }
 
-    // Generate narrative
+    if (selected.length === 0) {
+      return NextResponse.json(
+        { error: 'No events happening tonight. Try again tomorrow!' },
+        { status: 404 }
+      )
+    }
+
+    const alternates: ScoredEvent[] = []
+    for (const scored of scoredEvents) {
+      if (alternates.length >= ALTERNATE_LIMIT) break
+      if (selected.some(item => item.event.id === scored.event.id)) continue
+      if (scored.event.venue_id && usedVenues.has(scored.event.venue_id)) continue
+      alternates.push(scored)
+    }
+
+    const selectedEvents = selected.map(item => item.event)
     const narrative = generateNarrative(context, selectedEvents)
-
-    // Calculate total cost
-    const totalCost = selectedEvents.reduce((sum, event) => {
-      return sum + (event.is_free ? 0 : (event.price_min || 0))
-    }, 0)
-
-    // Calculate duration
-    const startTime = new Date(selectedEvents[0].start_time)
-    const endTime = new Date(selectedEvents[selectedEvents.length - 1].end_time)
-    const durationHours = Math.ceil((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60))
+    const summary = summarizeEvents(selectedEvents)
+    const toStop = (scored: ScoredEvent) => ({
+      event: scored.event,
+      reasons: scored.reasons,
+    })
 
     return NextResponse.json({
       narrative,
-      events: selectedEvents,
-      total_cost: totalCost === 0 ? 'Free' : `€${totalCost}+`,
-      estimated_duration: `${durationHours} hours`,
+      stops: selected.map(toStop),
+      alternates: alternates.map(toStop),
+      total_cost: summary.total_cost,
+      estimated_duration: summary.estimated_duration,
     })
   } catch (error) {
     console.error('Planner error:', error)

@@ -20,7 +20,7 @@ export interface EventCardEvent {
   }
 }
 
-const EVENT_EMOJI: Record<string, string> = {
+export const EVENT_EMOJI: Record<string, string> = {
   dj: '🎧',
   live_music: '🎵',
   comedy: '🎤',

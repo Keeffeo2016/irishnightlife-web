@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { viewerManagesVenue } from '@/lib/venue-access'
+import { BackToPlanner } from '@/components/BackToPlanner'
+import { plannerPlanHref, preservePlannerOrigin } from '@/lib/planner'
 
 export const instant = false
 import { MapPin, Clock, Phone, Globe, Star, Music } from 'lucide-react'
@@ -12,10 +15,13 @@ import { PageHero } from '@/components/layout/PageHero'
 
 interface VenuePageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function VenuePage({ params }: VenuePageProps) {
+export default async function VenuePage({ params, searchParams }: VenuePageProps) {
   const { slug } = await params
+  const query = await searchParams
+  const planHref = plannerPlanHref(query)
   const supabase = await createClient()
 
   const { data: venue, error } = await supabase
@@ -39,6 +45,10 @@ export default async function VenuePage({ params }: VenuePageProps) {
     .single()
 
   if (error || !venue) {
+    notFound()
+  }
+
+  if (!venue.is_verified && !(await viewerManagesVenue(supabase, venue.owner_id))) {
     notFound()
   }
 
@@ -71,6 +81,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   return (
     <div className="flex flex-col bg-gray-50">
+      <BackToPlanner href={planHref} />
       <PageHero
         align="left"
         showMap={false}
@@ -85,7 +96,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
         subtitle={
           <span className="inline-flex items-center gap-2">
             <MapPin className="h-5 w-5 text-mint" />
-            {venue.address}, {venue.city}, {venue.county}
+            {venue.address}, {venue.city}, {venue.county}{venue.postcode ? `, ${venue.postcode}` : ''}
           </span>
         }
         actions={<FavoriteButton venueId={venue.id} />}
@@ -96,7 +107,21 @@ export default async function VenuePage({ params }: VenuePageProps) {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl ring-1 ring-foreground/10 p-8 mb-6">
-              <p className="text-gray-700 text-lg mb-6">{venue.description}</p>
+              {venue.images?.length ? (
+                <div className="mb-6 grid grid-cols-2 gap-3">
+                  {venue.images.map((src: string) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt={`${venue.name} photo`}
+                      className="h-44 w-full rounded-xl object-cover"
+                    />
+                  ))}
+                </div>
+              ) : null}
+              <p className="text-gray-700 text-lg mb-6">
+                {venue.description || 'This venue has not added a description yet.'}
+              </p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-3">
@@ -177,7 +202,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                 {upcomingEvents.length > 0 ? (
                   <div className="space-y-4">
                     {upcomingEvents.map((event: any) => (
-                      <Link key={event.id} href={`/events/${event.slug}`}>
+                      <Link key={event.id} href={preservePlannerOrigin(`/events/${event.slug}`, query)}>
                         <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-emerald-500 transition-colors">
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-900 mb-1">{event.title}</h3>

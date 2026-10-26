@@ -53,6 +53,7 @@ interface VenueWithEvents {
 
 const COUNTY_CENTERS: Record<string, [number, number]> = {
   Cork: [51.8985, -8.4736],
+  Kerry: [52.0594, -9.5044],
   Dublin: [53.3498, -6.2603],
   Galway: [53.2707, -9.0568],
   Limerick: [52.6638, -8.6267],
@@ -133,9 +134,11 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
             price_min,
             price_max,
             is_free,
-            music_genre
+            music_genre,
+            is_published
           )
         `)
+        .eq('is_verified', true)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null)
 
@@ -158,7 +161,7 @@ export default function EventsMapInner({ selectedCounty = 'Cork' }: EventsMapInn
           ...venue,
           events: venue.events.filter((event: any) => {
             const eventStart = new Date(event.start_time)
-            return eventStart >= now && eventStart <= fortyEightHoursLater
+            return event.is_published && eventStart >= now && eventStart <= fortyEightHoursLater
           }),
         }))
         .filter((venue: any) => venue.events.length > 0) || []

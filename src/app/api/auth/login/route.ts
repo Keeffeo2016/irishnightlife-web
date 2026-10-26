@@ -27,12 +27,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', data.user.id)
+      .maybeSingle()
+
     return NextResponse.json({
       success: true,
       user: {
         id: data.user.id,
         email: data.user.email,
       },
+      role: profile?.role ?? null,
       session: data.session,
     })
   } catch (error) {

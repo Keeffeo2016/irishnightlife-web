@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { viewerManagesVenue } from '@/lib/venue-access'
+import { BackToPlanner } from '@/components/BackToPlanner'
+import { plannerPlanHref, preservePlannerOrigin } from '@/lib/planner'
 
 export const instant = false
 import { MapPin, Calendar, Clock, Euro, Music, Share2 } from 'lucide-react'
@@ -12,10 +15,13 @@ import { PageHero } from '@/components/layout/PageHero'
 
 interface EventPageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function EventPage({ params }: EventPageProps) {
+export default async function EventPage({ params, searchParams }: EventPageProps) {
   const { slug } = await params
+  const query = await searchParams
+  const planHref = plannerPlanHref(query)
   const supabase = await createClient()
 
   const { data: event, error } = await supabase
@@ -28,10 +34,13 @@ export default async function EventPage({ params }: EventPageProps) {
       )
     `)
     .eq('slug', slug)
-    .eq('is_published', true)
     .single()
 
-  if (error || !event) {
+  if (error || !event?.venues) {
+    notFound()
+  }
+
+  if ((!event.venues.is_verified || !event.is_published) && !(await viewerManagesVenue(supabase, event.venues.owner_id))) {
     notFound()
   }
 
@@ -59,6 +68,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <div className="flex flex-col bg-gray-50">
+      <BackToPlanner href={planHref} />
       <PageHero
         align="left"
         showMap={false}
@@ -71,7 +81,7 @@ export default async function EventPage({ params }: EventPageProps) {
         subtitle={
           <>
             at{' '}
-            <Link href={`/venues/${event.venues.slug}`} className="text-mint hover:text-mint-light">
+            <Link href={preservePlannerOrigin(`/venues/${event.venues.slug}`, query)} className="text-mint hover:text-mint-light">
               {event.venues.name}
             </Link>
           </>
@@ -139,16 +149,35 @@ export default async function EventPage({ params }: EventPageProps) {
             {/* Venue Info */}
             <Card className="bg-white border-gray-200">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Venue Information</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">About the venue</h2>
+                {event.venues.images?.[0] ? (
+                  <img
+                    src={event.venues.images[0]}
+                    alt={`${event.venues.name} photo`}
+                    className="mb-4 h-48 w-full rounded-xl object-cover"
+                  />
+                ) : null}
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.venues.name}</h3>
                     <div className="flex items-center gap-2 text-gray-600 mb-3">
                       <MapPin className="h-4 w-4" />
-                      <span>{event.venues.address}, {event.venues.city}, {event.venues.county}</span>
+                      <span>{event.venues.address}, {event.venues.city}, {event.venues.county}{event.venues.postcode ? `, ${event.venues.postcode}` : ''}</span>
                     </div>
-                    <p className="text-gray-600 mb-4">{event.venues.description}</p>
-                    <Link href={`/venues/${event.venues.slug}`}>
+                    <div className="mb-4 flex flex-wrap gap-4 text-sm text-gray-700">
+                      <span>
+                        <span className="text-gray-500">Type </span>
+                        {event.venues.venue_type?.replaceAll('_', ' ') || 'Venue'}
+                      </span>
+                      <span>
+                        <span className="text-gray-500">Price range </span>
+                        {event.venues.price_range || 'Not set'}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      {event.venues.description || 'This venue has not added a description yet.'}
+                    </p>
+                    <Link href={preservePlannerOrigin(`/venues/${event.venues.slug}`, query)}>
                       <Button variant="brand-outline">
                         View Venue
                       </Button>

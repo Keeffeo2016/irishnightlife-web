@@ -5,14 +5,109 @@ import { Search, MapPin, ChevronDown, Filter, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { IRISH_COUNTIES, PROVINCES } from '@/lib/counties'
+import { EVENT_TYPES } from '@/lib/venue-profile'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import EventsMap from '@/components/EventsMap'
-import { EventCard } from '@/components/EventCard'
+import { EventCard, EVENT_EMOJI } from '@/components/EventCard'
 
 const supabase = createClient()
 
 const GENRES = ['All', 'Live Music', 'DJ', 'Comedy', 'Sports', 'Quiz', 'Traditional Irish', 'Electronic', 'Rock', 'Jazz']
+const LATER_SECTION_CAP = 3
+
+function isSameLocalDay(startTime: string) {
+  return new Date(startTime).toDateString() === new Date().toDateString()
+}
+
+function eventsPageHref(county: string, type: string) {
+  const params = new URLSearchParams({ type })
+  if (county !== 'All Ireland') params.set('county', county)
+  return `/events?${params.toString()}`
+}
+
+function EventGrid({ events }: { events: Event[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {events.map((event) => (
+        <EventCard key={event.id} event={event} />
+      ))}
+    </div>
+  )
+}
+
+type LaterSection = {
+  key: string
+  label: string
+  emoji: string
+  events: Event[]
+  seeAllHref: string | null
+}
+
+function laterSections(events: Event[], county: string) {
+  const known = new Set<string>(EVENT_TYPES.map((type) => type.value))
+  const sections: LaterSection[] = EVENT_TYPES.flatMap((type) => {
+    const matches = events.filter((event) => event.event_type === type.value)
+    if (matches.length === 0) return []
+    return [{
+      key: type.value,
+      label: type.label,
+      emoji: EVENT_EMOJI[type.value] ?? '🎉',
+      events: matches.slice(0, LATER_SECTION_CAP),
+      seeAllHref: matches.length > LATER_SECTION_CAP ? eventsPageHref(county, type.value) : null,
+    }]
+  })
+
+  const other = events.filter((event) => !known.has(event.event_type))
+  if (other.length > 0) {
+    sections.push({
+      key: 'other',
+      label: 'Other',
+      emoji: '🎉',
+      events: other.slice(0, LATER_SECTION_CAP),
+      seeAllHref: null,
+    })
+  }
+
+  return sections
+}
+
+function EventSections({ events, county }: { events: Event[]; county: string }) {
+  const tonight = events.filter((event) => isSameLocalDay(event.start_time))
+  const sections = laterSections(
+    events.filter((event) => !isSameLocalDay(event.start_time)),
+    county,
+  )
+
+  return (
+    <div className="space-y-12">
+      {tonight.length > 0 && (
+        <section aria-labelledby="tonight-heading">
+          <h3 id="tonight-heading" className="mb-4 text-xl font-bold text-gray-900">
+            Tonight
+          </h3>
+          <EventGrid events={tonight} />
+        </section>
+      )}
+      {sections.map((section) => (
+        <section key={section.key} aria-labelledby={`section-${section.key}`}>
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <h3 id={`section-${section.key}`} className="text-xl font-bold text-gray-900">
+              <span aria-hidden="true">{section.emoji} </span>
+              {section.label}
+            </h3>
+            {section.seeAllHref && (
+              <Link href={section.seeAllHref} className="text-sm font-semibold text-emerald-700 hover:underline">
+                See all
+              </Link>
+            )}
+          </div>
+          <EventGrid events={section.events} />
+        </section>
+      ))}
+    </div>
+  )
+}
 
 interface Event {
   id: string
@@ -83,6 +178,7 @@ export default function HomePage() {
           )
         `)
         .eq('is_published', true)
+        .eq('venues.is_verified', true)
         .gte('start_time', new Date().toISOString())
         .order('start_time', { ascending: true })
         .limit(50)
@@ -279,11 +375,11 @@ export default function HomePage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Loading events...</h3>
             </div>
           ) : events.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
+            selectedGenre === 'All' && searchQuery.trim() === '' ? (
+              <EventSections events={events} county={selectedCounty} />
+            ) : (
+              <EventGrid events={events} />
+            )
           ) : (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🔍</div>
@@ -312,7 +408,7 @@ export default function HomePage() {
               🗺️ Explore Other Cities
             </h3>
             <div className="flex flex-wrap justify-center gap-3">
-              {['Dublin', 'Galway', 'Limerick', 'Waterford', 'Kilkenny'].map((city) => (
+              {['Kerry', 'Dublin', 'Galway', 'Limerick', 'Waterford', 'Kilkenny'].map((city) => (
                 <Button
                   key={city}
                   variant="outline"

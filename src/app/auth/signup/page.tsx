@@ -34,6 +34,7 @@ function SignupForm() {
     password: '',
     venueName: '',
     address: '',
+    eircode: '',
     city: '',
     county: '',
   })
@@ -64,7 +65,7 @@ function SignupForm() {
       
       // Redirect after 2 seconds
       setTimeout(() => {
-        router.push('/auth/login')
+        router.push(accountType === 'venue' ? '/auth/login?next=/dashboard' : '/auth/login')
       }, 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -184,6 +185,9 @@ function SignupForm() {
 
             {accountType === 'venue' && (
               <>
+                <p className="text-sm text-gray-600">
+                  Your venue stays hidden until a superadmin approves it.
+                </p>
                 <div>
                   <label className="text-sm text-gray-700 mb-1 block font-medium">Venue Name</label>
                   <Input
@@ -202,6 +206,18 @@ function SignupForm() {
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-700 mb-1 block font-medium">Eircode</label>
+                  <Input
+                    placeholder="T12 W8RP"
+                    className="bg-white border-gray-300 text-gray-900 uppercase"
+                    value={formData.eircode}
+                    onChange={(e) => setFormData({ ...formData, eircode: e.target.value.toUpperCase() })}
+                    required
+                    autoCapitalize="characters"
+                    maxLength={8}
                   />
                 </div>
                 <div>
@@ -244,16 +260,6 @@ function SignupForm() {
               )}
             </Button>
           </form>
-
-          {accountType === 'venue' && (
-            <>
-              <AuthDivider label="or continue with" />
-              <SocialAuthButtons intent="signup" nextPath="/auth/complete-venue" />
-              <p className="mt-3 text-center text-xs text-gray-500">
-                You will add the venue name and address on the next screen.
-              </p>
-            </>
-          )}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}

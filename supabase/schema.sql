@@ -181,13 +181,57 @@ CREATE POLICY "Venue owners can insert own venues" ON public.venues
 CREATE POLICY "Published events are publicly readable" ON public.events
   FOR SELECT USING (is_published = true);
 
--- Venue owners can manage their events
-CREATE POLICY "Venue owners can manage own events" ON public.events
-  FOR ALL USING (
+-- Venue owners can read, update, and delete their events.
+-- New events are allowed only after the venue is approved.
+CREATE POLICY "Venue owners can read own events" ON public.events
+  FOR SELECT
+  TO authenticated
+  USING (
     EXISTS (
       SELECT 1 FROM public.venues
       WHERE venues.id = events.venue_id
-      AND venues.owner_id = auth.uid()
+      AND venues.owner_id = (SELECT auth.uid())
+    )
+  );
+
+CREATE POLICY "Venue owners can update own events" ON public.events
+  FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.venues
+      WHERE venues.id = events.venue_id
+      AND venues.owner_id = (SELECT auth.uid())
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.venues
+      WHERE venues.id = events.venue_id
+      AND venues.owner_id = (SELECT auth.uid())
+    )
+  );
+
+CREATE POLICY "Venue owners can delete own events" ON public.events
+  FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.venues
+      WHERE venues.id = events.venue_id
+      AND venues.owner_id = (SELECT auth.uid())
+    )
+  );
+
+CREATE POLICY "Venue owners can create events for approved venues" ON public.events
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.venues
+      WHERE venues.id = events.venue_id
+      AND venues.owner_id = (SELECT auth.uid())
+      AND venues.is_verified = true
     )
   );
 

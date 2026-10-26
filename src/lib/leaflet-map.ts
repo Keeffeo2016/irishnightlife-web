@@ -7,9 +7,12 @@ type MapWithContainer = LeafletMap & {
 
 let removeGuarded = false
 
-// Leaflet's map.remove() throws "Map container is being reused by another instance"
-// if it runs again after the container was already cleared. Next.js can replay
-// map effects while keeping the same DOM node, so removal must be idempotent.
+// react-leaflet removes the map from a useEffect cleanup. React Strict Mode and
+// Next.js Activity (cacheComponents) both re-run that cleanup while the container
+// is still in the document, then tile layers call appendChild on panes remove()
+// already deleted. Skip teardown until the node is actually leaving the document.
+// A second remove after a real teardown is also a no-op: Leaflet throws if the
+// container was already cleared and then reused.
 export function guardLeafletRemove(): void {
   if (removeGuarded) return
   removeGuarded = true
@@ -18,6 +21,9 @@ export function guardLeafletRemove(): void {
   LeafletMap.prototype.remove = function removeMap() {
     const map = this as MapWithContainer
     const container = map._container
+    if (container?.isConnected) {
+      return this
+    }
     const containerId = container?._leaflet_id
     const mapId = map._containerId
     if (!container || containerId !== mapId || mapId == null) {
@@ -40,6 +46,8 @@ export function syncLeafletView(
     return false
   }
 
+  // Activity hides the map with display:none, so the cached page comes back at 0×0.
+  instance.invalidateSize({ animate: false })
   if (instance.getZoom() !== zoom || !instance.getCenter().equals(center)) {
     instance.setView(center, zoom, { animate: false })
   }

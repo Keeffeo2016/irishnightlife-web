@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
 import { syncLeafletView } from '@/lib/leaflet-map'
+import { detailHrefFromPlan } from '@/lib/planner'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -57,9 +58,10 @@ interface Venue {
 
 interface PlanMapProps {
   venues: Venue[]
+  detailQuery?: string
 }
 
-export default function PlanMapInner({ venues }: PlanMapProps) {
+export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps) {
   const [mapCenter, setMapCenter] = useState<[number, number]>([51.8985, -8.4736]) // Default to Cork
   const [mapEpoch, setMapEpoch] = useState(0)
   const rebuildMap = useCallback(() => {
@@ -137,7 +139,7 @@ export default function PlanMapInner({ venues }: PlanMapProps) {
                     <MapPin className="h-3 w-3 text-emerald-600" />
                     <span>{venue.address}</span>
                   </div>
-                  <Link href={`/venues/${venue.slug}`}>
+                  <Link href={detailHrefFromPlan(`/venues/${venue.slug}`, detailQuery)}>
                     <Button
                       variant="outline"
                       size="sm"

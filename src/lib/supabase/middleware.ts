@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { pathAfterSignIn, safeNextPath } from '@/lib/auth/redirect'
 
 export async function updateSession(request: NextRequest) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -33,8 +34,9 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname
   const needsOwner = path.startsWith('/dashboard')
   const needsAdmin = path.startsWith('/admin')
+  const signingIn = path === '/auth/login'
 
-  if (needsOwner || needsAdmin) {
+  if (needsOwner || needsAdmin || (signingIn && user)) {
     const redirectTo = (pathname: string) => {
       const url = request.nextUrl.clone()
       url.pathname = pathname
@@ -60,6 +62,11 @@ export async function updateSession(request: NextRequest) {
       .single()
 
     const role = profile?.role
+
+    if (signingIn && role === 'venue_owner') {
+      const next = safeNextPath(request.nextUrl.searchParams.get('next'))
+      return redirectTo(pathAfterSignIn(role, next))
+    }
 
     if (needsAdmin && role !== 'admin') {
       return redirectTo('/')

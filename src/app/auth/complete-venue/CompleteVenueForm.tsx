@@ -14,6 +14,7 @@ export function CompleteVenueForm({ email }: { email: string }) {
   const [formData, setFormData] = useState({
     venueName: '',
     address: '',
+    eircode: '',
     city: '',
     county: '',
   })
@@ -54,6 +55,7 @@ export function CompleteVenueForm({ email }: { email: string }) {
           <CardTitle className="text-2xl text-gray-900">Add your venue</CardTitle>
           <p className="text-gray-600">
             Signed in as {email || 'your account'}. These details link the venue to your dashboard.
+            The venue stays hidden until a superadmin approves it.
           </p>
         </CardHeader>
         <CardContent>
@@ -81,6 +83,18 @@ export function CompleteVenueForm({ email }: { email: string }) {
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 required
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-700 mb-1 block font-medium">Eircode</label>
+              <Input
+                placeholder="T12 W8RP"
+                className="bg-white border-gray-300 text-gray-900 uppercase"
+                value={formData.eircode}
+                onChange={(e) => setFormData({ ...formData, eircode: e.target.value.toUpperCase() })}
+                required
+                autoCapitalize="characters"
+                maxLength={8}
               />
             </div>
             <div>

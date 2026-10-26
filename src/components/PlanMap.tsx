@@ -24,12 +24,13 @@ interface Venue {
 
 interface PlanMapProps {
   venues: Venue[]
+  detailQuery?: string
 }
 
-export default function PlanMap({ venues }: PlanMapProps) {
+export default function PlanMap({ venues, detailQuery }: PlanMapProps) {
   if (venues.length === 0) {
     return null
   }
 
-  return <PlanMapDynamic venues={venues} />
+  return <PlanMapDynamic venues={venues} detailQuery={detailQuery} />
 }

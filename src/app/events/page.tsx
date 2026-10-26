@@ -1,57 +1,156 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useMemo, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createClient } from '@/lib/supabase/client'
 import { EventCard, type EventCardEvent } from '@/components/EventCard'
 import { PageHero, HeroAccent } from '@/components/layout/PageHero'
+import { EVENT_TYPES } from '@/lib/venue-profile'
 
 const supabase = createClient()
 
 const GENRES = ['All', 'Live Music', 'DJ', 'Comedy', 'Sports', 'Quiz', 'Traditional Irish', 'Electronic', 'Rock', 'Jazz']
-const CITIES = ['All', 'Cork', 'Dublin', 'Galway', 'Limerick', 'Waterford', 'Kilkenny']
+const CITIES = ['All', 'Cork', 'Kerry', 'Dublin', 'Galway', 'Limerick', 'Waterford', 'Kilkenny']
+const TYPE_VALUES = ['All', ...EVENT_TYPES.map((type) => type.value)]
+
+function typeChipLabel(value: string) {
+  return EVENT_TYPES.find((type) => type.value === value)?.label ?? value
+}
+
+function initialCity(county: string | null) {
+  if (!county || county === 'All' || county === 'All Ireland') return 'All'
+  return county
+}
+
+function initialType(type: string | null) {
+  if (type && EVENT_TYPES.some((item) => item.value === type)) return type
+  return 'All'
+}
+
+function cityOptions(selectedCity: string) {
+  if (selectedCity !== 'All' && !CITIES.includes(selectedCity)) {
+    return ['All', selectedCity, ...CITIES.filter((city) => city !== 'All')]
+  }
+  return CITIES
+}
+
+function chipFadeStyle(fade: { left: boolean; right: boolean }) {
+  if (!fade.left && !fade.right) return undefined
+
+  const maskImage =
+    fade.left && fade.right
+      ? 'linear-gradient(to right, transparent, black 2.5rem, black calc(100% - 2.5rem), transparent)'
+      : fade.right
+        ? 'linear-gradient(to right, black calc(100% - 2.5rem), transparent)'
+        : 'linear-gradient(to right, transparent, black 2.5rem)'
+
+  return { maskImage, WebkitMaskImage: maskImage }
+}
 
 function FilterChips({
   label,
   options,
   selected,
   onSelect,
+  optionLabel = (value) => value,
 }: {
   label: string
-  options: string[]
+  options: readonly string[]
   selected: string
   onSelect: (value: string) => void
+  optionLabel?: (value: string) => string
 }) {
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const [fade, setFade] = useState({ left: false, right: false })
+
+  useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+
+    const updateFade = () => {
+      const remaining = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft
+      setFade({
+        left: scroller.scrollLeft > 1,
+        right: remaining > 1,
+      })
+    }
+
+    updateFade()
+    const observer = new ResizeObserver(updateFade)
+    observer.observe(scroller)
+    scroller.addEventListener('scroll', updateFade, { passive: true })
+    return () => {
+      observer.disconnect()
+      scroller.removeEventListener('scroll', updateFade)
+    }
+  }, [options])
+
+  useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    const selectedButton = scroller.querySelector<HTMLButtonElement>('[aria-pressed="true"]')
+    if (!selectedButton) return
+
+    const scrollerRect = scroller.getBoundingClientRect()
+    const buttonRect = selectedButton.getBoundingClientRect()
+    const padding = 8
+    if (buttonRect.left < scrollerRect.left + padding) {
+      scroller.scrollBy({ left: buttonRect.left - scrollerRect.left - padding, behavior: 'smooth' })
+    } else if (buttonRect.right > scrollerRect.right - padding) {
+      scroller.scrollBy({ left: buttonRect.right - scrollerRect.right + padding, behavior: 'smooth' })
+    }
+  }, [selected])
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <span className="text-sm font-medium text-gray-400 mr-1">{label}:</span>
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          onClick={() => onSelect(option)}
-          aria-pressed={selected === option}
-          className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
-            selected === option
-              ? 'border-mint bg-mint text-night'
-              : 'border-white/15 bg-white/5 text-gray-200 hover:border-mint hover:text-mint'
-          }`}
+    <div className="flex items-center gap-2">
+      <span className="shrink-0 text-sm font-medium text-gray-400">{label}:</span>
+      <div className="relative min-w-0 flex-1">
+        <div
+          ref={scrollerRef}
+          className="flex snap-x items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={chipFadeStyle(fade)}
         >
-          {option}
-        </button>
-      ))}
+          {options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onSelect(option)}
+              aria-pressed={selected === option}
+              className={`shrink-0 snap-start rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
+                selected === option
+                  ? 'border-mint bg-mint text-night'
+                  : 'border-white/15 bg-white/5 text-gray-200 hover:border-mint hover:text-mint'
+              }`}
+            >
+              {optionLabel(option)}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
 
 export default function EventsPage() {
-  const [selectedCity, setSelectedCity] = useState('All')
+  return (
+    <Suspense>
+      <EventsBrowser />
+    </Suspense>
+  )
+}
+
+function EventsBrowser() {
+  const searchParams = useSearchParams()
+  const [selectedCity, setSelectedCity] = useState(() => initialCity(searchParams.get('county')))
+  const [selectedType, setSelectedType] = useState(() => initialType(searchParams.get('type')))
   const [selectedGenre, setSelectedGenre] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [events, setEvents] = useState<EventCardEvent[]>([])
   const [loading, setLoading] = useState(true)
+  const cities = useMemo(() => cityOptions(selectedCity), [selectedCity])
 
   useEffect(() => {
     async function fetchEvents() {
@@ -69,12 +168,17 @@ export default function EventsPage() {
           )
         `)
         .eq('is_published', true)
+        .eq('venues.is_verified', true)
         .gte('start_time', new Date().toISOString())
         .order('start_time', { ascending: true })
         .limit(50)
 
       if (selectedCity !== 'All') {
         query = query.eq('venues.county', selectedCity)
+      }
+
+      if (selectedType !== 'All') {
+        query = query.eq('event_type', selectedType)
       }
 
       if (selectedGenre !== 'All') {
@@ -99,7 +203,7 @@ export default function EventsPage() {
     }
 
     fetchEvents()
-  }, [selectedCity, selectedGenre, searchQuery])
+  }, [selectedCity, selectedType, selectedGenre, searchQuery])
 
   return (
     <div className="flex flex-col bg-gray-50">
@@ -117,7 +221,14 @@ export default function EventsPage() {
           />
         </div>
         <div className="space-y-3">
-          <FilterChips label="City" options={CITIES} selected={selectedCity} onSelect={setSelectedCity} />
+          <FilterChips label="City" options={cities} selected={selectedCity} onSelect={setSelectedCity} />
+          <FilterChips
+            label="Type"
+            options={TYPE_VALUES}
+            selected={selectedType}
+            onSelect={setSelectedType}
+            optionLabel={typeChipLabel}
+          />
           <FilterChips label="Genre" options={GENRES} selected={selectedGenre} onSelect={setSelectedGenre} />
         </div>
       </PageHero>
@@ -153,6 +264,7 @@ export default function EventsPage() {
                 variant="brand-outline"
                 onClick={() => {
                   setSelectedCity('All')
+                  setSelectedType('All')
                   setSelectedGenre('All')
                   setSearchQuery('')
                 }}
