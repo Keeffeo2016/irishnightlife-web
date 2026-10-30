@@ -1,21 +1,44 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { MapPin, Clock, Euro, Sparkles, RefreshCw, Share2, Check, Shuffle } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  Check,
+  Clock,
+  Compass,
+  Euro,
+  MapPin,
+  RefreshCw,
+  Share2,
+  Shuffle,
+  SlidersHorizontal,
+  Sparkles,
+} from 'lucide-react'
+import {
+  eventTypeLabel,
+  formatEventDate,
+  formatEventPrice,
+  formatEventTime,
+} from '@/components/EventCard'
+import { FavoriteButton } from '@/components/FavoriteButton'
+import PlanMap, { type PlanMapVenue } from '@/components/PlanMap'
+import { HeroAccent, PageHero } from '@/components/layout/PageHero'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
-import PlanMap from '@/components/PlanMap'
-import { PageHero, HeroAccent } from '@/components/layout/PageHero'
 import {
   bestAlternate,
+  buildPlannerWizardHref,
   canShuffleStops,
   detailHrefFromPlan,
+  parsePlannerSearchParams,
   shuffleStops,
-  summarizeEvents,
   sortStopsByStart,
+  summarizeEvents,
   swapStop,
 } from '@/lib/planner'
 
@@ -23,29 +46,30 @@ interface Venue {
   id: string
   name: string
   slug: string
-  description: string
-  address: string
-  city: string
-  county: string
-  latitude: number
-  longitude: number
-  price_range: string
-  music_genres: string[]
-  atmosphere: string[]
+  description?: string | null
+  address?: string | null
+  city?: string | null
+  county?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  price_range?: string | null
+  music_genres?: string[] | null
+  atmosphere?: string[] | null
 }
 
 interface Event {
   id: string
   title: string
   slug: string
-  description: string
+  description?: string | null
+  event_type?: string | null
   start_time: string
   end_time: string
-  price_min: number
+  price_min: number | null
   price_max: number | null
   is_free: boolean
-  music_genre: string
-  atmosphere: string
+  music_genre?: string | null
+  atmosphere?: string | null
   venues: Venue
 }
 
@@ -54,13 +78,13 @@ interface ScoredStop {
   reasons: string[]
 }
 
-type ShareState = 'idle' | 'copied' | 'failed'
+type ShareState = 'idle' | 'copied' | 'shared' | 'failed'
 
 const LOADING_LINES = [
-  "Checking who's on tonight…",
-  'Leaving room for a late one…',
-  'Matching the vibe to the room…',
-  'Keeping tomorrow morning in mind…',
+  "Checking what's on across verified venues…",
+  'Matching the atmosphere and music to your choices…',
+  'Pacing the stops for your tomorrow morning plan…',
+  'Putting together your route for the night…',
 ]
 
 function checksKey(query: string): string {
@@ -82,9 +106,9 @@ function readChecks(query: string): string[] {
 function withReasons(stops: ScoredStop[] | undefined): ScoredStop[] {
   if (!Array.isArray(stops)) return []
   return stops.flatMap(stop => {
-    if (!stop?.event?.id) return []
+    if (!stop?.event?.id || !stop?.event?.venues) return []
     const reasons = Array.isArray(stop.reasons)
-      ? stop.reasons.filter((reason): reason is string => typeof reason === 'string')
+      ? stop.reasons.filter((reason): reason is string => typeof reason === 'string' && reason.trim().length > 0)
       : []
     return [{ event: stop.event, reasons }]
   })
@@ -93,9 +117,11 @@ function withReasons(stops: ScoredStop[] | undefined): ScoredStop[] {
 function shareLabel(state: ShareState): string {
   switch (state) {
     case 'idle':
-      return 'Share Plan'
+      return 'Share plan'
     case 'copied':
-      return 'Copied'
+      return 'Link copied'
+    case 'shared':
+      return 'Plan shared'
     case 'failed':
       return "Couldn't copy"
     default: {
@@ -105,23 +131,113 @@ function shareLabel(state: ShareState): string {
   }
 }
 
+function formatStopLocation(venue: Venue): string {
+  const address = venue.address?.trim()
+  const city = venue.city?.trim()
+  const county = venue.county?.trim()
+
+  const parts: string[] = []
+  if (address) parts.push(address)
+  if (city) parts.push(city)
+  if (county && (!city || city.toLowerCase() !== county.toLowerCase())) {
+    parts.push(`Co. ${county}`)
+  }
+
+  return parts.join(', ') || 'Ireland'
+}
+
+function formatStopTimeRange(startIso: string, endIso: string): string {
+  const startDateLabel = formatEventDate(startIso)
+  const startTimeLabel = formatEventTime(startIso)
+  const endTimeLabel = formatEventTime(endIso)
+
+  if (!startDateLabel && !startTimeLabel) return 'Time TBA'
+  if (startTimeLabel && endTimeLabel) {
+    return `${startDateLabel} · ${startTimeLabel}–${endTimeLabel}`
+  }
+  if (startTimeLabel) {
+    return `${startDateLabel} · ${startTimeLabel}`
+  }
+  return startDateLabel
+}
+
+function shouldShowGenreBadge(eventType: string | null | undefined, musicGenre: string | null | undefined): boolean {
+  const trimmed = musicGenre?.trim()
+  if (!trimmed) return false
+  const lower = trimmed.toLowerCase()
+  const typeLower = (eventType ?? '').trim().toLowerCase()
+  const labelLower = eventTypeLabel(eventType).toLowerCase()
+  return lower !== typeLower && lower !== labelLower && lower !== typeLower.replaceAll('_', ' ')
+}
+
 export function PlannerLoading() {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
     const id = window.setInterval(() => {
       setIndex(current => (current + 1) % LOADING_LINES.length)
-    }, 1600)
+    }, 1800)
     return () => window.clearInterval(id)
   }, [])
 
   return (
-    <div className="flex flex-col bg-gray-50">
-      <main className="flex flex-1 items-center justify-center py-24">
-        <div className="text-center">
-          <Sparkles className="mx-auto mb-4 h-16 w-16 animate-pulse text-emerald-600" />
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Crafting your perfect night...</h2>
-          <p className="text-gray-600">{LOADING_LINES[index]}</p>
+    <div className="flex flex-col bg-background">
+      <PageHero
+        eyebrow={
+          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+            NIGHT PLANNER ITINERARY
+          </Badge>
+        }
+        title={
+          <>
+            Your Night, <HeroAccent>Planned.</HeroAccent>
+          </>
+        }
+        subtitle="Putting together a route based on your preferences."
+        align="left"
+        showMap={false}
+        compact
+      />
+
+      <main className="flex-1">
+        <div
+          role="status"
+          aria-live="polite"
+          className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8"
+        >
+          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-mint/30 bg-mint/10 px-5 py-4">
+            <Sparkles
+              className="h-5 w-5 shrink-0 animate-pulse text-mint motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-sm font-semibold text-white">Building your night plan…</p>
+              <p className="text-xs text-muted-foreground">{LOADING_LINES[index]}</p>
+            </div>
+          </div>
+
+          <div className="space-y-5">
+            {[1, 2, 3].map(stopNum => (
+              <div
+                key={stopNum}
+                className="rounded-2xl border border-border bg-card p-6 animate-pulse motion-reduce:animate-none"
+              >
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="h-8 w-20 rounded-full bg-muted" />
+                  <div className="h-6 w-24 rounded-full bg-muted" />
+                </div>
+                <div className="mb-2 h-7 w-2/3 rounded-lg bg-muted" />
+                <div className="mb-4 h-4 w-1/3 rounded-lg bg-muted" />
+                <div className="mb-4 h-16 w-full rounded-xl bg-muted/70" />
+                <div className="flex gap-3">
+                  <div className="h-9 w-28 rounded-lg bg-muted" />
+                  <div className="h-9 w-36 rounded-lg bg-muted" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 h-72 rounded-2xl border border-border bg-card animate-pulse motion-reduce:animate-none" />
         </div>
       </main>
     </div>
@@ -130,60 +246,102 @@ export function PlannerLoading() {
 
 export default function PlanResultContent() {
   const searchParams = useSearchParams()
+  const queryKey = searchParams.toString()
+
+  return <PlanResultView key={queryKey} queryKey={queryKey} />
+}
+
+function PlanResultView({ queryKey }: { queryKey: string }) {
+  const searchParams = useSearchParams()
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [narrative, setNarrative] = useState('')
+  const [apiTotals, setApiTotals] = useState<{ total_cost?: string; estimated_duration?: string }>({})
   const [catalog, setCatalog] = useState<ScoredStop[]>([])
   const [stops, setStops] = useState<ScoredStop[]>([])
   const [loading, setLoading] = useState(true)
+  const [emptyMessage, setEmptyMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [openWhyId, setOpenWhyId] = useState<string | null>(null)
-  const [checkedIds, setCheckedIds] = useState<string[]>([])
+  const [checkedIds, setCheckedIds] = useState<string[]>(() => readChecks(queryKey))
   const [shareState, setShareState] = useState<ShareState>('idle')
+  const [drawCount, setDrawCount] = useState(0)
 
+  const parsedPrefs = useMemo(
+    () => parsePlannerSearchParams(searchParams),
+    [searchParams]
+  )
   const who = searchParams.get('who') || ''
   const occasion = searchParams.get('occasion') || ''
   const vibe = searchParams.get('vibe') || ''
   const budget = searchParams.get('budget') || ''
   const tomorrow = searchParams.get('tomorrow') || ''
-  const queryKey = searchParams.toString()
+  const adjustPrefsHref = useMemo(
+    () => buildPlannerWizardHref(parsedPrefs),
+    [parsedPrefs]
+  )
 
-  const fetchPlan = useCallback(async () => {
+  const requestFreshDraw = useCallback(() => {
     setLoading(true)
     setError(null)
+    setEmptyMessage(null)
+    setDrawCount(count => count + 1)
+  }, [])
 
-    try {
-      const response = await fetch('/api/planner', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ who, occasion, vibe, budget, tomorrow }),
-      })
+  useEffect(() => {
+    let active = true
 
-      const data = await response.json().catch(() => null)
+    async function loadPlan() {
+      try {
+        const response = await fetch('/api/planner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ who, occasion, vibe, budget, tomorrow }),
+        })
 
-      if (!response.ok) {
-        throw new Error(data?.error || 'Failed to generate plan')
+        const data = await response.json().catch(() => null)
+        if (!active) return
+
+        if (response.status === 404) {
+          setStops([])
+          setCatalog([])
+          setEmptyMessage(
+            typeof data?.error === 'string'
+              ? data.error
+              : 'No events matched your preferences in the next 48 hours.'
+          )
+          setLoading(false)
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error(data?.error || 'Failed to generate plan')
+        }
+
+        const nextStops = withReasons(data?.stops)
+        const nextAlternates = withReasons(data?.alternates)
+        setNarrative(typeof data?.narrative === 'string' ? data.narrative : '')
+        setApiTotals({
+          total_cost: typeof data?.total_cost === 'string' ? data.total_cost : undefined,
+          estimated_duration:
+            typeof data?.estimated_duration === 'string' ? data.estimated_duration : undefined,
+        })
+        setCatalog([...nextStops, ...nextAlternates])
+        setStops(sortStopsByStart(nextStops))
+      } catch (err) {
+        if (!active) return
+        setError(err instanceof Error ? err.message : 'Unable to load your night plan right now.')
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
       }
-
-      const nextStops = withReasons(data?.stops)
-      const nextAlternates = withReasons(data?.alternates)
-      setNarrative(typeof data?.narrative === 'string' ? data.narrative : '')
-      setCatalog([...nextStops, ...nextAlternates])
-      setStops(sortStopsByStart(nextStops))
-      setOpenWhyId(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setLoading(false)
     }
-  }, [who, occasion, vibe, budget, tomorrow])
 
-  useEffect(() => {
-    void fetchPlan()
-  }, [fetchPlan])
+    void loadPlan()
 
-  useEffect(() => {
-    setCheckedIds(readChecks(queryKey))
-  }, [queryKey])
+    return () => {
+      active = false
+    }
+  }, [who, occasion, vibe, budget, tomorrow, drawCount])
 
   useEffect(() => {
     return () => {
@@ -191,16 +349,20 @@ export default function PlanResultContent() {
     }
   }, [])
 
-  const mapVenues = useMemo(
+  const mapVenues: PlanMapVenue[] = useMemo(
     () =>
-      stops.map(stop => ({
+      stops.map((stop, index) => ({
         id: stop.event.venues.id,
         name: stop.event.venues.name,
         slug: stop.event.venues.slug,
         address: stop.event.venues.address,
         city: stop.event.venues.city,
+        county: stop.event.venues.county,
         latitude: stop.event.venues.latitude,
         longitude: stop.event.venues.longitude,
+        stopNumber: index + 1,
+        eventTitle: stop.event.title,
+        eventSlug: stop.event.slug,
       })),
     [stops]
   )
@@ -213,7 +375,7 @@ export default function PlanResultContent() {
       try {
         window.localStorage.setItem(checksKey(queryKey), JSON.stringify(next))
       } catch {
-        // The stamp still updates if storage is unavailable.
+        // State still updates in memory if localStorage is unavailable.
       }
       return next
     })
@@ -221,8 +383,28 @@ export default function PlanResultContent() {
 
   const handleShare = async () => {
     if (shareTimer.current) clearTimeout(shareTimer.current)
+    const shareUrl = window.location.href
+
     try {
-      const wrote = navigator.clipboard.writeText(window.location.href)
+      if (typeof navigator.share === 'function') {
+        await navigator.share({
+          title: 'My Night Plan — IrishNightlife.ie',
+          text: narrative || 'Check out this night plan on IrishNightlife.ie',
+          url: shareUrl,
+        })
+        setShareState('shared')
+        shareTimer.current = setTimeout(() => setShareState('idle'), 2500)
+        return
+      }
+    } catch (shareErr) {
+      if (shareErr instanceof Error && shareErr.name === 'AbortError') {
+        return
+      }
+      // Fall through to clipboard copy if navigator.share failed
+    }
+
+    try {
+      const wrote = navigator.clipboard.writeText(shareUrl)
       const timedOut = new Promise<never>((_, reject) => {
         window.setTimeout(() => reject(new Error('clipboard timeout')), 1500)
       })
@@ -231,248 +413,446 @@ export default function PlanResultContent() {
     } catch {
       setShareState('failed')
     }
-    shareTimer.current = setTimeout(() => setShareState('idle'), 2000)
-  }
-
-  const formatWhen = (dateString: string) => {
-    const date = new Date(dateString)
-    const time = date.toLocaleTimeString('en-IE', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const day = new Date(date)
-    day.setHours(0, 0, 0, 0)
-    const dayOffset = Math.round((day.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    if (dayOffset === 0) return time
-    if (dayOffset === 1) return `Tomorrow ${time}`
-    if (dayOffset === -1) return `Yesterday ${time}`
-    return `${date.toLocaleDateString('en-IE', { weekday: 'short' })} ${time}`
-  }
-
-  const formatRange = (start: string, end: string) => {
-    const startDate = new Date(start)
-    const endDate = new Date(end)
-    const sameDay = startDate.toDateString() === endDate.toDateString()
-    if (sameDay) {
-      const startLabel = formatWhen(start)
-      const endTime = endDate.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })
-      return `${startLabel} - ${endTime}`
-    }
-    return `${formatWhen(start)} - ${formatWhen(end)}`
-  }
-
-  const formatPrice = (event: Event) => {
-    if (event.is_free) return 'Free'
-    if (event.price_max == null || event.price_min === event.price_max) return `€${event.price_min}`
-    return `€${event.price_min}-€${event.price_max}`
+    shareTimer.current = setTimeout(() => setShareState('idle'), 2500)
   }
 
   if (loading) return <PlannerLoading />
 
   if (error) {
     return (
-      <div className="flex flex-col bg-gray-50">
-        <main className="flex-1 flex items-center justify-center py-24">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()} variant="brand">
-              Try Again
-            </Button>
+      <div className="flex flex-col bg-background">
+        <PageHero
+          eyebrow={
+            <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+              NIGHT PLANNER ITINERARY
+            </Badge>
+          }
+          title={
+            <>
+              Your Night, <HeroAccent>Planned.</HeroAccent>
+            </>
+          }
+          subtitle="We hit a snag while putting your itinerary together."
+          align="left"
+          showMap={false}
+          compact
+        />
+        <main className="flex-1">
+          <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
+            <Card className="border-border bg-card shadow-lg">
+              <CardContent className="p-8 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive">
+                  <AlertCircle className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h2 className="mb-2 text-2xl font-bold text-foreground">
+                  Couldn&apos;t generate your night plan
+                </h2>
+                <p className="mb-6 text-sm text-muted-foreground">{error}</p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Button type="button" onClick={requestFreshDraw} variant="brand">
+                    <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Try again
+                  </Button>
+                  <Link href={adjustPrefsHref}>
+                    <Button type="button" variant="outline">
+                      <SlidersHorizontal className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Adjust preferences
+                    </Button>
+                  </Link>
+                  <Link href="/events">
+                    <Button type="button" variant="outline">
+                      Browse all events
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
     )
   }
 
-  if (stops.length === 0) {
+  if (emptyMessage || stops.length === 0) {
     return (
-      <div className="flex flex-col bg-gray-50">
-        <main className="flex-1 flex items-center justify-center py-24">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nothing lined up</h2>
-            <p className="text-gray-600 mb-4">No events matched this night. Start over and try a different vibe.</p>
-            <Link href="/planner">
-              <Button variant="brand">Start Over</Button>
-            </Link>
+      <div className="flex flex-col bg-background">
+        <PageHero
+          eyebrow={
+            <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+              NIGHT PLANNER ITINERARY
+            </Badge>
+          }
+          title={
+            <>
+              Your Night, <HeroAccent>Planned.</HeroAccent>
+            </>
+          }
+          subtitle="No matching events were lined up for this combination in the next 48 hours."
+          align="left"
+          showMap={false}
+          compact
+        />
+        <main className="flex-1">
+          <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
+            <Card className="border-border bg-card shadow-lg">
+              <CardContent className="p-8 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10 text-mint">
+                  <Compass className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h2 className="mb-2 text-2xl font-bold text-foreground">
+                  No matching events right now
+                </h2>
+                <p className="mb-2 text-base font-medium text-foreground/90">
+                  {emptyMessage ?? 'No events matched this combination tonight.'}
+                </p>
+                <p className="mb-6 text-sm text-muted-foreground">
+                  The planner looks at verified events starting within the next 48 hours. You can tweak your preferences or browse all upcoming events across Ireland.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Link href={adjustPrefsHref}>
+                    <Button type="button" variant="brand">
+                      <SlidersHorizontal className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Try different preferences
+                    </Button>
+                  </Link>
+                  <Link href="/events">
+                    <Button type="button" variant="brand-outline">
+                      View all upcoming events
+                    </Button>
+                  </Link>
+                  <Link href="/planner">
+                    <Button type="button" variant="outline">
+                      Start fresh
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
     )
   }
 
-  const totals = summarizeEvents(stops.map(stop => stop.event))
+  const computedTotals = summarizeEvents(stops.map(stop => stop.event))
+  const totalCostLabel = computedTotals.total_cost || apiTotals.total_cost || 'Free'
+  const durationLabel = computedTotals.estimated_duration || apiTotals.estimated_duration || '1 hour'
   const shuffleReady = canShuffleStops(catalog, stops)
   const nightSorted = stops.every(stop => checkedIds.includes(stop.event.id))
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
-        eyebrow={<Sparkles className="h-10 w-10 text-mint mx-auto" />}
-        title={<>Your Perfect <HeroAccent>Night</HeroAccent></>}
-        subtitle={<span className="italic">&ldquo;{narrative}&rdquo;</span>}
+        eyebrow={
+          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+            NIGHT PLANNER ITINERARY
+          </Badge>
+        }
+        title={
+          <>
+            Your Night, <HeroAccent>Planned.</HeroAccent>
+          </>
+        }
+        subtitle="A curated run of stops ordered by start time. Swap any stop or shuffle the route to make it yours."
+        align="left"
+        showMap={false}
+        compact
       >
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300 mb-6">
-          <div className="flex items-center gap-2">
-            <Euro className="h-4 w-4 text-mint" />
-            <span>Estimated cost: {totals.total_cost}</span>
+        <div className="space-y-5">
+          {narrative ? (
+            <div className="rounded-2xl border border-mint/25 bg-night/75 p-4 sm:p-5 backdrop-blur-sm">
+              <div className="flex items-start gap-3">
+                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+                <p className="text-sm leading-relaxed text-foreground/95 sm:text-base">
+                  {narrative}
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+            {/* Summary Pills */}
+            <div className="flex flex-wrap items-center gap-2.5 text-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
+                <MapPin className="h-4 w-4 text-mint" aria-hidden="true" />
+                <span>
+                  <strong className="font-semibold text-white">{stops.length}</strong>{' '}
+                  {stops.length === 1 ? 'stop' : 'stops'}
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
+                <Euro className="h-4 w-4 text-mint" aria-hidden="true" />
+                <span>
+                  Estimated tickets: <strong className="font-semibold text-white">{totalCostLabel}</strong>
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
+                <Clock className="h-4 w-4 text-mint" aria-hidden="true" />
+                <span>
+                  Duration: <strong className="font-semibold text-white">{durationLabel}</strong>
+                </span>
+              </div>
+            </div>
+
+            {/* Itinerary Action Toolbar */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Button
+                type="button"
+                onClick={() => setStops(current => shuffleStops(catalog, current))}
+                variant="brand"
+                disabled={!shuffleReady}
+              >
+                <Shuffle className="mr-2 h-4 w-4" aria-hidden="true" />
+                Shuffle route
+              </Button>
+              <Button
+                type="button"
+                onClick={requestFreshDraw}
+                variant="brand-outline-dark"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" />
+                Fresh draw
+              </Button>
+              <Button
+                type="button"
+                onClick={() => void handleShare()}
+                variant="brand-outline-dark"
+                aria-live="polite"
+              >
+                <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                {shareLabel(shareState)}
+              </Button>
+              <Link href={adjustPrefsHref}>
+                <Button type="button" variant="outline" className="border-border bg-night/60">
+                  <SlidersHorizontal className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Adjust preferences
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-mint" />
-            <span>Duration: {totals.estimated_duration}</span>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button
-            onClick={() => setStops(current => shuffleStops(catalog, current))}
-            variant="brand"
-            disabled={!shuffleReady}
-          >
-            <Shuffle className="mr-2 h-4 w-4" />
-            Shuffle the night
-          </Button>
-          <Button onClick={() => void fetchPlan()} variant="brand-outline-dark">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Fresh draw
-          </Button>
-          <Button onClick={() => void handleShare()} variant="brand-outline-dark">
-            <Share2 className="mr-2 h-4 w-4" />
-            {shareLabel(shareState)}
-          </Button>
         </div>
       </PageHero>
 
       <main className="flex-1">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <ol className="relative space-y-6">
-            {stops.length > 1 && (
-              <div aria-hidden className="absolute top-10 bottom-10 left-5 w-px -translate-x-1/2 bg-emerald-200" />
-            )}
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+                Itinerary Stops
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Ordered chronologically in Irish time (Europe/Dublin)
+              </p>
+            </div>
+            {nightSorted ? (
+              <Badge className="border border-mint/40 bg-mint/15 px-3 py-1 text-xs font-semibold text-mint">
+                <Check className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                All stops marked sorted
+              </Badge>
+            ) : null}
+          </div>
+
+          <ol aria-label="Planned itinerary stops" className="relative space-y-6">
+            {stops.length > 1 ? (
+              <div
+                aria-hidden="true"
+                className="absolute top-12 bottom-12 left-5 hidden w-px -translate-x-1/2 bg-primary/35 sm:block"
+              />
+            ) : null}
+
             {stops.map((stop, index) => {
               const event = stop.event
               const checked = checkedIds.includes(event.id)
               const replacement = bestAlternate(catalog, stops, index)
-              const whyOpen = openWhyId === event.id
-              const reasons = stop.reasons.length > 0 ? stop.reasons : ['It lined up with your night.']
+              const reasons =
+                stop.reasons.length > 0
+                  ? stop.reasons
+                  : ['Matches your selected preferences for tonight']
+              const priceLabel = formatEventPrice(event)
+              const typeBadgeLabel = eventTypeLabel(event.event_type)
+              const showGenreBadge = shouldShowGenreBadge(event.event_type, event.music_genre)
+              const eventDetailHref = detailHrefFromPlan(`/events/${event.slug}`, queryKey)
+              const venueDetailHref = detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)
+              const locationString = formatStopLocation(event.venues)
 
               return (
-                <li key={event.id} className="relative flex gap-3 sm:gap-4">
+                <li key={event.id} className="relative flex flex-col gap-3 sm:flex-row sm:gap-5">
+                  {/* Stop Number Circle on Desktop */}
                   <div
-                    className={`relative z-10 mt-6 flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
+                    aria-hidden="true"
+                    className={`relative z-10 mt-6 hidden h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition-colors sm:flex ${
                       checked
-                        ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-600'
-                        : 'bg-emerald-600 text-white'
+                        ? 'bg-primary/20 text-primary ring-2 ring-primary'
+                        : 'bg-mint text-night shadow-md shadow-mint/20'
                     }`}
                   >
                     {index + 1}
                   </div>
 
                   <Card
-                    className={`relative min-w-0 flex-1 transition-all ${
+                    className={`relative min-w-0 flex-1 overflow-hidden rounded-2xl border transition-all motion-reduce:transition-none ${
                       checked
-                        ? 'border-emerald-200 bg-emerald-50/60 opacity-80'
-                        : 'border-gray-200 bg-white hover:border-emerald-500'
+                        ? 'border-primary/50 bg-card/85'
+                        : 'border-border bg-card hover:border-primary/60'
                     }`}
                   >
-                    <CardContent className="p-6">
-                      <div className="animate-in fade-in-0 duration-300" key={event.id}>
-                        <div className="mb-2 flex items-start justify-between gap-3">
-                          <div>
-                            <div className="mb-1 flex flex-wrap items-center gap-2">
-                              <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
-                              {checked && (
-                                <span className="rotate-[-8deg] rounded-md border-2 border-emerald-600 px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-emerald-700">
-                                  Sorted
-                                </span>
-                              )}
-                            </div>
-                            <Link
-                              href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}
-                              className="font-medium text-emerald-600 hover:text-emerald-700"
-                            >
-                              {event.venues.name}
-                            </Link>
-                          </div>
+                    <CardContent className="p-5 sm:p-6">
+                      {/* Top Bar: Stop Badge, Event Type, Genre, and Sorted Toggle */}
+                      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge className="bg-mint text-night font-bold">
+                            Stop {index + 1}
+                          </Badge>
+                          <Badge className="border border-mint/30 bg-mint/10 text-mint">
+                            {typeBadgeLabel}
+                          </Badge>
+                          {showGenreBadge ? (
+                            <Badge variant="outline" className="border-border text-foreground/90">
+                              {event.music_genre}
+                            </Badge>
+                          ) : null}
+                          {checked ? (
+                            <Badge className="border border-primary/50 bg-primary/15 text-mint-light">
+                              <Check className="mr-1 h-3 w-3" aria-hidden="true" />
+                              Sorted
+                            </Badge>
+                          ) : null}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <FavoriteButton
+                            eventId={event.id}
+                            variant="icon"
+                            label={event.title}
+                          />
                           <button
                             type="button"
                             aria-pressed={checked}
-                            aria-label={checked ? 'Mark this stop as not sorted' : 'Mark this stop as sorted'}
+                            aria-label={
+                              checked ? 'Mark stop as not sorted' : 'Mark stop as sorted'
+                            }
                             onClick={() => toggleChecked(event.id)}
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                            className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                               checked
-                                ? 'border-emerald-600 bg-emerald-600 text-white'
-                                : 'border-gray-300 bg-white text-gray-400 hover:border-emerald-400 hover:text-emerald-600'
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border bg-night/60 text-muted-foreground hover:border-primary/60 hover:text-foreground'
                             }`}
                           >
-                            <Check className="h-5 w-5" />
+                            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>{checked ? 'Sorted' : 'Mark sorted'}</span>
                           </button>
                         </div>
+                      </div>
 
-                        {event.music_genre && (
-                          <Badge className="mb-3 bg-emerald-100 text-emerald-700">{event.music_genre}</Badge>
-                        )}
+                      {/* Event Title & Venue Link */}
+                      <div className="mb-3">
+                        <h3 className="mb-1 text-xl font-bold text-foreground sm:text-2xl">
+                          <Link
+                            href={eventDetailHref}
+                            className="transition-colors hover:text-primary focus-visible:outline-none focus-visible:underline"
+                          >
+                            {event.title}
+                          </Link>
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          Hosted at{' '}
+                          <Link
+                            href={venueDetailHref}
+                            className="font-semibold text-primary hover:underline"
+                          >
+                            {event.venues.name}
+                          </Link>
+                        </p>
+                      </div>
 
-                        <p className="mb-4 text-gray-600">{event.description}</p>
-
-                        <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <span>{formatRange(event.start_time, event.end_time)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>{event.venues.address}, {event.venues.city}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Euro className="h-4 w-4" />
-                            <span>{formatPrice(event)}</span>
-                          </div>
+                      {/* Metadata Row: Time, Location, Price */}
+                      <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-border/70 bg-night/50 p-3.5 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2 text-foreground/90">
+                          <Calendar className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <span>{formatStopTimeRange(event.start_time, event.end_time)}</span>
                         </div>
+                        <div className="flex items-center gap-2 text-foreground/90">
+                          <MapPin className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <span className="truncate" title={locationString}>
+                            {locationString}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-foreground/90">
+                          <Euro className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <span className="font-semibold text-white">
+                            {priceLabel
+                              ? priceLabel === 'Free'
+                                ? 'Free entry'
+                                : priceLabel
+                              : 'Check venue for entry'}
+                          </span>
+                        </div>
+                      </div>
 
-                        <div className="mb-4 flex flex-wrap gap-2">
+                      {event.description ? (
+                        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                          {event.description}
+                        </p>
+                      ) : null}
+
+                      {/* Why This Stop Fits Your Night (Visible by default per Phase 6 §6) */}
+                      <div className="mb-5 rounded-xl border border-mint/25 bg-mint/8 p-3.5">
+                        <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-mint">
+                          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                          Why this stop was recommended
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {reasons.map(reason => (
+                            <Badge
+                              key={reason}
+                              className="border border-mint/30 bg-night/80 text-xs font-medium text-mint-light"
+                            >
+                              {reason}
+                            </Badge>
+                          ))}
                           {(event.venues.atmosphere ?? []).slice(0, 3).map(atm => (
-                            <Badge key={atm} variant="outline" className="border-gray-300 text-gray-700">
+                            <Badge
+                              key={atm}
+                              variant="outline"
+                              className="border-border/80 bg-night/50 text-xs text-muted-foreground"
+                            >
                               {atm}
                             </Badge>
                           ))}
                         </div>
+                      </div>
 
-                        {whyOpen && (
-                          <div className="mb-4 flex animate-in fade-in-0 flex-wrap gap-2">
-                            {reasons.map(reason => (
-                              <Badge key={reason} className="bg-emerald-50 text-emerald-800">
-                                {reason}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-3">
-                          <Button variant="brand-outline" onClick={() => setOpenWhyId(whyOpen ? null : event.id)}>
-                            {whyOpen ? 'Hide why' : 'Why this'}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                            disabled={!replacement}
-                            onClick={() => {
-                              const next = swapStop(catalog, stops, index)
-                              if (next) setStops(next)
-                            }}
-                          >
-                            {replacement ? 'Swap' : "That's the only match"}
-                          </Button>
-                          <Link href={detailHrefFromPlan(`/events/${event.slug}`, queryKey)}>
-                            <Button variant="brand-outline">View Event Details</Button>
+                      {/* Card Footer Actions */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/70 pt-4">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <Link href={eventDetailHref}>
+                            <Button type="button" variant="brand" size="sm">
+                              View event details
+                            </Button>
                           </Link>
-                          <Link href={detailHrefFromPlan(`/venues/${event.venues.slug}`, queryKey)}>
-                            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                              View Venue
+                          <Link href={venueDetailHref}>
+                            <Button type="button" variant="brand-outline" size="sm">
+                              View venue
                             </Button>
                           </Link>
                         </div>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={!replacement}
+                          onClick={() => {
+                            const next = swapStop(catalog, stops, index)
+                            if (next) setStops(next)
+                          }}
+                          className="gap-1.5"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>
+                            {replacement ? 'Swap stop' : 'Only match for this slot'}
+                          </span>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -481,43 +861,54 @@ export default function PlanResultContent() {
             })}
           </ol>
 
-          {nightSorted && (
-            <p className="mt-8 text-center text-lg font-medium text-emerald-700">That&apos;s the night, sorted.</p>
-          )}
-
-          <div className="mt-8">
-            <Suspense fallback={
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center">
-                <div className="text-6xl mb-4">🗺️</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Loading map...</h3>
-                <p className="text-gray-600">Preparing your route</p>
-              </div>
-            }>
+          {/* Route Map */}
+          <div className="mt-10">
+            <Suspense
+              fallback={
+                <div className="rounded-2xl border border-border bg-card p-8 text-center">
+                  <h3 className="mb-1 text-lg font-bold text-foreground">Loading route map…</h3>
+                  <p className="text-sm text-muted-foreground">Plotting your planned stops</p>
+                </div>
+              }
+            >
               <PlanMap venues={mapVenues} detailQuery={queryKey} />
             </Suspense>
           </div>
 
-          <div className="text-center mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Not quite right?</h2>
-            <p className="text-gray-600 mb-6">Shuffle a new route, draw again, or start over</p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Button
-                onClick={() => setStops(current => shuffleStops(catalog, current))}
-                variant="brand"
-                disabled={!shuffleReady}
-              >
-                <Shuffle className="mr-2 h-4 w-4" />
-                Shuffle
-              </Button>
-              <Button onClick={() => void fetchPlan()} variant="brand-outline">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Fresh draw
-              </Button>
-              <Link href="/planner">
-                <Button variant="brand-outline">Start Over</Button>
-              </Link>
-            </div>
-          </div>
+          {/* Bottom Callout: Adjust or Re-roll */}
+          <Card className="mt-10 border-border bg-card/70">
+            <CardContent className="flex flex-col items-center justify-between gap-4 p-6 text-center sm:flex-row sm:text-left">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">
+                  Want to take the night in a different direction?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Shuffle a new combination of stops, draw a fresh plan, or tweak your answers.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
+                <Button
+                  type="button"
+                  onClick={() => setStops(current => shuffleStops(catalog, current))}
+                  variant="brand"
+                  disabled={!shuffleReady}
+                >
+                  <Shuffle className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Shuffle route
+                </Button>
+                <Button type="button" onClick={requestFreshDraw} variant="brand-outline">
+                  <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Fresh draw
+                </Button>
+                <Link href={adjustPrefsHref}>
+                  <Button type="button" variant="outline">
+                    <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Adjust preferences
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

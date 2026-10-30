@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -8,6 +9,10 @@ import { RemoveSaveButton } from './RemoveSaveButton'
 import { SignOutButton } from './SignOutButton'
 
 export const instant = false
+
+export const metadata: Metadata = {
+  robots: { index: false },
+}
 
 function first<T>(value: T | T[] | null | undefined): T | null {
   if (value == null) return null
@@ -52,7 +57,7 @@ export default async function ProfilePage() {
   const email = profile?.email || user.email || ''
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="flex flex-col bg-background">
       <PageHero
         align="left"
         compact
@@ -63,15 +68,15 @@ export default async function ProfilePage() {
       />
       <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle>Saved venues</CardTitle>
             </CardHeader>
             <CardContent>
               {savedVenues.length === 0 ? (
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   You have not saved any venues yet.{' '}
-                  <Link href="/venues" className="text-emerald-700 hover:underline">
+                  <Link href="/venues" className="text-primary hover:underline">
                     Browse venues
                   </Link>
                 </p>
@@ -80,10 +85,10 @@ export default async function ProfilePage() {
                   {savedVenues.map((row) => (
                     <li key={row.id} className="flex items-start justify-between gap-4">
                       <div>
-                        <Link href={`/venues/${row.venue.slug}`} className="font-semibold text-gray-900 hover:underline">
+                        <Link href={`/venues/${row.venue.slug}`} className="font-semibold text-foreground hover:underline">
                           {row.venue.name}
                         </Link>
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
                           {row.venue.city}, {row.venue.county}
                         </p>
@@ -96,22 +101,22 @@ export default async function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-gray-200">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle>Saved events</CardTitle>
             </CardHeader>
             <CardContent>
               {savedEvents.length === 0 ? (
-                <p className="text-gray-600">You have not saved any events yet.</p>
+                <p className="text-muted-foreground">You have not saved any events yet.</p>
               ) : (
                 <ul className="space-y-3">
                   {savedEvents.map((row) => (
                     <li key={row.id} className="flex items-start justify-between gap-4">
                       <div>
-                        <Link href={`/events/${row.event.slug}`} className="font-semibold text-gray-900 hover:underline">
+                        <Link href={`/events/${row.event.slug}`} className="font-semibold text-foreground hover:underline">
                           {row.event.title}
                         </Link>
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(row.event.start_time).toLocaleString('en-IE', {
                             weekday: 'short',

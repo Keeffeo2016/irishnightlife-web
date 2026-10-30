@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 type ShareTarget = 'facebook' | 'x' | 'instagram'
-type InstagramNotice = 'idle' | 'copied' | 'failed'
+type InstagramNotice = 'idle' | 'copied' | 'failed' | 'link-copied'
 
 interface ShareEventButtonsProps {
   title: string
@@ -39,8 +39,10 @@ function instagramNotice(notice: InstagramNotice): string | null {
       return null
     case 'copied':
       return 'Link copied. Paste it into your Instagram post or story.'
+    case 'link-copied':
+      return 'Event link copied.'
     case 'failed':
-      return 'Instagram is open. Copy this page’s address and paste it there.'
+      return 'Could not share automatically. Copy this page’s address from the browser.'
     default: {
       const exhaustive: never = notice
       return exhaustive
@@ -57,6 +59,23 @@ export function ShareEventButtons({ title, venueName, slug }: ShareEventButtonsP
       if (timer.current) clearTimeout(timer.current)
     }
   }, [])
+
+  const shareNative = async () => {
+    const pageUrl = eventPageUrl(slug)
+    const text = `${title} at ${venueName}`
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title, text, url: pageUrl })
+        return
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+      }
+    }
+    if (timer.current) clearTimeout(timer.current)
+    const copied = await copyEventLink(pageUrl)
+    setNotice(copied === 'copied' ? 'link-copied' : 'failed')
+    timer.current = setTimeout(() => setNotice('idle'), 4000)
+  }
 
   const share = async (target: ShareTarget) => {
     const pageUrl = eventPageUrl(slug)
@@ -91,6 +110,11 @@ export function ShareEventButtons({ title, venueName, slug }: ShareEventButtonsP
 
   return (
     <div>
+      <div className="mb-2">
+        <Button type="button" variant="outline" className="min-h-10 w-full" onClick={() => void shareNative()}>
+          Share
+        </Button>
+      </div>
       <div className="grid grid-cols-3 gap-2">
         <Button type="button" variant="outline" size="sm" onClick={() => void share('facebook')}>
           <FacebookIcon />
@@ -106,7 +130,7 @@ export function ShareEventButtons({ title, venueName, slug }: ShareEventButtonsP
         </Button>
       </div>
       {message ? (
-        <p className="mt-2 text-sm text-gray-500" role="status">
+        <p className="mt-2 text-sm text-muted-foreground" role="status">
           {message}
         </p>
       ) : null}

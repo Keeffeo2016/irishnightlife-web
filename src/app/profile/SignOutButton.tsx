@@ -23,6 +23,7 @@ export function SignOutButton() {
       variant="brand-outline-dark"
       onClick={signOut}
       disabled={loading}
+      className="min-h-11"
     >
       {loading ? 'Signing out...' : 'Sign out'}
     </Button>

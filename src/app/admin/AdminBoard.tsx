@@ -52,11 +52,11 @@ export type BoardEvent = {
 }
 
 const CHART_COLORS = {
-  mint: '#10c98c',
-  forest: '#075c43',
+  mint: '#64f4c2',
+  forest: '#49d9a7',
   amber: '#d97706',
-  slate: '#64748b',
-  stone: '#e5e7eb',
+  slate: '#9aabb0',
+  stone: '#283a3d',
 }
 
 export function AdminBoard({
@@ -122,7 +122,7 @@ export function AdminBoard({
         />
       </div>
 
-      <Card className="bg-white border-gray-200">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle>Trend</CardTitle>
           <FilterSelect
@@ -142,7 +142,7 @@ export function AdminBoard({
         </CardContent>
       </Card>
 
-      <Card className="bg-white border-gray-200">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between space-y-0">
           <CardTitle>{sectionTitle(section)}</CardTitle>
           <div className="flex flex-wrap gap-2">
@@ -218,41 +218,41 @@ function VenueSetups({ venues }: { venues: BoardVenue[] }) {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
-    <Card className={pending.length > 0 ? 'border-amber-200 bg-amber-50/60' : 'bg-white border-gray-200'}>
+    <Card className={pending.length > 0 ? 'border-amber-500/40 bg-amber-500/15' : 'bg-card border-border'}>
       <CardHeader className="space-y-1">
         <CardTitle>
           New venue setups{pending.length > 0 ? ` (${pending.length})` : ''}
         </CardTitle>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Venues registered by their owners. Approve one to put it on the public site.
         </p>
       </CardHeader>
       <CardContent>
         {pending.length === 0 ? (
-          <p className="text-sm text-gray-600">No new venues waiting for approval.</p>
+          <p className="text-sm text-muted-foreground">No new venues waiting for approval.</p>
         ) : (
           <ul className="divide-y divide-amber-200/80">
             {pending.map((venue) => (
               <li key={venue.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium text-gray-900">{venue.name}</p>
-                    <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                    <p className="font-medium text-foreground">{venue.name}</p>
+                    <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-200">
                       Pending
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-gray-700">{venue.address}</p>
-                  <p className="text-sm text-gray-700">
+                  <p className="mt-1 text-sm text-foreground/90">{venue.address}</p>
+                  <p className="text-sm text-foreground/90">
                     {venue.postcode ? `${venue.postcode} · ` : ''}{venue.city}, {venue.county}
                   </p>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {venue.ownerName || 'No owner'}
                     {venue.ownerEmail ? ` · ${venue.ownerEmail}` : ''}
                   </p>
-                  <p className="text-xs text-gray-500">Submitted {formatDate(venue.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">Submitted {formatDate(venue.created_at)}</p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <Link href={`/venues/${venue.slug}`} className="text-sm text-emerald-700 hover:underline">
+                  <Link href={`/venues/${venue.slug}`} className="text-sm text-primary hover:underline">
                     Preview
                   </Link>
                   <VenueApprovalButton venueId={venue.id} verified={false} />
@@ -268,10 +268,10 @@ function VenueSetups({ venues }: { venues: BoardVenue[] }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <Card className="bg-white border-gray-200">
+    <Card className="bg-card border-border">
       <CardContent className="p-5">
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
       </CardContent>
     </Card>
   )
@@ -288,45 +288,52 @@ function DonutCard({
 }) {
   const radius = 36
   const circumference = 2 * Math.PI * radius
-  let offset = 0
-  const slices = total === 0 ? [] : segments.filter((segment) => segment.value > 0)
+  const slices =
+    total === 0
+      ? []
+      : segments
+          .filter((segment) => segment.value > 0)
+          .reduce<{ label: string; value: number; color: string; length: number; dashOffset: number }[]>(
+            (acc, segment) => {
+              const length = (segment.value / total) * circumference
+              const dashOffset = acc.reduce((sum, item) => sum + item.length, 0)
+              acc.push({ ...segment, length, dashOffset })
+              return acc
+            },
+            []
+          )
 
   return (
-    <Card className="bg-white border-gray-200">
+    <Card className="bg-card border-border">
       <CardContent className="p-5 flex items-center gap-4">
         <svg viewBox="0 0 100 100" className="size-24 shrink-0" role="img" aria-label={`${title}: ${total}`}>
           <circle cx="50" cy="50" r={radius} fill="none" stroke={CHART_COLORS.stone} strokeWidth="12" />
-          {slices.map((segment) => {
-            const length = (segment.value / total) * circumference
-            const circle = (
-              <circle
-                key={segment.label}
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="none"
-                stroke={segment.color}
-                strokeWidth="12"
-                strokeDasharray={`${length} ${circumference - length}`}
-                strokeDashoffset={-offset}
-                transform="rotate(-90 50 50)"
-              />
-            )
-            offset += length
-            return circle
-          })}
-          <text x="50" y="55" textAnchor="middle" fontSize="18" fontWeight="700" fill="#111827">
+          {slices.map((segment) => (
+            <circle
+              key={segment.label}
+              cx="50"
+              cy="50"
+              r={radius}
+              fill="none"
+              stroke={segment.color}
+              strokeWidth="12"
+              strokeDasharray={`${segment.length} ${circumference - segment.length}`}
+              strokeDashoffset={-segment.dashOffset}
+              transform="rotate(-90 50 50)"
+            />
+          ))}
+          <text x="50" y="55" textAnchor="middle" fontSize="18" fontWeight="700" fill="#f4f7f6">
             {total}
           </text>
         </svg>
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-2">{title}</p>
+          <p className="text-sm font-medium text-foreground mb-2">{title}</p>
           <ul className="space-y-1">
             {segments.map((segment) => (
-              <li key={segment.label} className="flex items-center gap-2 text-sm text-gray-600">
+              <li key={segment.label} className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="size-2.5 rounded-full" style={{ backgroundColor: segment.color }} />
                 <span>{segment.label}</span>
-                <span className="font-medium text-gray-900">{segment.value}</span>
+                <span className="font-medium text-foreground">{segment.value}</span>
               </li>
             ))}
           </ul>
@@ -379,12 +386,12 @@ function ColumnChart({ rows, label }: { rows: { label: string; value: number }[]
     <div className="flex items-end gap-1 h-44" role="img" aria-label={label}>
       {rows.map((row) => (
         <div key={row.label} className="flex-1 min-w-0 flex flex-col items-center justify-end h-full gap-1">
-          <span className="text-[10px] text-gray-500">{row.value}</span>
+          <span className="text-[10px] text-muted-foreground">{row.value}</span>
           <div
-            className="w-full max-w-8 rounded-t bg-emerald-500"
+            className="w-full max-w-8 rounded-t bg-primary"
             style={{ height: `${Math.max(row.value === 0 ? 2 : 8, (row.value / max) * 112)}px` }}
           />
-          <span className="text-[10px] leading-tight text-gray-500 text-center">{row.label}</span>
+          <span className="text-[10px] leading-tight text-muted-foreground text-center">{row.label}</span>
         </div>
       ))}
     </div>
@@ -392,7 +399,7 @@ function ColumnChart({ rows, label }: { rows: { label: string; value: number }[]
 }
 
 function BarList({ rows, empty }: { rows: { label: string; value: number }[]; empty: string }) {
-  if (rows.length === 0) return <p className="text-sm text-gray-600">{empty}</p>
+  if (rows.length === 0) return <p className="text-sm text-muted-foreground">{empty}</p>
   const max = Math.max(...rows.map((row) => row.value), 1)
 
   return (
@@ -400,12 +407,12 @@ function BarList({ rows, empty }: { rows: { label: string; value: number }[]; em
       {rows.map((row) => (
         <li key={row.label}>
           <div className="flex items-baseline justify-between gap-3 text-sm mb-1">
-            <span className="text-gray-800 truncate">{row.label}</span>
-            <span className="font-medium text-gray-900">{row.value}</span>
+            <span className="text-foreground truncate">{row.label}</span>
+            <span className="font-medium text-foreground">{row.value}</span>
           </div>
-          <div className="h-2 rounded-full bg-gray-100">
+          <div className="h-2 rounded-full bg-muted">
             <div
-              className="h-2 rounded-full bg-emerald-500"
+              className="h-2 rounded-full bg-primary"
               style={{ width: `${(row.value / max) * 100}%` }}
             />
           </div>
@@ -428,7 +435,7 @@ function FilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={(next) => { if (next) onChange(next) }}>
-      <SelectTrigger className="w-48 bg-white" aria-label={label}>
+      <SelectTrigger className="w-48 bg-card" aria-label={label}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -443,13 +450,13 @@ function FilterSelect({
 }
 
 function VenueTable({ venues }: { venues: BoardVenue[] }) {
-  if (venues.length === 0) return <p className="text-sm text-gray-600">No venues in this view.</p>
+  if (venues.length === 0) return <p className="text-sm text-muted-foreground">No venues in this view.</p>
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 text-left text-gray-500">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th className="py-2 pr-4 font-medium">Venue</th>
             <th className="py-2 pr-4 font-medium">Place</th>
             <th className="py-2 pr-4 font-medium">Owner</th>
@@ -460,20 +467,20 @@ function VenueTable({ venues }: { venues: BoardVenue[] }) {
         </thead>
         <tbody>
           {venues.map((venue) => (
-            <tr key={venue.id} className="border-b border-gray-100 last:border-0">
+            <tr key={venue.id} className="border-b border-border last:border-0">
               <td className="py-3 pr-4">
-                <Link href={`/venues/${venue.slug}`} className="font-medium text-emerald-700 hover:underline">
+                <Link href={`/venues/${venue.slug}`} className="font-medium text-primary hover:underline">
                   {venue.name}
                 </Link>
               </td>
-              <td className="py-3 pr-4 text-gray-700">{venue.city}, {venue.county}</td>
-              <td className="py-3 pr-4 text-gray-700">
+              <td className="py-3 pr-4 text-foreground/90">{venue.city}, {venue.county}</td>
+              <td className="py-3 pr-4 text-foreground/90">
                 <p>{venue.ownerName || 'No owner'}</p>
-                {venue.ownerEmail ? <p className="text-xs text-gray-500">{venue.ownerEmail}</p> : null}
+                {venue.ownerEmail ? <p className="text-xs text-muted-foreground">{venue.ownerEmail}</p> : null}
               </td>
-              <td className="py-3 pr-4 text-gray-700">{venue.eventCount}</td>
+              <td className="py-3 pr-4 text-foreground/90">{venue.eventCount}</td>
               <td className="py-3 pr-4">
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${venue.is_verified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${venue.is_verified ? 'bg-primary/15 text-mint-light' : 'bg-amber-100 text-amber-200'}`}>
                   {venue.is_verified ? 'Verified' : 'Pending'}
                 </span>
               </td>
@@ -489,13 +496,13 @@ function VenueTable({ venues }: { venues: BoardVenue[] }) {
 }
 
 function EventTable({ events }: { events: BoardEvent[] }) {
-  if (events.length === 0) return <p className="text-sm text-gray-600">No events in this view.</p>
+  if (events.length === 0) return <p className="text-sm text-muted-foreground">No events in this view.</p>
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 text-left text-gray-500">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th className="py-2 pr-4 font-medium">Event</th>
             <th className="py-2 pr-4 font-medium">Venue</th>
             <th className="py-2 pr-4 font-medium">Starts</th>
@@ -507,16 +514,16 @@ function EventTable({ events }: { events: BoardEvent[] }) {
           {events.map((event) => {
             const live = event.is_published && event.venueVerified
             return (
-              <tr key={event.id} className="border-b border-gray-100 last:border-0">
-                <td className="py-3 pr-4 font-medium text-gray-900">{event.title}</td>
-                <td className="py-3 pr-4 text-gray-700">{event.venueName ?? 'Unknown venue'}</td>
-                <td className="py-3 pr-4 text-gray-700 whitespace-nowrap">{formatEventWhen(event.start_time)}</td>
-                <td className="py-3 pr-4 text-gray-700">{eventStatus(event)}</td>
+              <tr key={event.id} className="border-b border-border last:border-0">
+                <td className="py-3 pr-4 font-medium text-foreground">{event.title}</td>
+                <td className="py-3 pr-4 text-foreground/90">{event.venueName ?? 'Unknown venue'}</td>
+                <td className="py-3 pr-4 text-foreground/90 whitespace-nowrap">{formatEventWhen(event.start_time)}</td>
+                <td className="py-3 pr-4 text-foreground/90">{eventStatus(event)}</td>
                 <td className="py-3">
                   {live ? (
-                    <Link href={`/events/${event.slug}`} className="text-emerald-700 hover:underline">View</Link>
+                    <Link href={`/events/${event.slug}`} className="text-primary hover:underline">View</Link>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-muted-foreground">—</span>
                   )}
                 </td>
               </tr>
@@ -529,13 +536,13 @@ function EventTable({ events }: { events: BoardEvent[] }) {
 }
 
 function UserTable({ users }: { users: BoardUser[] }) {
-  if (users.length === 0) return <p className="text-sm text-gray-600">No users in this view.</p>
+  if (users.length === 0) return <p className="text-sm text-muted-foreground">No users in this view.</p>
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 text-left text-gray-500">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th className="py-2 pr-4 font-medium">Name</th>
             <th className="py-2 pr-4 font-medium">Email</th>
             <th className="py-2 pr-4 font-medium">Role</th>
@@ -544,11 +551,11 @@ function UserTable({ users }: { users: BoardUser[] }) {
         </thead>
         <tbody>
           {users.map((account) => (
-            <tr key={account.id} className="border-b border-gray-100 last:border-0">
-              <td className="py-3 pr-4 font-medium text-gray-900">{account.full_name || '—'}</td>
-              <td className="py-3 pr-4 text-gray-700">{account.email}</td>
-              <td className="py-3 pr-4 text-gray-700">{roleLabel(account.role)}</td>
-              <td className="py-3 text-gray-700 whitespace-nowrap">{formatDate(account.created_at)}</td>
+            <tr key={account.id} className="border-b border-border last:border-0">
+              <td className="py-3 pr-4 font-medium text-foreground">{account.full_name || '—'}</td>
+              <td className="py-3 pr-4 text-foreground/90">{account.email}</td>
+              <td className="py-3 pr-4 text-foreground/90">{roleLabel(account.role)}</td>
+              <td className="py-3 text-foreground/90 whitespace-nowrap">{formatDate(account.created_at)}</td>
             </tr>
           ))}
         </tbody>

@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const LINKS = [
+  { href: '/', label: 'Home' },
   { href: '/venues', label: 'Venues' },
   { href: '/events', label: 'Events' },
   { href: '/planner', label: 'Tonight Planner' },
@@ -69,7 +70,7 @@ export function Navbar() {
   }, [pathname])
 
   return (
-    <nav className="border-b border-white/10 bg-night sticky top-0 z-50">
+    <nav className="border-b border-border bg-night sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center" onClick={close}>
@@ -79,7 +80,7 @@ export function Navbar() {
               width={832}
               height={220}
               priority
-              className="h-11 w-auto"
+              className="h-[53px] w-auto"
             />
           </Link>
 
@@ -94,7 +95,7 @@ export function Navbar() {
                   className={
                     active
                       ? 'text-mint font-medium'
-                      : 'text-gray-300 hover:text-mint font-medium transition'
+                      : 'text-muted-foreground hover:text-mint font-medium transition'
                   }
                 >
                   {link.label}
@@ -102,7 +103,7 @@ export function Navbar() {
               )
             })}
             {role === 'admin' ? (
-              <Link href="/admin" className="text-gray-300 hover:text-mint font-medium transition">
+              <Link href="/admin" className="text-muted-foreground hover:text-mint font-medium transition">
                 Admin
               </Link>
             ) : null}
@@ -151,7 +152,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`block py-2 ${active ? 'text-mint font-medium' : 'text-gray-300 hover:text-mint'}`}
+                  className={`block py-2 ${active ? 'text-mint font-medium' : 'text-muted-foreground hover:text-mint'}`}
                   onClick={close}
                 >
                   {link.label}
@@ -159,7 +160,7 @@ export function Navbar() {
               )
             })}
             {role === 'admin' ? (
-              <Link href="/admin" className="block py-2 text-gray-300 hover:text-mint" onClick={close}>
+              <Link href="/admin" className="block py-2 text-muted-foreground hover:text-mint" onClick={close}>
                 Admin
               </Link>
             ) : null}

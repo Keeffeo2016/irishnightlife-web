@@ -1,10 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ImagePlus, Loader2, MapPin, Trash2 } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Eye,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  PlusCircle,
+  Trash2,
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import {
+  DASHBOARD_GENERIC_SAVE_ERROR,
+  DASHBOARD_GENERIC_UPLOAD_ERROR,
+  isVenueProfileComplete,
+  validateVenueProfileInput,
+} from '@/lib/dashboard-validation'
 import {
   MAX_VENUE_IMAGES,
   PRICE_RANGES,
@@ -15,12 +33,14 @@ import {
   venueImagePath,
 } from '@/lib/venue-profile'
 import type { DashboardVenue } from '@/lib/venue-dashboard'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { AwaitingApprovalNotice } from '@/components/AwaitingApprovalNotice'
+import { cn } from '@/lib/utils'
 import { HenStagSelect } from './HenStagSelect'
 
-const fieldClass = 'w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900'
+const selectFieldClass =
+  'h-11 w-full rounded-xl border border-border bg-background px-3.5 py-2 text-sm text-foreground transition-colors focus-visible:border-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/30'
 
 export function VenueProfileForm({
   venue,
@@ -40,17 +60,34 @@ export function VenueProfileForm({
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const savingRef = useRef(false)
+  const uploadingRef = useRef(false)
+
+  const completeness = isVenueProfileComplete({
+    description,
+    venue_type: venueType,
+    price_range: priceRange,
+    images,
+  })
 
   async function saveProfile(event: React.FormEvent) {
     event.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
     setSaving(true)
     setError(null)
     setMessage(null)
 
-    const about = description.trim()
-    if (!about || !venueType || !priceRange) {
+    const validation = validateVenueProfileInput({
+      description,
+      venueType,
+      priceRange,
+    })
+
+    if (!validation.ok) {
+      savingRef.current = false
       setSaving(false)
-      setError('Add a short description, a venue type, and a price range.')
+      setError(validation.error)
       return
     }
 
@@ -58,25 +95,26 @@ export function VenueProfileForm({
     const { error: updateError } = await supabase
       .from('venues')
       .update({
-        description: about,
+        description: validation.description,
         venue_type: venueType,
         price_range: priceRange,
       })
       .eq('id', venue.id)
 
+    savingRef.current = false
     setSaving(false)
     if (updateError) {
-      setError(updateError.message)
+      setError(DASHBOARD_GENERIC_SAVE_ERROR)
       return
     }
 
-    setDescription(about)
+    setDescription(validation.description)
     setMessage('Profile saved. New events will use these details.')
     router.refresh()
   }
 
   async function uploadPhotos(fileList: FileList | null) {
-    if (!fileList?.length) return
+    if (!fileList?.length || uploadingRef.current) return
     setError(null)
     setMessage(null)
 
@@ -93,6 +131,7 @@ export function VenueProfileForm({
       return
     }
 
+    uploadingRef.current = true
     setUploading(true)
     const supabase = createClient()
     const uploaded: string[] = []
@@ -105,8 +144,9 @@ export function VenueProfileForm({
         .upload(path, file, { contentType: file.type, upsert: false })
 
       if (uploadError) {
+        uploadingRef.current = false
         setUploading(false)
-        setError(uploadError.message)
+        setError(DASHBOARD_GENERIC_UPLOAD_ERROR)
         return
       }
 
@@ -120,9 +160,10 @@ export function VenueProfileForm({
       .update({ images: nextImages })
       .eq('id', venue.id)
 
+    uploadingRef.current = false
     setUploading(false)
     if (updateError) {
-      setError(updateError.message)
+      setError(DASHBOARD_GENERIC_SAVE_ERROR)
       return
     }
 
@@ -142,7 +183,7 @@ export function VenueProfileForm({
       .eq('id', venue.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(DASHBOARD_GENERIC_SAVE_ERROR)
       return
     }
 
@@ -152,45 +193,186 @@ export function VenueProfileForm({
     }
 
     setImages(nextImages)
+    setMessage('Photo removed.')
     router.refresh()
   }
 
   return (
-    <form onSubmit={saveProfile} className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{venue.name}</h3>
-          <p className="mt-1 flex items-start gap-1 text-sm text-gray-600">
-            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            {formatVenueAddress(venue)}
+    <form
+      onSubmit={saveProfile}
+      className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-6"
+      noValidate
+      aria-busy={saving || uploading}
+      aria-describedby={error ? `venue-profile-error-${venue.id}` : undefined}
+    >
+      {/* Venue Header Card */}
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-start">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 className="text-xl font-bold text-foreground">{venue.name}</h2>
+            {venue.is_verified ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-3 py-0.5 text-xs font-medium text-mint">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span>Verified — Live on public directory</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-0.5 text-xs font-medium text-amber-200">
+                <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span>Awaiting approval — Hidden from public directory</span>
+              </span>
+            )}
+          </div>
+
+          <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mint/80" aria-hidden="true" />
+            <span>{formatVenueAddress(venue)}</span>
           </p>
-          <p className="mt-1 text-sm text-gray-500">
-            {viewCount.toLocaleString('en-IE')} profile {viewCount === 1 ? 'view' : 'views'}
-          </p>
+
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Eye className="h-3.5 w-3.5 text-mint/80" aria-hidden="true" />
+              <span>
+                {viewCount.toLocaleString('en-IE')} profile{' '}
+                {viewCount === 1 ? 'view' : 'views'}
+              </span>
+            </span>
+            <span>·</span>
+            {completeness.complete ? (
+              <span className="inline-flex items-center gap-1 font-medium text-mint">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Profile 100% complete</span>
+              </span>
+            ) : (
+              <span className="font-medium text-amber-200">
+                Missing: {completeness.missing.join(', ')}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          <Link href={`/venues/${venue.slug}`} className="text-emerald-700 hover:underline">
-            View page
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href={`/venues/${venue.slug}`}
+            className={cn(
+              buttonVariants({ variant: 'brand-outline', size: 'sm' }),
+              'gap-1.5 text-xs'
+            )}
+          >
+            <span>View public profile</span>
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
           {venue.is_verified ? (
             <Link
               href={`/dashboard/events/new?venue=${venue.id}`}
-              className="text-emerald-700 hover:underline"
+              className={cn(buttonVariants({ variant: 'brand', size: 'sm' }), 'gap-1.5 text-xs')}
             >
-              Create event
+              <PlusCircle className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Add event</span>
             </Link>
           ) : (
-            <AwaitingApprovalNotice className="max-w-xs text-right text-sm text-amber-800" />
+            <AwaitingApprovalNotice className="max-w-xs text-xs text-amber-200" />
           )}
         </div>
       </div>
 
-      <HenStagSelect venueId={venue.id} value={venue.accepts_hen_stag} />
+      {/* Feedback banners */}
+      {error ? (
+        <div
+          id={`venue-profile-error-${venue.id}`}
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200"
+        >
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" aria-hidden="true" />
+          <p>{error}</p>
+        </div>
+      ) : null}
 
-      <div>
-        <label htmlFor={`about-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
-          About the venue
-        </label>
+      {message ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-start gap-3 rounded-xl border border-primary/40 bg-primary/15 p-4 text-sm text-mint"
+        >
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+          <p>{message}</p>
+        </div>
+      ) : null}
+
+      {/* 1. Venue Classification & Policy */}
+      <section className="space-y-4">
+        <div>
+          <h3 className="text-base font-bold text-foreground">
+            Venue classification &amp; group policy
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Help visitors and the Night Planner match your venue with the right crowd and budget.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div>
+            <label
+              htmlFor={`type-${venue.id}`}
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
+              Venue type <span className="text-mint">*</span>
+            </label>
+            <select
+              id={`type-${venue.id}`}
+              value={venueType}
+              onChange={(event) => setVenueType(event.target.value)}
+              className={selectFieldClass}
+              required
+            >
+              <option value="">Choose a type</option>
+              {VENUE_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor={`price-${venue.id}`}
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
+              Price range <span className="text-mint">*</span>
+            </label>
+            <select
+              id={`price-${venue.id}`}
+              value={priceRange}
+              onChange={(event) => setPriceRange(event.target.value)}
+              className={selectFieldClass}
+              required
+            >
+              <option value="">Choose a price range</option>
+              {PRICE_RANGES.map((range) => (
+                <option key={range} value={range}>
+                  {range}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <HenStagSelect venueId={venue.id} value={venue.accepts_hen_stag} />
+        </div>
+      </section>
+
+      {/* 2. About the Venue */}
+      <section className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <label
+            htmlFor={`about-${venue.id}`}
+            className="block text-sm font-medium text-foreground"
+          >
+            About the venue <span className="text-mint">*</span>
+          </label>
+          <span className="text-xs text-muted-foreground">
+            {description.length} / 2000
+          </span>
+        </div>
         <Textarea
           id={`about-${venue.id}`}
           value={description}
@@ -198,104 +380,113 @@ export function VenueProfileForm({
           maxLength={2000}
           rows={5}
           placeholder="What should people know before they come? Music, atmosphere, food, who it's for."
-          className="min-h-28 border-gray-300 bg-white text-gray-900"
+          className="min-h-28 border-border bg-background text-foreground"
           required
         />
-      </div>
+        <p className="text-xs text-muted-foreground">
+          This description appears on your public venue profile and is pre-filled when you create
+          new events.
+        </p>
+      </section>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor={`type-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
-            Type
-          </label>
-          <select
-            id={`type-${venue.id}`}
-            value={venueType}
-            onChange={(event) => setVenueType(event.target.value)}
-            className={fieldClass}
-            required
-          >
-            <option value="">Choose a type</option>
-            {VENUE_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
+      {/* 3. Venue Photographs */}
+      <section className="space-y-4 border-t border-border pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="text-base font-bold text-foreground">Venue photographs</h3>
+            <p className="text-xs text-muted-foreground">
+              Up to {MAX_VENUE_IMAGES} photos, 5 MB each (JPEG, PNG, WebP, or GIF). Your first
+              photo is used as the cover image.
+            </p>
+          </div>
+          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            {images.length} of {MAX_VENUE_IMAGES} photos uploaded
+          </span>
         </div>
-        <div>
-          <label htmlFor={`price-${venue.id}`} className="mb-1 block text-sm font-medium text-gray-700">
-            Price range
-          </label>
-          <select
-            id={`price-${venue.id}`}
-            value={priceRange}
-            onChange={(event) => setPriceRange(event.target.value)}
-            className={fieldClass}
-            required
-          >
-            <option value="">Choose a price range</option>
-            {PRICE_RANGES.map((range) => (
-              <option key={range} value={range}>
-                {range}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">Photos</p>
         {images.length > 0 ? (
-          <ul className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {images.map((url) => (
-              <li key={url} className="relative">
-                <img src={url} alt={`${venue.name} photo`} className="h-28 w-full rounded-lg object-cover" />
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {images.map((url, index) => (
+              <li
+                key={url}
+                className="group relative aspect-video overflow-hidden rounded-xl border border-border bg-background"
+              >
+                {/* Supabase public URLs only (uploaded then listed). Blob object-URL previews are not used here. */}
+                <Image
+                  src={url}
+                  alt={`${venue.name} photo ${index + 1}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                  className="object-cover"
+                />
+                {index === 0 ? (
+                  <span className="absolute bottom-2 left-2 rounded-md border border-primary/40 bg-night/90 px-2.5 py-1 text-xs font-semibold text-mint">
+                    Cover photo
+                  </span>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => removePhoto(url)}
-                  className="absolute right-2 top-2 rounded-md bg-white/90 p-1 text-gray-700 shadow-sm hover:text-red-600"
-                  aria-label="Remove photo"
+                  aria-label={`Remove photo ${index + 1} of ${venue.name}`}
+                  className="absolute right-2 top-2 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-night/90 text-foreground/90 shadow-sm transition-colors hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </button>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mb-3 text-sm text-gray-500">No photos yet. These show on your venue page and on events.</p>
+          <div className="rounded-xl border border-dashed border-border bg-background/50 p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              No photos uploaded yet. Photos appear on your venue directory card, venue page, and
+              events.
+            </p>
+          </div>
         )}
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50">
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-          {uploading ? 'Uploading…' : 'Upload photos'}
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            multiple
-            className="sr-only"
-            disabled={uploading || images.length >= MAX_VENUE_IMAGES}
-            onChange={(event) => {
-              void uploadPhotos(event.target.files)
-              event.target.value = ''
-            }}
-          />
-        </label>
-        <p className="mt-2 text-xs text-gray-500">Up to {MAX_VENUE_IMAGES} photos, 5 MB each.</p>
+
+        <div>
+          <label
+            htmlFor={`photos-${venue.id}`}
+            className={cn(
+              'inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-card',
+              (uploading || images.length >= MAX_VENUE_IMAGES) &&
+                'pointer-events-none opacity-50'
+            )}
+          >
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-mint" aria-hidden="true" />
+            ) : (
+              <ImagePlus className="h-4 w-4 text-mint" aria-hidden="true" />
+            )}
+            <span>{uploading ? 'Uploading…' : 'Upload photos'}</span>
+            <input
+              id={`photos-${venue.id}`}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="sr-only"
+              disabled={uploading || images.length >= MAX_VENUE_IMAGES}
+              onChange={(event) => {
+                void uploadPhotos(event.target.files)
+                event.target.value = ''
+              }}
+            />
+          </label>
+        </div>
+      </section>
+
+      <div className="flex items-center justify-end border-t border-border pt-5">
+        <Button type="submit" variant="brand" disabled={saving} className="min-h-11 px-6">
+          {saving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <span>Saving…</span>
+            </>
+          ) : (
+            <span>Save profile</span>
+          )}
+        </Button>
       </div>
-
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
-
-      <Button type="submit" variant="brand" disabled={saving}>
-        {saving ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Saving
-          </>
-        ) : (
-          'Save profile'
-        )}
-      </Button>
     </form>
   )
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { buildLoginSuccessBody } from '@/lib/auth/login-response'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -6,7 +7,6 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json()
     const supabase = await createClient()
 
-    // Sign in the user
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -33,15 +33,13 @@ export async function POST(request: NextRequest) {
       .eq('id', data.user.id)
       .maybeSingle()
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: data.user.id,
+    return NextResponse.json(
+      buildLoginSuccessBody({
+        userId: data.user.id,
         email: data.user.email,
-      },
-      role: profile?.role ?? null,
-      session: data.session,
-    })
+        role: profile?.role ?? null,
+      })
+    )
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(

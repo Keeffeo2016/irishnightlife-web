@@ -1,7 +1,5 @@
-import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { normalizeEircode } from '@/lib/eircode'
-import { slugify } from '@/lib/slug'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -52,33 +50,23 @@ export async function POST(request: NextRequest) {
     }
 
     if (accountType === 'venue') {
-      const venue = {
-        owner_id: authData.user.id,
-        name: venueName,
-        slug: slugify(venueName),
-        address,
-        city,
-        county,
-        postcode,
-        venue_type: 'pub',
-        subscription_tier: 'free',
-        subscription_status: 'active',
-      }
-
-      const { error: venueError } = await supabase.from('venues').insert(venue)
+      // Use SECURITY DEFINER function instead of service-role fallback
+      const { data: venueId, error: venueError } = await supabase.rpc('create_venue_for_owner', {
+        p_name: venueName,
+        p_address: address,
+        p_city: city,
+        p_county: county,
+        p_eircode: postcode,
+        p_venue_type: 'pub',
+        p_description: null,
+      })
 
       if (venueError) {
-        const admin = createAdminClient()
-        if (!admin) {
-          return NextResponse.json({ error: venueError.message }, { status: 400 })
-        }
-
-        const { error: adminError } = await admin.from('venues').insert(venue)
-        if (adminError) {
-          console.error('Venue creation error:', adminError)
-          return NextResponse.json({ error: adminError.message }, { status: 400 })
-        }
+        console.error('Venue creation error:', venueError)
+        return NextResponse.json({ error: venueError.message }, { status: 400 })
       }
+
+      console.log('Venue created with ID:', venueId)
     }
 
     return NextResponse.json({
