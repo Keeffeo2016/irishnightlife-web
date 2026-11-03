@@ -329,8 +329,8 @@ function VenuesBrowser() {
                   aria-pressed={active}
                   className={`min-h-9 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
                     active
-                      ? 'border-mint bg-mint text-night shadow-sm'
-                      : 'border-border bg-card/80 text-foreground/85 hover:border-mint/60 hover:text-mint'
+                      ? 'border-hotpink bg-hotpink text-white shadow-sm'
+                      : 'border-border bg-card/80 text-foreground/85 hover:border-hotpink/60 hover:text-hotpink'
                   }`}
                 >
                   {category.label}
@@ -346,7 +346,7 @@ function VenuesBrowser() {
             className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:inline-flex">
-              <MapPin className="h-3.5 w-3.5 text-mint" aria-hidden="true" />
+              <MapPin className="h-3.5 w-3.5 text-hotpink" aria-hidden="true" />
               County:
             </span>
             {POPULAR_VENUE_COUNTIES.map((countyName) => {
@@ -359,8 +359,8 @@ function VenuesBrowser() {
                   aria-pressed={active}
                   className={`min-h-8 shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                     active
-                      ? 'border-primary bg-primary/20 font-semibold text-mint'
-                      : 'border-border/80 bg-night/60 text-foreground/80 hover:border-mint/50 hover:text-foreground'
+                      ? 'border-primary bg-primary/20 font-semibold text-hotpink'
+                      : 'border-border/80 bg-night/60 text-foreground/80 hover:border-hotpink/50 hover:text-foreground'
                   }`}
                 >
                   {countyName}
@@ -403,14 +403,14 @@ function VenuesBrowser() {
               {activeChips.map((chip) => (
                 <span
                   key={chip.key}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-mint/35 bg-mint/10 py-1 pl-3 pr-2 text-xs font-medium text-mint"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-hotpink/35 bg-hotpink/10 py-1 pl-3 pr-2 text-xs font-medium text-hotpink"
                 >
                   <span>{chip.label}</span>
                   <button
                     type="button"
                     onClick={() => handleClearSingle(chip.key)}
                     aria-label={`Remove ${chip.label} filter`}
-                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-mint/25"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-hotpink/25"
                   >
                     <X className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
@@ -437,8 +437,8 @@ function VenuesBrowser() {
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10">
-                <SearchX className="h-7 w-7 text-mint" aria-hidden="true" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/25 bg-hotpink/10">
+                <SearchX className="h-7 w-7 text-hotpink" aria-hidden="true" />
               </div>
 
               <h3 className="mx-auto max-w-lg text-xl font-bold text-foreground sm:text-2xl">

@@ -37,7 +37,7 @@ export function PageHero({
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
           <div
             aria-hidden
-            className="h-full w-full max-w-4xl bg-mint"
+            className="h-full w-full max-w-4xl bg-hotpink"
             style={{
               maskImage: 'url(/ireland-map.svg)',
               maskRepeat: 'no-repeat',
@@ -82,7 +82,7 @@ export function PageHero({
 
 export function HeroAccent({ children }: { children: ReactNode }) {
   return (
-    <span className="bg-gradient-to-r from-mint-light to-mint bg-clip-text text-transparent">
+    <span className="bg-gradient-to-r from-hotpink-light to-hotpink bg-clip-text text-transparent">
       {children}
     </span>
   )

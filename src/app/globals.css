@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-outfit);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,16 +49,25 @@
 }
 
 /*
-  Brand palette — Phase 1 dark nightlife foundation.
+  Stitch design system palette — hot pink / electric violet / midnight purple.
+  Inspired by Resident Advisor, Spotify, and DICE.
   Prefer semantic tokens (bg-background, text-foreground, bg-primary) in new work.
-  Legacy night/mint/forest utilities remain for Navbar, Footer, and PageHero.
 */
 @theme {
-  --color-night: #1a2428;
-  --color-night-soft: #243035;
-  --color-mint: #64f4c2;
-  --color-mint-light: #49d9a7;
-  --color-forest: #1a3438;
+  /* Legacy aliases — remap mint/night to new palette for gradual migration */
+  --color-night: #0b0b14;
+  --color-night-soft: #171629;
+  --color-mint: #ff3d81;
+  --color-mint-light: #ff6ba0;
+  --color-forest: #13121c;
+
+  /* Stitch accent palette for direct use */
+  --color-hotpink: #ff3d81;
+  --color-hotpink-light: #ff6ba0;
+  --color-violet: #8b5cf6;
+  --color-violet-light: #a78bfa;
+  --color-teal: #00d9c0;
+  --color-teal-light: #4ffbe1;
 
   --color-emerald-50: #ebfdf5;
   --color-emerald-100: #cdfae8;
@@ -86,99 +95,94 @@
 }
 
 /*
-  Default theme is the premium dark nightlife surface.
-  Values align with the approved redesign tokens.
+  Stitch design system tokens.
   Contrast notes (approximate WCAG 2.2):
-  - #F4F7F6 on #0B1114: ~16:1 (AAA body)
-  - #9AABB0 on #0B1114: ~7.4:1 (AA body / large)
-  - #9AABB0 on #152124: ~6.5:1 (AA body)
-  - #0B1114 on #64F4C2: ~12:1 (AAA on mint buttons)
-  - #64F4C2 on #0B1114: ~12:1 (AAA for accents / large text)
-  - disabled uses opacity-50; avoid relying on muted mint for small disabled labels
+  - #F7F7FA on #13121c: ~15:1 (AAA body)
+  - #9CA3AF on #13121c: ~7.2:1 (AA body)
+  - #6B7280 on #13121c: ~4.6:1 (AA large text)
+  - #FFFFFF on #FF3D81: ~4.6:1 (AA large text / buttons)
+  - #13121c on #FF3D81: ~4.6:1 (dark text on pink)
 */
 :root {
-  --background: #1a2428;
-  --foreground: #f4f7f6;
-  --card: #243035;
-  --card-foreground: #f4f7f6;
-  --popover: #243035;
-  --popover-foreground: #f4f7f6;
-  --primary: #64f4c2;
-  --primary-foreground: #1a2428;
-  --secondary: #2d3d42;
-  --secondary-foreground: #f4f7f6;
-  --muted: #2d3d42;
-  --muted-foreground: #b8c5c9;
-  --accent: #2d3d42;
-  --accent-foreground: #f4f7f6;
-  --destructive: #f07178;
-  --border: #3a4f55;
-  /* Input borders need ~3:1 non-text contrast on night surfaces (WCAG 2.2 AA) */
-  --input: #4a6368;
-  --ring: #64f4c2;
-  --chart-1: #64f4c2;
-  --chart-2: #9aabb0;
-  --chart-3: #49d9a7;
-  --chart-4: #5eeab8;
-  --chart-5: #3a4f55;
-  --radius: 0.625rem;
-  --sidebar: #243035;
-  --sidebar-foreground: #f4f7f6;
-  --sidebar-primary: #64f4c2;
-  --sidebar-primary-foreground: #1a2428;
-  --sidebar-accent: #2d3d42;
-  --sidebar-accent-foreground: #f4f7f6;
-  --sidebar-border: #3a4f55;
-  --sidebar-ring: #64f4c2;
+  --background: #13121c;
+  --foreground: #f7f7fa;
+  --card: #1f1f28;
+  --card-foreground: #f7f7fa;
+  --popover: #1f1f28;
+  --popover-foreground: #f7f7fa;
+  --primary: #ff3d81;
+  --primary-foreground: #ffffff;
+  --secondary: #571bc1;
+  --secondary-foreground: #f7f7fa;
+  --muted: #292933;
+  --muted-foreground: #9ca3af;
+  --accent: #201f38;
+  --accent-foreground: #f7f7fa;
+  --destructive: #ffb4ab;
+  --border: #2f2e4d;
+  --input: #34343e;
+  --ring: #ff3d81;
+  --chart-1: #ff3d81;
+  --chart-2: #8b5cf6;
+  --chart-3: #00d9c0;
+  --chart-4: #d0bcff;
+  --chart-5: #4ffbe1;
+  --radius: 1rem;
+  --sidebar: #171629;
+  --sidebar-foreground: #f7f7fa;
+  --sidebar-primary: #ff3d81;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #201f38;
+  --sidebar-accent-foreground: #f7f7fa;
+  --sidebar-border: #2f2e4d;
+  --sidebar-ring: #ff3d81;
 
-  /* Type scale (Geist via --font-sans) */
-  --text-display: clamp(2.25rem, 4vw, 3.5rem);
-  --text-h1: clamp(1.875rem, 3vw, 2.5rem);
-  --text-h2: clamp(1.375rem, 2vw, 1.75rem);
+  /* Type scale — Outfit for headings, Geist for body */
+  --text-display: clamp(2.5rem, 5vw, 4rem);
+  --text-h1: clamp(2rem, 3.5vw, 2.75rem);
+  --text-h2: clamp(1.5rem, 2.5vw, 2rem);
   --text-body: 1rem;
   --text-meta: 0.875rem;
   --leading-display: 1.1;
-  --leading-body: 1.6;
+  --leading-body: 1.5;
 }
 
 .dark {
-  --background: #1a2428;
-  --foreground: #f4f7f6;
-  --card: #243035;
-  --card-foreground: #f4f7f6;
-  --popover: #243035;
-  --popover-foreground: #f4f7f6;
-  --primary: #64f4c2;
-  --primary-foreground: #1a2428;
-  --secondary: #2d3d42;
-  --secondary-foreground: #f4f7f6;
-  --muted: #2d3d42;
-  --muted-foreground: #b8c5c9;
-  --accent: #2d3d42;
-  --accent-foreground: #f4f7f6;
-  --destructive: #f07178;
-  --border: #3a4f55;
-  --input: #4a6368;
-  --ring: #64f4c2;
-  --chart-1: #64f4c2;
-  --chart-2: #9aabb0;
-  --chart-3: #49d9a7;
-  --chart-4: #5eeab8;
-  --chart-5: #3a4f55;
-  --sidebar: #243035;
-  --sidebar-foreground: #f4f7f6;
-  --sidebar-primary: #64f4c2;
-  --sidebar-primary-foreground: #1a2428;
-  --sidebar-accent: #2d3d42;
-  --sidebar-accent-foreground: #f4f7f6;
-  --sidebar-border: #3a4f55;
-  --sidebar-ring: #64f4c2;
+  --background: #13121c;
+  --foreground: #f7f7fa;
+  --card: #1f1f28;
+  --card-foreground: #f7f7fa;
+  --popover: #1f1f28;
+  --popover-foreground: #f7f7fa;
+  --primary: #ff3d81;
+  --primary-foreground: #ffffff;
+  --secondary: #571bc1;
+  --secondary-foreground: #f7f7fa;
+  --muted: #292933;
+  --muted-foreground: #9ca3af;
+  --accent: #201f38;
+  --accent-foreground: #f7f7fa;
+  --destructive: #ffb4ab;
+  --border: #2f2e4d;
+  --input: #34343e;
+  --ring: #ff3d81;
+  --chart-1: #ff3d81;
+  --chart-2: #8b5cf6;
+  --chart-3: #00d9c0;
+  --chart-4: #d0bcff;
+  --chart-5: #4ffbe1;
+  --sidebar: #171629;
+  --sidebar-foreground: #f7f7fa;
+  --sidebar-primary: #ff3d81;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #201f38;
+  --sidebar-accent-foreground: #f7f7fa;
+  --sidebar-border: #2f2e4d;
+  --sidebar-ring: #ff3d81;
 }
 
 /*
-  Phase 1 foundations use semantic tokens as the default surface.
-  Page shells were migrated from gray-50 / white / gray-900 utilities onto
-  background / card / foreground so dark text is not left on dark surfaces.
+  Stitch foundations use semantic tokens as the default surface.
   Prefer semantic utilities (bg-background, text-foreground, bg-primary) going forward.
 */
 @layer base {
@@ -191,15 +195,25 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
   h1 {
     font-size: var(--text-h1);
     line-height: var(--leading-display);
     font-weight: 700;
+    letter-spacing: -0.02em;
   }
   h2 {
     font-size: var(--text-h2);
     line-height: 1.25;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
   p {
     font-size: var(--text-body);
@@ -211,6 +225,36 @@
   }
   :focus-visible {
     outline: none;
+  }
+}
+
+/* Neon glow utilities — Stitch design system */
+@layer utilities {
+  .glow-pink {
+    box-shadow: 0 0 20px rgba(255, 61, 129, 0.4),
+      0 0 40px rgba(255, 61, 129, 0.15);
+  }
+  .glow-pink-sm {
+    box-shadow: 0 0 12px rgba(255, 61, 129, 0.3);
+  }
+  .glow-violet {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.1);
+  }
+  .glow-violet-sm {
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.25);
+  }
+  .glow-teal {
+    box-shadow: 0 0 20px rgba(0, 217, 192, 0.3),
+      0 0 40px rgba(0, 217, 192, 0.1);
+  }
+  .glass {
+    background: color-mix(in oklab, #171629 80%, transparent);
+    backdrop-filter: blur(16px);
+  }
+  .glass-elevated {
+    background: color-mix(in oklab, #201f38 65%, transparent);
+    backdrop-filter: blur(20px);
   }
 }
 

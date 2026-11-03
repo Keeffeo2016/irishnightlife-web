@@ -98,7 +98,7 @@ function ViewModeToggle({
         aria-pressed={view === 'grid'}
         className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
           view === 'grid'
-            ? 'bg-mint text-night shadow-xs'
+            ? 'bg-hotpink text-white shadow-xs'
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
@@ -111,7 +111,7 @@ function ViewModeToggle({
         aria-pressed={view === 'map'}
         className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
           view === 'map'
-            ? 'bg-mint text-night shadow-xs'
+            ? 'bg-hotpink text-white shadow-xs'
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
@@ -434,7 +434,7 @@ function EventsBrowser() {
           {/* Horizontal Date Strip (Europe/Dublin) */}
           <div className="flex items-center gap-2">
             <span className="hidden shrink-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:inline-flex">
-              <Calendar className="h-3.5 w-3.5 text-mint" aria-hidden="true" />
+              <Calendar className="h-3.5 w-3.5 text-hotpink" aria-hidden="true" />
               When:
             </span>
             <div
@@ -452,8 +452,8 @@ function EventsBrowser() {
                     aria-pressed={active}
                     className={`min-h-9 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
                       active
-                        ? 'border-mint bg-mint text-night shadow-sm'
-                        : 'border-border bg-card/80 text-foreground/85 hover:border-mint/60 hover:text-mint'
+                        ? 'border-hotpink bg-hotpink text-white shadow-sm'
+                        : 'border-border bg-card/80 text-foreground/85 hover:border-hotpink/60 hover:text-hotpink'
                     }`}
                   >
                     {option.shortLabel}
@@ -479,8 +479,8 @@ function EventsBrowser() {
                   aria-pressed={active}
                   className={`min-h-9 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors sm:text-sm ${
                     active
-                      ? 'border-primary bg-primary/20 font-semibold text-mint'
-                      : 'border-border/80 bg-night/60 text-foreground/80 hover:border-mint/50 hover:text-foreground'
+                      ? 'border-primary bg-primary/20 font-semibold text-hotpink'
+                      : 'border-border/80 bg-night/60 text-foreground/80 hover:border-hotpink/50 hover:text-foreground'
                   }`}
                 >
                   {category.label}
@@ -561,14 +561,14 @@ function EventsBrowser() {
                   {activeChips.map((chip) => (
                     <span
                       key={chip.key}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-mint/35 bg-mint/10 py-1 pl-3 pr-2 text-xs font-medium text-mint"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-hotpink/35 bg-hotpink/10 py-1 pl-3 pr-2 text-xs font-medium text-hotpink"
                     >
                       <span>{chip.label}</span>
                       <button
                         type="button"
                         onClick={() => handleClearSingle(chip.key)}
                         aria-label={`Remove ${chip.label} filter`}
-                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-mint/25"
+                        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-hotpink/25"
                       >
                         <X className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
@@ -588,9 +588,9 @@ function EventsBrowser() {
               {!loading && events.length === QUERY_CAP ? (
                 <div
                   role="status"
-                  className="mb-6 flex items-center gap-2.5 rounded-xl border border-mint/25 bg-mint/10 px-4 py-3 text-xs text-foreground/90 sm:text-sm"
+                  className="mb-6 flex items-center gap-2.5 rounded-xl border border-hotpink/25 bg-hotpink/10 px-4 py-3 text-xs text-foreground/90 sm:text-sm"
                 >
-                  <Info className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                  <Info className="h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
                   <span>
                     Showing the first {QUERY_CAP} matching events ordered by start time. Choose a
                     specific date or county to narrow results further.

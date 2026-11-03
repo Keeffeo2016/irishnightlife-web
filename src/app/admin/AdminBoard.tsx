@@ -52,7 +52,7 @@ export type BoardEvent = {
 }
 
 const CHART_COLORS = {
-  mint: '#64f4c2',
+  hotpink: '#64f4c2',
   forest: '#49d9a7',
   amber: '#d97706',
   slate: '#9aabb0',
@@ -99,7 +99,7 @@ export function AdminBoard({
           title="Users"
           total={users.length}
           segments={[
-            { label: 'Consumers', value: consumerCount, color: CHART_COLORS.mint },
+            { label: 'Consumers', value: consumerCount, color: CHART_COLORS.hotpink },
             { label: 'Venue owners', value: ownerCount, color: CHART_COLORS.forest },
             { label: 'Admins', value: adminCount, color: CHART_COLORS.slate },
           ]}
@@ -108,7 +108,7 @@ export function AdminBoard({
           title="Venues"
           total={venues.length}
           segments={[
-            { label: 'Verified', value: verifiedCount, color: CHART_COLORS.mint },
+            { label: 'Verified', value: verifiedCount, color: CHART_COLORS.hotpink },
             { label: 'Pending', value: pendingCount, color: CHART_COLORS.amber },
           ]}
         />
@@ -116,7 +116,7 @@ export function AdminBoard({
           title="Events"
           total={events.length}
           segments={[
-            { label: 'Published', value: publishedCount, color: CHART_COLORS.mint },
+            { label: 'Published', value: publishedCount, color: CHART_COLORS.hotpink },
             { label: 'Drafts', value: events.length - publishedCount, color: CHART_COLORS.slate },
           ]}
         />
@@ -480,7 +480,7 @@ function VenueTable({ venues }: { venues: BoardVenue[] }) {
               </td>
               <td className="py-3 pr-4 text-foreground/90">{venue.eventCount}</td>
               <td className="py-3 pr-4">
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${venue.is_verified ? 'bg-primary/15 text-mint-light' : 'bg-amber-100 text-amber-200'}`}>
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${venue.is_verified ? 'bg-primary/15 text-hotpink-light' : 'bg-amber-100 text-amber-200'}`}>
                   {venue.is_verified ? 'Verified' : 'Pending'}
                 </span>
               </td>

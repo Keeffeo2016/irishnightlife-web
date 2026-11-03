@@ -12,8 +12,8 @@ const EventsMapDynamic = dynamic(() => import('./EventsMapInner'), {
       aria-busy="true"
       aria-live="polite"
     >
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-mint/20 bg-mint/10">
-        <MapPin className="h-6 w-6 text-mint" aria-hidden="true" />
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-hotpink/20 bg-hotpink/10">
+        <MapPin className="h-6 w-6 text-hotpink" aria-hidden="true" />
       </div>
       <h3 className="mb-1 text-lg font-bold text-foreground">Loading interactive map…</h3>
       <p className="text-sm text-muted-foreground">Preparing venue pins and event details</p>

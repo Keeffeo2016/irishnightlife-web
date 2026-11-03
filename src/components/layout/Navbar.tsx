@@ -70,7 +70,7 @@ export function Navbar() {
   }, [pathname])
 
   return (
-    <nav className="border-b border-border bg-night sticky top-0 z-50">
+    <nav className="border-b border-border glass sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center" onClick={close}>
@@ -94,8 +94,8 @@ export function Navbar() {
                   aria-current={active ? 'page' : undefined}
                   className={
                     active
-                      ? 'text-mint font-medium'
-                      : 'text-muted-foreground hover:text-mint font-medium transition'
+                      ? 'text-hotpink font-medium'
+                      : 'text-muted-foreground hover:text-hotpink font-medium transition'
                   }
                 >
                   {link.label}
@@ -103,14 +103,14 @@ export function Navbar() {
               )
             })}
             {role === 'admin' ? (
-              <Link href="/admin" className="text-muted-foreground hover:text-mint font-medium transition">
+              <Link href="/admin" className="text-muted-foreground hover:text-hotpink font-medium transition">
                 Admin
               </Link>
             ) : null}
             {!isVenue && signedIn === true ? (
               <Link
                 href="/profile"
-                className="inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10 transition"
+                className="inline-flex items-center justify-center rounded-md border border-hotpink px-4 py-2 text-sm text-hotpink hover:bg-hotpink/10 transition"
               >
                 Profile
               </Link>
@@ -119,13 +119,13 @@ export function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10 transition"
+                  className="inline-flex items-center justify-center rounded-md border border-hotpink px-4 py-2 text-sm text-hotpink hover:bg-hotpink/10 transition"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-mint px-4 py-2 text-sm font-semibold text-night hover:bg-mint-light transition"
+                  className="inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light transition"
                 >
                   Get Started
                 </Link>
@@ -152,7 +152,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`block py-2 ${active ? 'text-mint font-medium' : 'text-muted-foreground hover:text-mint'}`}
+                  className={`block py-2 ${active ? 'text-hotpink font-medium' : 'text-muted-foreground hover:text-hotpink'}`}
                   onClick={close}
                 >
                   {link.label}
@@ -160,7 +160,7 @@ export function Navbar() {
               )
             })}
             {role === 'admin' ? (
-              <Link href="/admin" className="block py-2 text-muted-foreground hover:text-mint" onClick={close}>
+              <Link href="/admin" className="block py-2 text-muted-foreground hover:text-hotpink" onClick={close}>
                 Admin
               </Link>
             ) : null}
@@ -169,7 +169,7 @@ export function Navbar() {
                 <Link
                   href="/profile"
                   onClick={close}
-                  className="flex-1 inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10"
+                  className="flex-1 inline-flex items-center justify-center rounded-md border border-hotpink px-4 py-2 text-sm text-hotpink hover:bg-hotpink/10"
                 >
                   Profile
                 </Link>
@@ -180,14 +180,14 @@ export function Navbar() {
                 <Link
                   href="/auth/login"
                   onClick={close}
-                  className="flex-1 inline-flex items-center justify-center rounded-md border border-mint px-4 py-2 text-sm text-mint hover:bg-mint/10"
+                  className="flex-1 inline-flex items-center justify-center rounded-md border border-hotpink px-4 py-2 text-sm text-hotpink hover:bg-hotpink/10"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/signup"
                   onClick={close}
-                  className="flex-1 inline-flex items-center justify-center rounded-md bg-mint px-4 py-2 text-sm font-semibold text-night hover:bg-mint-light"
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light"
                 >
                   Get Started
                 </Link>

@@ -335,7 +335,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               />
             ) : (
               <div className="absolute inset-0 flex items-end p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-mint">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-hotpink">
                   {typeLabel}
                 </p>
               </div>
@@ -346,13 +346,13 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             />
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className="border border-mint/30 bg-night/85 text-mint">
+                <Badge className="border border-hotpink/30 bg-night/85 text-hotpink">
                   {typeLabel}
                 </Badge>
                 {venue.is_verified ? (
                   <Badge
                     variant="outline"
-                    className="inline-flex items-center gap-1.5 border-mint/40 bg-night/85 text-mint"
+                    className="inline-flex items-center gap-1.5 border-hotpink/40 bg-night/85 text-hotpink"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     <span>Verified Venue</span>
@@ -367,7 +367,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-foreground/85 sm:text-base">
                 {place ? (
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                    <MapPin className="h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
                     <span>{place}</span>
                   </span>
                 ) : null}
@@ -377,7 +377,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                   </span>
                 ) : null}
                 {priceRange ? (
-                  <span className="font-semibold text-mint">{priceRange}</span>
+                  <span className="font-semibold text-hotpink">{priceRange}</span>
                 ) : null}
               </p>
             </div>
@@ -404,8 +404,8 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             {/* Key Facts Grid */}
             <dl className="mt-6 grid grid-cols-1 gap-4 border-t border-border/70 pt-6 sm:grid-cols-2">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-mint/20 bg-mint/10">
-                  <Sparkles className="h-5 w-5 text-mint" aria-hidden="true" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hotpink/20 bg-hotpink/10">
+                  <Sparkles className="h-5 w-5 text-hotpink" aria-hidden="true" />
                 </div>
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -417,8 +417,8 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
 
               {priceRange ? (
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-mint/20 bg-mint/10">
-                    <Tag className="h-5 w-5 text-mint" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hotpink/20 bg-hotpink/10">
+                    <Tag className="h-5 w-5 text-hotpink" aria-hidden="true" />
                   </div>
                   <div>
                     <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -431,8 +431,8 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
 
               {ageRestriction ? (
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-mint/20 bg-mint/10">
-                    <ShieldCheck className="h-5 w-5 text-mint" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hotpink/20 bg-hotpink/10">
+                    <ShieldCheck className="h-5 w-5 text-hotpink" aria-hidden="true" />
                   </div>
                   <div>
                     <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -447,8 +447,8 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
 
               {henStagLabel ? (
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-mint/20 bg-mint/10">
-                    <Users className="h-5 w-5 text-mint" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hotpink/20 bg-hotpink/10">
+                    <Users className="h-5 w-5 text-hotpink" aria-hidden="true" />
                   </div>
                   <div>
                     <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -466,7 +466,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             {musicGenres.length > 0 ? (
               <div className="mt-6 border-t border-border/70 pt-6">
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <Music className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Music className="h-4 w-4 text-hotpink" aria-hidden="true" />
                   <span>Music genres</span>
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -474,7 +474,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                     <Badge
                       key={genre}
                       variant="outline"
-                      className="border-mint/35 bg-mint/10 text-mint"
+                      className="border-hotpink/35 bg-hotpink/10 text-hotpink"
                     >
                       {genre}
                     </Badge>
@@ -534,7 +534,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             ) : (
               <div className="rounded-xl border border-dashed border-border bg-background/40 px-6 py-10 text-center">
                 <Calendar
-                  className="mx-auto mb-3 h-7 w-7 text-mint/80"
+                  className="mx-auto mb-3 h-7 w-7 text-hotpink/80"
                   aria-hidden="true"
                 />
                 <p className="font-semibold text-foreground">
@@ -595,7 +595,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
             </h2>
             {addressLine ? (
               <p className="mt-4 flex items-start gap-2 text-foreground">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-hotpink" aria-hidden="true" />
                 <span>{addressLine}</span>
               </p>
             ) : (
@@ -624,7 +624,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                   'mt-4 inline-flex min-h-11 gap-2'
                 )}
               >
-                <Navigation className="h-4 w-4 text-mint" aria-hidden="true" />
+                <Navigation className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 Get directions
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 <span className="sr-only">Opens OpenStreetMap in a new tab</span>
@@ -687,7 +687,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                     'inline-flex min-h-11 w-full gap-2'
                   )}
                 >
-                  <Phone className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Phone className="h-4 w-4 text-hotpink" aria-hidden="true" />
                   <span>Call {phoneDisplay}</span>
                 </a>
               ) : null}
@@ -700,7 +700,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                     'inline-flex min-h-11 w-full gap-2'
                   )}
                 >
-                  <Mail className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Mail className="h-4 w-4 text-hotpink" aria-hidden="true" />
                   <span className="truncate">Email venue</span>
                 </a>
               ) : null}

@@ -106,11 +106,11 @@ export default async function VenueEventsPage() {
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground">
             <span>{metrics.total} Total</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-mint">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-hotpink">
             <span>{metrics.upcomingCount} Upcoming</span>
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground/90">
-            <CheckCircle2 className="h-3.5 w-3.5 text-mint" aria-hidden="true" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-hotpink" aria-hidden="true" />
             <span>{metrics.publishedCount} Published</span>
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-amber-200">
@@ -172,7 +172,7 @@ export default async function VenueEventsPage() {
               </div>
             ) : metrics.upcoming.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border bg-background/50 p-8 text-center">
-                <Sparkles className="mx-auto h-7 w-7 text-mint/70" aria-hidden="true" />
+                <Sparkles className="mx-auto h-7 w-7 text-hotpink/70" aria-hidden="true" />
                 <p className="mt-2 font-semibold text-foreground">
                   No upcoming events for your venues
                 </p>
@@ -251,13 +251,13 @@ function EventList({
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/events/${event.slug}`}
-                  className="text-base font-semibold text-foreground hover:text-mint hover:underline"
+                  className="text-base font-semibold text-foreground hover:text-hotpink hover:underline"
                 >
                   {event.title}
                 </Link>
 
                 {event.is_published ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-mint">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-hotpink">
                     <CheckCircle2 className="h-3 w-3 shrink-0" aria-hidden="true" />
                     <span>Published</span>
                   </span>
@@ -278,7 +278,7 @@ function EventList({
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5 text-mint/80" aria-hidden="true" />
+                  <Calendar className="h-3.5 w-3.5 text-hotpink/80" aria-hidden="true" />
                   {formatDashboardDateTime(event.start_time)}
                 </span>
                 <span>·</span>
@@ -286,7 +286,7 @@ function EventList({
                 {price ? (
                   <>
                     <span>·</span>
-                    <span className="font-medium text-mint">{price}</span>
+                    <span className="font-medium text-hotpink">{price}</span>
                   </>
                 ) : null}
                 <span>·</span>

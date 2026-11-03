@@ -47,7 +47,7 @@ export function CompleteVenueForm({ email }: { email: string }) {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-night via-night-soft to-forest">
-      <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-mint/10">
+      <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-hotpink/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <MapPin className="h-10 w-10 text-primary" />

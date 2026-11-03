@@ -10,7 +10,7 @@ export function PlannerPromo() {
         <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-night-soft via-card to-forest px-6 py-10 sm:px-10 md:py-12">
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-mint/15 blur-3xl motion-reduce:hidden"
+            className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-hotpink/15 blur-3xl motion-reduce:hidden"
           />
           <div className="relative max-w-2xl">
             <h2 id="planner-promo-heading" className="text-2xl font-bold text-white md:text-3xl">

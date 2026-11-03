@@ -10,7 +10,7 @@ const EventLocationMapInner = dynamic(() => import('./EventLocationMapInner'), {
       className="flex h-64 items-center justify-center rounded-xl border border-border bg-card text-sm text-muted-foreground"
       aria-busy="true"
     >
-      <MapPin className="mr-2 h-4 w-4 text-mint" aria-hidden="true" />
+      <MapPin className="mr-2 h-4 w-4 text-hotpink" aria-hidden="true" />
       Loading map
     </div>
   ),

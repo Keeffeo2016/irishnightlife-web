@@ -184,7 +184,7 @@ export function PlannerLoading() {
     <div className="flex flex-col bg-background">
       <PageHero
         eyebrow={
-          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+          <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
             NIGHT PLANNER ITINERARY
           </Badge>
         }
@@ -205,9 +205,9 @@ export function PlannerLoading() {
           aria-live="polite"
           className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8"
         >
-          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-mint/30 bg-mint/10 px-5 py-4">
+          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-hotpink/30 bg-hotpink/10 px-5 py-4">
             <Sparkles
-              className="h-5 w-5 shrink-0 animate-pulse text-mint motion-reduce:animate-none"
+              className="h-5 w-5 shrink-0 animate-pulse text-hotpink motion-reduce:animate-none"
               aria-hidden="true"
             />
             <div>
@@ -423,7 +423,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
       <div className="flex flex-col bg-background">
         <PageHero
           eyebrow={
-            <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+            <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
               NIGHT PLANNER ITINERARY
             </Badge>
           }
@@ -478,7 +478,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
       <div className="flex flex-col bg-background">
         <PageHero
           eyebrow={
-            <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+            <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
               NIGHT PLANNER ITINERARY
             </Badge>
           }
@@ -496,7 +496,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
           <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
             <Card className="border-border bg-card shadow-lg">
               <CardContent className="p-8 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10 text-mint">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-hotpink/25 bg-hotpink/10 text-hotpink">
                   <Compass className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <h2 className="mb-2 text-2xl font-bold text-foreground">
@@ -544,7 +544,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
     <div className="flex flex-col bg-background">
       <PageHero
         eyebrow={
-          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+          <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
             NIGHT PLANNER ITINERARY
           </Badge>
         }
@@ -560,9 +560,9 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
       >
         <div className="space-y-5">
           {narrative ? (
-            <div className="rounded-2xl border border-mint/25 bg-night/75 p-4 sm:p-5 backdrop-blur-sm">
+            <div className="rounded-2xl border border-hotpink/25 bg-night/75 p-4 sm:p-5 backdrop-blur-sm">
               <div className="flex items-start gap-3">
-                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-hotpink" aria-hidden="true" />
                 <p className="text-sm leading-relaxed text-foreground/95 sm:text-base">
                   {narrative}
                 </p>
@@ -574,20 +574,20 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
             {/* Summary Pills */}
             <div className="flex flex-wrap items-center gap-2.5 text-sm">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
-                <MapPin className="h-4 w-4 text-mint" aria-hidden="true" />
+                <MapPin className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 <span>
                   <strong className="font-semibold text-white">{stops.length}</strong>{' '}
                   {stops.length === 1 ? 'stop' : 'stops'}
                 </span>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
-                <Euro className="h-4 w-4 text-mint" aria-hidden="true" />
+                <Euro className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 <span>
                   Estimated tickets: <strong className="font-semibold text-white">{totalCostLabel}</strong>
                 </span>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-night/80 px-3.5 py-1.5 text-foreground">
-                <Clock className="h-4 w-4 text-mint" aria-hidden="true" />
+                <Clock className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 <span>
                   Duration: <strong className="font-semibold text-white">{durationLabel}</strong>
                 </span>
@@ -645,7 +645,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
               </p>
             </div>
             {nightSorted ? (
-              <Badge className="border border-mint/40 bg-mint/15 px-3 py-1 text-xs font-semibold text-mint">
+              <Badge className="border border-hotpink/40 bg-hotpink/15 px-3 py-1 text-xs font-semibold text-hotpink">
                 <Check className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                 All stops marked sorted
               </Badge>
@@ -683,7 +683,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                     className={`relative z-10 mt-6 hidden h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition-colors sm:flex ${
                       checked
                         ? 'bg-primary/20 text-primary ring-2 ring-primary'
-                        : 'bg-mint text-night shadow-md shadow-mint/20'
+                        : 'bg-hotpink text-white shadow-md shadow-hotpink/20'
                     }`}
                   >
                     {index + 1}
@@ -700,10 +700,10 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                       {/* Top Bar: Stop Badge, Event Type, Genre, and Sorted Toggle */}
                       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="bg-mint text-night font-bold">
+                          <Badge className="bg-hotpink text-white font-bold">
                             Stop {index + 1}
                           </Badge>
-                          <Badge className="border border-mint/30 bg-mint/10 text-mint">
+                          <Badge className="border border-hotpink/30 bg-hotpink/10 text-hotpink">
                             {typeBadgeLabel}
                           </Badge>
                           {showGenreBadge ? (
@@ -712,7 +712,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                             </Badge>
                           ) : null}
                           {checked ? (
-                            <Badge className="border border-primary/50 bg-primary/15 text-mint-light">
+                            <Badge className="border border-primary/50 bg-primary/15 text-hotpink-light">
                               <Check className="mr-1 h-3 w-3" aria-hidden="true" />
                               Sorted
                             </Badge>
@@ -768,17 +768,17 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                       {/* Metadata Row: Time, Location, Price */}
                       <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-border/70 bg-night/50 p-3.5 text-sm sm:grid-cols-3">
                         <div className="flex items-center gap-2 text-foreground/90">
-                          <Calendar className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <Calendar className="h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
                           <span>{formatStopTimeRange(event.start_time, event.end_time)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-foreground/90">
-                          <MapPin className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <MapPin className="h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
                           <span className="truncate" title={locationString}>
                             {locationString}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-foreground/90">
-                          <Euro className="h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+                          <Euro className="h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
                           <span className="font-semibold text-white">
                             {priceLabel
                               ? priceLabel === 'Free'
@@ -796,8 +796,8 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                       ) : null}
 
                       {/* Why This Stop Fits Your Night (Visible by default per Phase 6 §6) */}
-                      <div className="mb-5 rounded-xl border border-mint/25 bg-mint/8 p-3.5">
-                        <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-mint">
+                      <div className="mb-5 rounded-xl border border-hotpink/25 bg-hotpink/8 p-3.5">
+                        <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-hotpink">
                           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                           Why this stop was recommended
                         </p>
@@ -805,7 +805,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                           {reasons.map(reason => (
                             <Badge
                               key={reason}
-                              className="border border-mint/30 bg-night/80 text-xs font-medium text-mint-light"
+                              className="border border-hotpink/30 bg-night/80 text-xs font-medium text-hotpink-light"
                             >
                               {reason}
                             </Badge>

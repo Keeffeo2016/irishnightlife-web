@@ -26,7 +26,7 @@ export default async function VenueProfilePage() {
       {venues.length === 0 ? (
         <Card className="border-border bg-card">
           <CardContent className="p-6 text-center sm:p-8">
-            <Building2 className="mx-auto h-8 w-8 text-mint" aria-hidden="true" />
+            <Building2 className="mx-auto h-8 w-8 text-hotpink" aria-hidden="true" />
             <h2 className="mt-3 text-lg font-semibold text-foreground">
               No venue is linked to this account yet
             </h2>

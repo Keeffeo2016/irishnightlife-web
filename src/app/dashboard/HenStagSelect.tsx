@@ -77,7 +77,7 @@ export function HenStagSelect({ venueId, value }: { venueId: string; value: bool
           <span
             role="status"
             aria-live="polite"
-            className="inline-flex items-center gap-1 text-xs text-mint"
+            className="inline-flex items-center gap-1 text-xs text-hotpink"
           >
             <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
             <span>Saved</span>

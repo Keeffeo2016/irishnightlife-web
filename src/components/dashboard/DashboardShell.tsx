@@ -28,7 +28,7 @@ function NavIcon({
 }) {
   const iconClass = cn(
     'h-4 w-4 shrink-0',
-    active ? 'stroke-[2.25] text-mint' : 'stroke-[1.75] text-muted-foreground'
+    active ? 'stroke-[2.25] text-hotpink' : 'stroke-[1.75] text-muted-foreground'
   )
 
   switch (href) {
@@ -64,7 +64,7 @@ export function DashboardNav() {
                 className={cn(
                   'relative flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:w-auto sm:justify-start sm:rounded-t-xl sm:rounded-b-none sm:border-b-0 sm:px-4',
                   active
-                    ? 'border-primary/40 bg-primary/15 font-semibold text-mint'
+                    ? 'border-primary/40 bg-primary/15 font-semibold text-hotpink'
                     : 'border-border bg-card/50 font-medium text-muted-foreground hover:border-border hover:bg-card hover:text-foreground sm:border-transparent sm:bg-transparent'
                 )}
               >
@@ -102,7 +102,7 @@ export function DashboardShell({
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-mint">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-hotpink">
                 VENUE OWNER PORTAL
               </p>
               <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

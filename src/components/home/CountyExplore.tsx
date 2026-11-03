@@ -40,7 +40,7 @@ export function CountyExplore({ selectedCounty, onSelectCounty }: CountyExploreP
                 className={cn(
                   'min-h-11 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
                   selected
-                    ? 'border-mint bg-mint text-night'
+                    ? 'border-hotpink bg-hotpink text-white'
                     : 'border-primary/40 text-primary hover:border-primary hover:bg-primary/10'
                 )}
               >
@@ -58,7 +58,7 @@ export function CountyExplore({ selectedCounty, onSelectCounty }: CountyExploreP
             className={cn(
               'min-h-11 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
               selectedCounty === 'All Ireland'
-                ? 'border-mint bg-mint text-night'
+                ? 'border-hotpink bg-hotpink text-white'
                 : 'border-primary/40 text-primary hover:border-primary hover:bg-primary/10'
             )}
           >

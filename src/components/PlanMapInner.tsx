@@ -194,8 +194,8 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
           </p>
         </div>
         {validVenues.length > 0 ? (
-          <div className="inline-flex items-center gap-2 rounded-full border border-mint/25 bg-night/70 px-3 py-1 text-xs font-medium text-mint">
-            <span className="h-2 w-2 rounded-full bg-mint" aria-hidden="true" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-hotpink/25 bg-night/70 px-3 py-1 text-xs font-medium text-hotpink">
+            <span className="h-2 w-2 rounded-full bg-hotpink" aria-hidden="true" />
             <span>Select a numbered pin for details</span>
           </div>
         ) : null}
@@ -293,7 +293,7 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
                 className="flex items-start justify-between gap-3 rounded-xl border border-border/80 bg-card p-3 text-xs"
               >
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint text-[11px] font-bold text-night">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-hotpink text-[11px] font-bold text-white">
                     {stopNumber}
                   </span>
                   <div className="min-w-0">

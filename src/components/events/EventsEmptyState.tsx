@@ -75,8 +75,8 @@ export function EventsEmptyState({
 
   return (
     <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10">
-        <SearchX className="h-7 w-7 text-mint" aria-hidden="true" />
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/25 bg-hotpink/10">
+        <SearchX className="h-7 w-7 text-hotpink" aria-hidden="true" />
       </div>
 
       <h3 className="mx-auto max-w-lg text-xl font-bold text-foreground sm:text-2xl">

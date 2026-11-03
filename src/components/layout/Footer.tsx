@@ -34,26 +34,26 @@ export function Footer() {
             </p>
           </div>
           <div>
-            <h3 className="mb-3 font-semibold text-mint">Explore</h3>
+            <h3 className="mb-3 font-semibold text-hotpink">Explore</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/events" className="text-muted-foreground hover:text-mint">Events</Link></li>
-              <li><Link href="/venues" className="text-muted-foreground hover:text-mint">Venues</Link></li>
-              <li><Link href="/planner" className="text-muted-foreground hover:text-mint">Tonight Planner</Link></li>
+              <li><Link href="/events" className="text-muted-foreground hover:text-hotpink">Events</Link></li>
+              <li><Link href="/venues" className="text-muted-foreground hover:text-hotpink">Venues</Link></li>
+              <li><Link href="/planner" className="text-muted-foreground hover:text-hotpink">Tonight Planner</Link></li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-3 font-semibold text-mint">For Venues</h3>
+            <h3 className="mb-3 font-semibold text-hotpink">For Venues</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/for-venues" className="text-muted-foreground hover:text-mint">List Your Venue</Link></li>
-              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-mint">Create an account</Link></li>
-              <li><Link href="/dashboard" className="text-muted-foreground hover:text-mint">Dashboard</Link></li>
+              <li><Link href="/for-venues" className="text-muted-foreground hover:text-hotpink">List Your Venue</Link></li>
+              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-hotpink">Create an account</Link></li>
+              <li><Link href="/dashboard" className="text-muted-foreground hover:text-hotpink">Dashboard</Link></li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-3 font-semibold text-mint">Account</h3>
+            <h3 className="mb-3 font-semibold text-hotpink">Account</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/auth/login" className="text-muted-foreground hover:text-mint">Sign in</Link></li>
-              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-mint">Get started</Link></li>
+              <li><Link href="/auth/login" className="text-muted-foreground hover:text-hotpink">Sign in</Link></li>
+              <li><Link href="/auth/signup" className="text-muted-foreground hover:text-hotpink">Get started</Link></li>
             </ul>
           </div>
         </div>

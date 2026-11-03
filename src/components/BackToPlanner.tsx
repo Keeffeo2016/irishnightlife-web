@@ -9,7 +9,7 @@ export function BackToPlanner({ href }: { href: string | null }) {
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href={href}
-          className="inline-flex items-center gap-2 text-sm font-medium text-mint hover:text-mint-light"
+          className="inline-flex items-center gap-2 text-sm font-medium text-hotpink hover:text-hotpink-light"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to your plan

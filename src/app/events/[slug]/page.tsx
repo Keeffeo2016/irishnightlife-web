@@ -328,19 +328,19 @@ export default async function EventPage({ params, searchParams }: EventPageProps
               />
             ) : (
               <div className="absolute inset-0 flex items-end p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-mint">{typeLabel}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-hotpink">{typeLabel}</p>
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-night via-night/35 to-night/10" aria-hidden="true" />
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
-              <Badge className="border border-mint/30 bg-night/80 text-mint">{typeLabel}</Badge>
+              <Badge className="border border-hotpink/30 bg-night/80 text-hotpink">{typeLabel}</Badge>
               <h1 className="mt-3 max-w-3xl text-balance text-3xl font-bold text-white sm:text-5xl">{event.title}</h1>
               <p className="mt-3 text-sm text-foreground/85 sm:text-base">
                 {dateLabel}
                 {startLabel ? ` · ${startLabel}` : ''}
                 {place ? ` · ${place}` : ''}
               </p>
-              <p className="mt-1 text-sm text-mint">
+              <p className="mt-1 text-sm text-hotpink">
                 <Link href={venueHref} className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
                   {venue.name}
                 </Link>
@@ -374,14 +374,14 @@ export default async function EventPage({ params, searchParams }: EventPageProps
             <h2 id="when-heading" className="text-2xl font-bold text-foreground">Date and time</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <p className="flex items-start gap-3 text-foreground">
-                <Calendar className="mt-0.5 h-5 w-5 text-mint" aria-hidden="true" />
+                <Calendar className="mt-0.5 h-5 w-5 text-hotpink" aria-hidden="true" />
                 <span>
                   <span className="block text-sm text-muted-foreground">Date</span>
                   {dateLabel || 'Date to be confirmed'}
                 </span>
               </p>
               <p className="flex items-start gap-3 text-foreground">
-                <Clock className="mt-0.5 h-5 w-5 text-mint" aria-hidden="true" />
+                <Clock className="mt-0.5 h-5 w-5 text-hotpink" aria-hidden="true" />
                 <span>
                   <span className="block text-sm text-muted-foreground">Start time</span>
                   {startLabel || 'Time to be confirmed'}
@@ -433,7 +433,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
             <h2 id="location-heading" className="text-2xl font-bold text-foreground">Location and directions</h2>
             {addressLine ? (
               <p className="mt-4 flex items-start gap-2 text-foreground">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-hotpink" aria-hidden="true" />
                 <span>{addressLine}</span>
               </p>
             ) : (

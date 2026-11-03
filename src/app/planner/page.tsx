@@ -378,14 +378,14 @@ function ChoiceGrid({
                   className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors motion-reduce:transition-none ${
                     active
                       ? 'border-primary/50 bg-primary text-primary-foreground'
-                      : 'border-mint/20 bg-mint/10 text-mint group-hover:border-mint/40'
+                      : 'border-hotpink/20 bg-hotpink/10 text-hotpink group-hover:border-hotpink/40'
                   }`}
                 >
                   <OptionIcon className="h-5 w-5" />
                 </span>
 
                 {active ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-primary/20 px-2.5 py-1 text-xs font-semibold text-mint-light">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-primary/20 px-2.5 py-1 text-xs font-semibold text-hotpink-light">
                     <Check className="h-3.5 w-3.5" aria-hidden="true" />
                     Selected
                   </span>
@@ -494,7 +494,7 @@ function PlannerWizardContent() {
     <div className="flex flex-col bg-background">
       <PageHero
         eyebrow={
-          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+          <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
             NIGHT PLANNER
           </Badge>
         }
@@ -531,9 +531,9 @@ function PlannerWizardContent() {
                     aria-label={`Step ${item.id}: ${item.label}${done ? ' (completed)' : ''}`}
                     className={`flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-2.5 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-100 ${
                       isCurrent
-                        ? 'border-mint bg-mint/15 text-white'
+                        ? 'border-hotpink bg-hotpink/15 text-white'
                         : done
-                          ? 'border-mint/40 bg-night/70 text-mint hover:border-mint'
+                          ? 'border-hotpink/40 bg-night/70 text-hotpink hover:border-hotpink'
                           : clickable
                             ? 'border-border/70 bg-night/40 text-muted-foreground hover:border-border'
                             : 'cursor-default border-border/40 bg-night/30 text-muted-foreground/70'
@@ -542,9 +542,9 @@ function PlannerWizardContent() {
                     <span
                       className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                         isCurrent
-                          ? 'bg-mint text-night ring-2 ring-mint/40'
+                          ? 'bg-hotpink text-white ring-2 ring-hotpink/40'
                           : done
-                            ? 'bg-mint/25 text-mint'
+                            ? 'bg-hotpink/25 text-hotpink'
                             : 'bg-card text-muted-foreground'
                       }`}
                     >
@@ -595,11 +595,11 @@ function PlannerWizardContent() {
                       }}
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         isCurrent
-                          ? 'border-primary bg-primary/15 text-mint-light'
+                          ? 'border-primary bg-primary/15 text-hotpink-light'
                           : 'border-border bg-night/70 text-foreground hover:border-primary/60'
                       }`}
                     >
-                      <ChipIcon className="h-3.5 w-3.5 text-mint" aria-hidden="true" />
+                      <ChipIcon className="h-3.5 w-3.5 text-hotpink" aria-hidden="true" />
                       <span>
                         {item.label}: <strong>{option.label}</strong>
                       </span>
@@ -629,11 +629,11 @@ function PlannerWizardContent() {
               <div className="mb-8 text-center">
                 <div
                   aria-hidden="true"
-                  className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10 text-mint"
+                  className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/25 bg-hotpink/10 text-hotpink"
                 >
                   <StepIcon className="h-7 w-7" />
                 </div>
-                <p className="mb-1 text-xs font-semibold tracking-wider uppercase text-mint">
+                <p className="mb-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
                   Question {step} of {TOTAL_STEPS}
                 </p>
                 <h2 className="mb-2 text-2xl font-bold text-foreground sm:text-3xl">
@@ -645,8 +645,8 @@ function PlannerWizardContent() {
 
                 <div className="mt-4 min-h-[2.5rem]" aria-live="polite" role="status">
                   {reaction ? (
-                    <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-mint-light">
-                      <Check className="h-4 w-4 text-mint" aria-hidden="true" />
+                    <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-hotpink-light">
+                      <Check className="h-4 w-4 text-hotpink" aria-hidden="true" />
                       <span>{reaction}</span>
                     </p>
                   ) : null}
@@ -709,9 +709,9 @@ function PlannerWizardContent() {
               </div>
 
               {allComplete && recap ? (
-                <div className="mt-6 rounded-xl border border-mint/25 bg-mint/10 p-4 text-center">
+                <div className="mt-6 rounded-xl border border-hotpink/25 bg-hotpink/10 p-4 text-center">
                   <p className="text-sm text-foreground/90">
-                    <strong className="font-semibold text-mint-light">Tonight&apos;s brief: </strong>
+                    <strong className="font-semibold text-hotpink-light">Tonight&apos;s brief: </strong>
                     {recap}
                   </p>
                 </div>
@@ -729,7 +729,7 @@ function PlannerWizardFallback() {
     <div className="flex flex-col bg-background">
       <PageHero
         eyebrow={
-          <Badge className="border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-mint">
+          <Badge className="border border-hotpink/30 bg-hotpink/10 px-3 py-1 text-xs font-semibold tracking-wider uppercase text-hotpink">
             NIGHT PLANNER
           </Badge>
         }

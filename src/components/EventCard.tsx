@@ -74,19 +74,19 @@ function EventTypeIcon({ eventType }: { eventType: string }) {
   const normalized = eventType.trim().toLowerCase()
   switch (normalized) {
     case 'live_music':
-      return <Music className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Music className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     case 'dj':
-      return <Disc3 className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Disc3 className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     case 'comedy':
-      return <Mic2 className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Mic2 className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     case 'quiz':
-      return <HelpCircle className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <HelpCircle className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     case 'sports':
-      return <Trophy className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Trophy className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     case 'special_offer':
-      return <Tag className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Tag className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
     default:
-      return <Sparkles className="h-7 w-7 text-mint/80" aria-hidden="true" />
+      return <Sparkles className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
   }
 }
 
@@ -221,11 +221,11 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
             <div
               aria-hidden="true"
-              className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl border border-mint/20 bg-mint/10 shadow-inner"
+              className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/20 bg-hotpink/10 shadow-inner"
             >
               <EventTypeIcon eventType={event.event_type} />
             </div>
-            <span className="text-xs font-medium tracking-wider uppercase text-mint/75">
+            <span className="text-xs font-medium tracking-wider uppercase text-hotpink/75">
               { event.venues.name }
             </span>
           </div>
@@ -233,7 +233,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
 
         {/* Top-left badges over media */}
         <div className=" absolute left-3 top-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-wrap items-center gap-1.5">
-          <Badge className="border border-mint/30 bg-night/85 text-mint backdrop-blur-sm">
+          <Badge className="border border-hotpink/30 bg-night/85 text-hotpink backdrop-blur-sm">
             {typeLabel}
           </Badge>
           {showGenre ? (
@@ -249,7 +249,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
         {/* Bottom-left date/time pill over media */}
         <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between gap-2">
           <div className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-night/85 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-            <span className="inline-flex items-center gap-1 text-mint">
+            <span className="inline-flex items-center gap-1 text-hotpink">
               <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
               {dateLabel}
             </span>
@@ -270,7 +270,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
             <span
               className={`rounded-lg px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur-sm ${
                 event.is_free
-                  ? 'border border-mint/40 bg-mint text-night'
+                  ? 'border border-hotpink/40 bg-hotpink text-white'
                   : 'border border-white/15 bg-night/90 text-white'
               }`}
             >

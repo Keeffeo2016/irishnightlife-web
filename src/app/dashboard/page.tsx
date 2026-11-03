@@ -134,7 +134,7 @@ export default async function VenueDashboard() {
           <Card className="border-primary/30 bg-card/90">
             <CardContent className="flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wider text-mint">
+                <p className="text-xs font-semibold uppercase tracking-wider text-hotpink">
                   GET STARTED
                 </p>
                 <h2 className="text-xl font-bold text-foreground">
@@ -175,7 +175,7 @@ export default async function VenueDashboard() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Upcoming events
                   </p>
-                  <Calendar className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Calendar className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">
                   {metrics.upcomingCount}
@@ -192,7 +192,7 @@ export default async function VenueDashboard() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Published events
                   </p>
-                  <CheckCircle2 className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">
                   {metrics.publishedCount}
@@ -211,7 +211,7 @@ export default async function VenueDashboard() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Venue profile views
                   </p>
-                  <Building2 className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Building2 className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">
                   {venueViews.toLocaleString('en-IE')}
@@ -229,7 +229,7 @@ export default async function VenueDashboard() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Event page views
                   </p>
-                  <Eye className="h-4 w-4 text-mint" aria-hidden="true" />
+                  <Eye className="h-4 w-4 text-hotpink" aria-hidden="true" />
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">
                   {eventViews.toLocaleString('en-IE')}
@@ -289,7 +289,7 @@ export default async function VenueDashboard() {
                   <p className="text-sm text-muted-foreground">{DASHBOARD_GENERIC_LOAD_ERROR}</p>
                 ) : metrics.upcoming.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-border bg-background/50 p-8 text-center">
-                    <Sparkles className="mx-auto h-7 w-7 text-mint/70" aria-hidden="true" />
+                    <Sparkles className="mx-auto h-7 w-7 text-hotpink/70" aria-hidden="true" />
                     <p className="mt-2 font-semibold text-foreground">
                       No upcoming events for your venues
                     </p>
@@ -327,12 +327,12 @@ export default async function VenueDashboard() {
                             <div className="flex flex-wrap items-center gap-2">
                               <Link
                                 href={`/events/${event.slug}`}
-                                className="font-semibold text-foreground hover:text-mint hover:underline"
+                                className="font-semibold text-foreground hover:text-hotpink hover:underline"
                               >
                                 {event.title}
                               </Link>
                               {event.is_published ? (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-mint">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-hotpink">
                                   <CheckCircle2 className="h-3 w-3 shrink-0" aria-hidden="true" />
                                   <span>Published</span>
                                 </span>
@@ -352,7 +352,7 @@ export default async function VenueDashboard() {
 
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                               <span className="inline-flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5 text-mint/80" aria-hidden="true" />
+                                <Calendar className="h-3.5 w-3.5 text-hotpink/80" aria-hidden="true" />
                                 {formatDashboardDateTime(event.start_time)}
                               </span>
                               <span>·</span>
@@ -419,7 +419,7 @@ export default async function VenueDashboard() {
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="font-semibold text-foreground">{venue.name}</h3>
                             {venue.is_verified ? (
-                              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-mint">
+                              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-hotpink">
                                 <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                                 <span>Verified</span>
                               </span>
@@ -433,7 +433,7 @@ export default async function VenueDashboard() {
 
                           <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
                             <MapPin
-                              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-mint/80"
+                              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-hotpink/80"
                               aria-hidden="true"
                             />
                             <span>{formatVenueAddress(venue)}</span>
@@ -451,7 +451,7 @@ export default async function VenueDashboard() {
                               </span>
                             ) : null}
                             <span className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5">
-                              <ImageIcon className="h-3 w-3 text-mint/80" aria-hidden="true" />
+                              <ImageIcon className="h-3 w-3 text-hotpink/80" aria-hidden="true" />
                               <span>
                                 {photoCount} / {MAX_VENUE_IMAGES} photos
                               </span>
@@ -461,7 +461,7 @@ export default async function VenueDashboard() {
 
                           <div className="rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-xs">
                             {completeness.complete ? (
-                              <p className="flex items-center gap-1.5 font-medium text-mint">
+                              <p className="flex items-center gap-1.5 font-medium text-hotpink">
                                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                                 <span>Profile complete</span>
                               </p>
@@ -491,7 +491,7 @@ export default async function VenueDashboard() {
                             {venue.is_verified ? (
                               <Link
                                 href={`/dashboard/events/new?venue=${venue.id}`}
-                                className="text-mint hover:underline"
+                                className="text-hotpink hover:underline"
                               >
                                 Add event
                               </Link>

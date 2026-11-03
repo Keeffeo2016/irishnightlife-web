@@ -51,7 +51,7 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-15">
         <div
           aria-hidden
-          className="h-full w-full max-w-4xl bg-mint"
+          className="h-full w-full max-w-4xl bg-hotpink"
           style={{
             maskImage: 'url(/ireland-map.svg)',
             maskRepeat: 'no-repeat',
@@ -62,11 +62,11 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
       </div>
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-24 top-10 h-56 w-56 rounded-full bg-mint/10 blur-3xl motion-reduce:hidden"
+        className="pointer-events-none absolute -left-24 top-10 h-56 w-56 rounded-full bg-hotpink/10 blur-3xl motion-reduce:hidden"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-mint-light/10 blur-3xl motion-reduce:hidden"
+        className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-violet/10 blur-3xl motion-reduce:hidden"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">

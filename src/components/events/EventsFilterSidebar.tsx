@@ -89,8 +89,8 @@ function FilterControlFields({
                 aria-pressed={active}
                 className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                   active
-                    ? 'border-mint bg-mint text-night'
-                    : 'border-border bg-foreground/5 text-foreground/80 hover:border-mint/60 hover:text-mint'
+                    ? 'border-hotpink bg-hotpink text-white'
+                    : 'border-border bg-foreground/5 text-foreground/80 hover:border-hotpink/60 hover:text-hotpink'
                 }`}
               >
                 {county === 'All' ? 'All Ireland' : county}
@@ -177,8 +177,8 @@ function FilterControlFields({
           aria-pressed={filters.free}
           className={`flex w-full items-center justify-between rounded-xl border px-3.5 py-2.5 text-left text-sm font-medium transition-colors ${
             filters.free
-              ? 'border-mint bg-mint/15 text-mint'
-              : 'border-border bg-background/60 text-foreground/90 hover:border-mint/50'
+              ? 'border-hotpink bg-hotpink/15 text-hotpink'
+              : 'border-border bg-background/60 text-foreground/90 hover:border-hotpink/50'
           }`}
         >
           <span className="inline-flex items-center gap-2">
@@ -188,7 +188,7 @@ function FilterControlFields({
           <span
             aria-hidden="true"
             className={`inline-flex h-5 w-9 items-center rounded-full p-0.5 transition-colors ${
-              filters.free ? 'bg-mint justify-end' : 'bg-muted justify-start'
+              filters.free ? 'bg-hotpink justify-end' : 'bg-muted justify-start'
             }`}
           >
             <span
@@ -223,7 +223,7 @@ export function EventsFilterSidebar({
           <Filter className="h-4 w-4 text-primary" aria-hidden="true" />
           <h2 className="text-base font-bold text-foreground">Filters</h2>
           {activeFilterCount > 0 ? (
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint px-1.5 text-xs font-bold text-night">
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-white">
               {activeFilterCount}
             </span>
           ) : null}
@@ -276,7 +276,7 @@ export function EventsMobileFilterSheet({
         <Filter className="h-4 w-4 text-primary" aria-hidden="true" />
         <span>Filters</span>
         {activeFilterCount > 0 ? (
-          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint px-1.5 text-xs font-bold text-night">
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-white">
             {activeFilterCount}
           </span>
         ) : null}

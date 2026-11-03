@@ -211,7 +211,7 @@ export function VenueProfileForm({
           <div className="flex flex-wrap items-center gap-2.5">
             <h2 className="text-xl font-bold text-foreground">{venue.name}</h2>
             {venue.is_verified ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-3 py-0.5 text-xs font-medium text-mint">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-3 py-0.5 text-xs font-medium text-hotpink">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 <span>Verified — Live on public directory</span>
               </span>
@@ -224,13 +224,13 @@ export function VenueProfileForm({
           </div>
 
           <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mint/80" aria-hidden="true" />
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-hotpink/80" aria-hidden="true" />
             <span>{formatVenueAddress(venue)}</span>
           </p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <Eye className="h-3.5 w-3.5 text-mint/80" aria-hidden="true" />
+              <Eye className="h-3.5 w-3.5 text-hotpink/80" aria-hidden="true" />
               <span>
                 {viewCount.toLocaleString('en-IE')} profile{' '}
                 {viewCount === 1 ? 'view' : 'views'}
@@ -238,7 +238,7 @@ export function VenueProfileForm({
             </span>
             <span>·</span>
             {completeness.complete ? (
-              <span className="inline-flex items-center gap-1 font-medium text-mint">
+              <span className="inline-flex items-center gap-1 font-medium text-hotpink">
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Profile 100% complete</span>
               </span>
@@ -291,9 +291,9 @@ export function VenueProfileForm({
         <div
           role="status"
           aria-live="polite"
-          className="flex items-start gap-3 rounded-xl border border-primary/40 bg-primary/15 p-4 text-sm text-mint"
+          className="flex items-start gap-3 rounded-xl border border-primary/40 bg-primary/15 p-4 text-sm text-hotpink"
         >
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-mint" aria-hidden="true" />
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-hotpink" aria-hidden="true" />
           <p>{message}</p>
         </div>
       ) : null}
@@ -315,7 +315,7 @@ export function VenueProfileForm({
               htmlFor={`type-${venue.id}`}
               className="mb-1.5 block text-sm font-medium text-foreground"
             >
-              Venue type <span className="text-mint">*</span>
+              Venue type <span className="text-hotpink">*</span>
             </label>
             <select
               id={`type-${venue.id}`}
@@ -338,7 +338,7 @@ export function VenueProfileForm({
               htmlFor={`price-${venue.id}`}
               className="mb-1.5 block text-sm font-medium text-foreground"
             >
-              Price range <span className="text-mint">*</span>
+              Price range <span className="text-hotpink">*</span>
             </label>
             <select
               id={`price-${venue.id}`}
@@ -367,7 +367,7 @@ export function VenueProfileForm({
             htmlFor={`about-${venue.id}`}
             className="block text-sm font-medium text-foreground"
           >
-            About the venue <span className="text-mint">*</span>
+            About the venue <span className="text-hotpink">*</span>
           </label>
           <span className="text-xs text-muted-foreground">
             {description.length} / 2000
@@ -420,7 +420,7 @@ export function VenueProfileForm({
                   className="object-cover"
                 />
                 {index === 0 ? (
-                  <span className="absolute bottom-2 left-2 rounded-md border border-primary/40 bg-night/90 px-2.5 py-1 text-xs font-semibold text-mint">
+                  <span className="absolute bottom-2 left-2 rounded-md border border-primary/40 bg-night/90 px-2.5 py-1 text-xs font-semibold text-hotpink">
                     Cover photo
                   </span>
                 ) : null}
@@ -454,9 +454,9 @@ export function VenueProfileForm({
             )}
           >
             {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin text-mint" aria-hidden="true" />
+              <Loader2 className="h-4 w-4 animate-spin text-hotpink" aria-hidden="true" />
             ) : (
-              <ImagePlus className="h-4 w-4 text-mint" aria-hidden="true" />
+              <ImagePlus className="h-4 w-4 text-hotpink" aria-hidden="true" />
             )}
             <span>{uploading ? 'Uploading…' : 'Upload photos'}</span>
             <input

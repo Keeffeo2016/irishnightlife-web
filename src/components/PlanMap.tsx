@@ -12,7 +12,7 @@ const PlanMapDynamic = dynamic(() => import('./PlanMapInner'), {
       aria-live="polite"
       className="overflow-hidden rounded-2xl border border-border bg-card p-8 text-center shadow-lg"
     >
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-mint/25 bg-mint/10 text-mint">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-hotpink/25 bg-hotpink/10 text-hotpink">
         <MapPin className="h-6 w-6 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
       </div>
       <h3 className="mb-1 text-lg font-bold text-foreground">Loading route map…</h3>

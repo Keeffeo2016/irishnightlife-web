@@ -189,7 +189,7 @@ export function CreateEventForm({
       {/* Section 1: Venue Details */}
       <section className="rounded-2xl border border-border bg-card p-6 space-y-5">
         <div className="flex items-start gap-3 border-b border-border/60 pb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-mint">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-hotpink">
             <Building2 className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -238,7 +238,7 @@ export function CreateEventForm({
               Registered address
             </dt>
             <dd className="mt-1 flex items-start gap-1.5 text-sm text-foreground">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mint" aria-hidden="true" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-hotpink" aria-hidden="true" />
               <span>{formatVenueAddress(venue)}</span>
             </dd>
           </div>
@@ -250,7 +250,7 @@ export function CreateEventForm({
               htmlFor="template-type"
               className="mb-1.5 block text-sm font-medium text-foreground"
             >
-              Type <span className="text-mint">*</span>
+              Type <span className="text-hotpink">*</span>
             </label>
             <select
               id="template-type"
@@ -273,7 +273,7 @@ export function CreateEventForm({
               htmlFor="template-price"
               className="mb-1.5 block text-sm font-medium text-foreground"
             >
-              Price range <span className="text-mint">*</span>
+              Price range <span className="text-hotpink">*</span>
             </label>
             <select
               id="template-price"
@@ -297,7 +297,7 @@ export function CreateEventForm({
             htmlFor="template-about"
             className="mb-1.5 block text-sm font-medium text-foreground"
           >
-            About the venue <span className="text-mint">*</span>
+            About the venue <span className="text-hotpink">*</span>
           </label>
           <Textarea
             id="template-about"
@@ -336,7 +336,7 @@ export function CreateEventForm({
                     className="h-20 w-28 rounded-lg border border-border object-cover"
                   />
                   {idx === 0 ? (
-                    <span className="absolute bottom-1 left-1 rounded bg-night/90 px-1.5 py-0.5 text-[10px] font-semibold text-mint">
+                    <span className="absolute bottom-1 left-1 rounded bg-night/90 px-1.5 py-0.5 text-[10px] font-semibold text-hotpink">
                       Cover
                     </span>
                   ) : null}
@@ -358,7 +358,7 @@ export function CreateEventForm({
       {/* Section 2: Event Information & Category */}
       <section className="rounded-2xl border border-border bg-card p-6 space-y-5">
         <div className="flex items-start gap-3 border-b border-border/60 pb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-mint">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-hotpink">
             <Sparkles className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -376,7 +376,7 @@ export function CreateEventForm({
             htmlFor="event-title"
             className="mb-1.5 block text-sm font-medium text-foreground"
           >
-            Event title <span className="text-mint">*</span>
+            Event title <span className="text-hotpink">*</span>
           </label>
           <Input
             id="event-title"
@@ -449,7 +449,7 @@ export function CreateEventForm({
       {/* Section 3: Date & Time */}
       <section className="rounded-2xl border border-border bg-card p-6 space-y-5">
         <div className="flex items-start gap-3 border-b border-border/60 pb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-mint">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-hotpink">
             <Calendar className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -467,7 +467,7 @@ export function CreateEventForm({
               htmlFor="event-start"
               className="mb-1.5 block text-sm font-medium text-foreground"
             >
-              Starts <span className="text-mint">*</span>
+              Starts <span className="text-hotpink">*</span>
             </label>
             <Input
               id="event-start"
@@ -500,7 +500,7 @@ export function CreateEventForm({
       {/* Section 4: Tickets & Pricing */}
       <section className="rounded-2xl border border-border bg-card p-6 space-y-5">
         <div className="flex items-start gap-3 border-b border-border/60 pb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-mint">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-hotpink">
             <Ticket className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -528,7 +528,7 @@ export function CreateEventForm({
                 htmlFor="price-min"
                 className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                Price from (€) <span className="text-mint">*</span>
+                Price from (€) <span className="text-hotpink">*</span>
               </label>
               <Input
                 id="price-min"
@@ -590,7 +590,7 @@ export function CreateEventForm({
       {/* Section 5: Publication Settings */}
       <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <div className="flex items-start gap-3 border-b border-border/60 pb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-mint">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-hotpink">
             {publish ? (
               <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
             ) : (

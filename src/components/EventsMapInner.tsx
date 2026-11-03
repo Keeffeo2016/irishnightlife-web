@@ -394,8 +394,8 @@ export default function EventsMapInner({
               : `${totalMappedEvents} ${totalMappedEvents === 1 ? 'event' : 'events'} across ${venues.length} ${venues.length === 1 ? 'venue' : 'venues'} ${locationContext}`}
           </p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-mint/25 bg-night/70 px-3 py-1 text-xs font-medium text-mint">
-          <span className="h-2 w-2 rounded-full bg-mint" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2 rounded-full border border-hotpink/25 bg-night/70 px-3 py-1 text-xs font-medium text-hotpink">
+          <span className="h-2 w-2 rounded-full bg-hotpink" aria-hidden="true" />
           <span>Click a pin to view line-up</span>
         </div>
       </div>
