@@ -22,11 +22,11 @@ export function Footer() {
           <div>
             <Link href="/" className="mb-4 inline-block">
               <Image
-                src="/brand/logo.png"
+                src="/brand/wordmark.png"
                 alt="IrishNightlife.ie — Discover what's happening tonight"
-                width={832}
-                height={220}
-                className="h-[77px] w-auto"
+                width={1024}
+                height={341}
+                className="h-20 w-auto max-w-full"
               />
             </Link>
             <p className="text-sm text-muted-foreground">

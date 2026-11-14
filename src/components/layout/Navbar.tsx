@@ -75,12 +75,12 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center" onClick={close}>
             <Image
-              src="/brand/logo-nav.png"
+              src="/brand/wordmark.png"
               alt="IrishNightlife.ie"
-              width={832}
-              height={220}
+              width={1024}
+              height={341}
               priority
-              className="h-[53px] w-auto"
+              className="h-12 w-auto sm:h-14"
             />
           </Link>
 
