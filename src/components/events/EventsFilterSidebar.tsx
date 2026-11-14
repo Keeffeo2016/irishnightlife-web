@@ -89,7 +89,7 @@ function FilterControlFields({
                 aria-pressed={active}
                 className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                   active
-                    ? 'border-hotpink bg-hotpink text-white'
+                    ? 'border-hotpink bg-hotpink text-night'
                     : 'border-border bg-foreground/5 text-foreground/80 hover:border-hotpink/60 hover:text-hotpink'
                 }`}
               >
@@ -223,7 +223,7 @@ export function EventsFilterSidebar({
           <Filter className="h-4 w-4 text-primary" aria-hidden="true" />
           <h2 className="text-base font-bold text-foreground">Filters</h2>
           {activeFilterCount > 0 ? (
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-white">
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-night">
               {activeFilterCount}
             </span>
           ) : null}
@@ -276,7 +276,7 @@ export function EventsMobileFilterSheet({
         <Filter className="h-4 w-4 text-primary" aria-hidden="true" />
         <span>Filters</span>
         {activeFilterCount > 0 ? (
-          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-white">
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-hotpink px-1.5 text-xs font-bold text-night">
             {activeFilterCount}
           </span>
         ) : null}

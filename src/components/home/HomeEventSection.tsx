@@ -38,11 +38,11 @@ export function HomeEventSection({
   }
 
   return (
-    <section aria-labelledby={headingId} className="border-b border-border">
+    <section aria-labelledby={headingId}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <h2 id={headingId} className="text-2xl font-bold text-foreground md:text-3xl">
+            <h2 id={headingId} className="text-3xl font-bold text-foreground md:text-4xl">
               {title}
             </h2>
             {description ? <p className="mt-2 text-muted-foreground">{description}</p> : null}

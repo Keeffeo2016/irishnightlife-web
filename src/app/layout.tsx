@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Outfit } from "next/font/google";
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["600", "700", "800"],
 });
 
 // Prefer NEXT_PUBLIC_APP_URL when valid http(s); otherwise localhost (matches siteOrigin helpers).
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#13121c",
+  themeColor: "#0B0A12",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <a

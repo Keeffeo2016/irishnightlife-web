@@ -106,7 +106,7 @@ function SignupForm() {
               onClick={() => setAccountType('consumer')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'consumer'
-                  ? 'bg-hotpink text-white font-semibold'
+                  ? 'bg-hotpink text-night font-semibold'
                   : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >
@@ -117,7 +117,7 @@ function SignupForm() {
               onClick={() => setAccountType('venue')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'venue'
-                  ? 'bg-hotpink text-white font-semibold'
+                  ? 'bg-hotpink text-night font-semibold'
                   : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >

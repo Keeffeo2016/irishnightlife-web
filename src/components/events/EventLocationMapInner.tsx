@@ -2,6 +2,7 @@
 
 import { Icon } from 'leaflet'
 import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { DARK_MAP_CLASS, MAP_TILE_ATTRIBUTION, MAP_TILE_URL } from '@/lib/map-tiles'
 
 const pin = new Icon({
   iconUrl: `data:image/svg+xml;base64,${btoa(`
@@ -24,7 +25,7 @@ export default function EventLocationMapInner({
   name: string
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border" aria-label={`Map showing ${name}`}>
+    <div className={`overflow-hidden rounded-xl border border-border ${DARK_MAP_CLASS}`} aria-label={`Map showing ${name}`}>
       <MapContainer
         center={[latitude, longitude]}
         zoom={16}
@@ -32,8 +33,8 @@ export default function EventLocationMapInner({
         className="h-64 w-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={MAP_TILE_ATTRIBUTION}
+          url={MAP_TILE_URL}
         />
         <Marker position={[latitude, longitude]} icon={pin} title={name} />
       </MapContainer>

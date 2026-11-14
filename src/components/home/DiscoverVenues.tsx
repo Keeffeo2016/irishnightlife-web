@@ -12,11 +12,11 @@ export function DiscoverVenues({ venues, loading = false, county, seeAllHref }: 
   if (!loading && venues.length === 0) return null
 
   return (
-    <section aria-labelledby="discover-venues-heading" className="border-b border-border">
+    <section aria-labelledby="discover-venues-heading" className="band-wash">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <h2 id="discover-venues-heading" className="text-2xl font-bold text-foreground md:text-3xl">
+            <h2 id="discover-venues-heading" className="text-3xl font-bold text-foreground md:text-4xl">
               Discover venues
             </h2>
             <p className="mt-2 text-muted-foreground">

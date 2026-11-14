@@ -125,7 +125,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light transition"
+                  className="inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-night hover:bg-hotpink-light transition"
                 >
                   Get Started
                 </Link>
@@ -187,7 +187,7 @@ export function Navbar() {
                 <Link
                   href="/auth/signup"
                   onClick={close}
-                  className="flex-1 inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light"
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-night hover:bg-hotpink-light"
                 >
                   Get Started
                 </Link>

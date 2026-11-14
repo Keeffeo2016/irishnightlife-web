@@ -6,6 +6,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import { Icon } from 'leaflet'
 import { Calendar, Clock, Euro, MapPin } from 'lucide-react'
 import { syncLeafletView } from '@/lib/leaflet-map'
+import { DARK_MAP_CLASS, MAP_TILE_ATTRIBUTION, MAP_TILE_URL } from '@/lib/map-tiles'
 import { createClient } from '@/lib/supabase/client'
 import {
   eventTypeLabel,
@@ -400,7 +401,7 @@ export default function EventsMapInner({
         </div>
       </div>
 
-      <div className="relative h-[460px] w-full sm:h-[520px]">
+      <div className={`relative h-[460px] w-full sm:h-[520px] ${DARK_MAP_CLASS}`}>
         <MapContainer
           key={mapEpoch}
           center={mapCenter}
@@ -410,8 +411,8 @@ export default function EventsMapInner({
         >
           <MapViewport center={mapCenter} zoom={mapZoom} onUnavailable={rebuildMap} />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution={MAP_TILE_ATTRIBUTION}
+            url={MAP_TILE_URL}
           />
 
           {venues.map((venue) => (

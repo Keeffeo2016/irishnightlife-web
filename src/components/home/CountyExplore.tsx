@@ -13,10 +13,10 @@ type CountyExploreProps = {
 
 export function CountyExplore({ selectedCounty, onSelectCounty }: CountyExploreProps) {
   return (
-    <section aria-labelledby="explore-counties-heading" className="border-b border-border">
+    <section aria-labelledby="explore-counties-heading" className="band-wash">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto mb-8 max-w-2xl text-center">
-          <h2 id="explore-counties-heading" className="text-2xl font-bold text-foreground md:text-3xl">
+          <h2 id="explore-counties-heading" className="text-3xl font-bold text-foreground md:text-4xl">
             Explore Ireland by county
           </h2>
           <p className="mt-2 text-muted-foreground">
@@ -40,7 +40,7 @@ export function CountyExplore({ selectedCounty, onSelectCounty }: CountyExploreP
                 className={cn(
                   'min-h-11 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
                   selected
-                    ? 'border-hotpink bg-hotpink text-white'
+                    ? 'border-hotpink bg-hotpink text-night'
                     : 'border-primary/40 text-primary hover:border-primary hover:bg-primary/10'
                 )}
               >
@@ -58,7 +58,7 @@ export function CountyExplore({ selectedCounty, onSelectCounty }: CountyExploreP
             className={cn(
               'min-h-11 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
               selectedCounty === 'All Ireland'
-                ? 'border-hotpink bg-hotpink text-white'
+                ? 'border-hotpink bg-hotpink text-night'
                 : 'border-primary/40 text-primary hover:border-primary hover:bg-primary/10'
             )}
           >

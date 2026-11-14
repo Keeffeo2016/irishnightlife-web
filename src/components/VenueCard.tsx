@@ -1,17 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Beer,
-  CheckCircle2,
-  Disc3,
-  MapPin,
-  Music,
-  Sparkles,
-  Utensils,
-  Wine,
-} from 'lucide-react'
+import { CheckCircle2, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { FallbackArt } from '@/components/FallbackArt'
 import { FavoriteButton } from '@/components/FavoriteButton'
 import { venueTypeLabel } from '@/lib/venue-profile'
 
@@ -29,24 +21,6 @@ export interface VenueCardVenue {
   atmosphere?: string[] | null
   is_verified?: boolean
   images?: string[] | null
-}
-
-function VenueTypeIcon({ venueType }: { venueType: string | null | undefined }) {
-  const normalized = (venueType ?? '').trim().toLowerCase()
-  switch (normalized) {
-    case 'pub':
-      return <Beer className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'bar':
-      return <Wine className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'club':
-      return <Disc3 className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'live_music_venue':
-      return <Music className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'restaurant':
-      return <Utensils className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    default:
-      return <Sparkles className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-  }
 }
 
 export function resolveVenueCardImage(images: string[] | null | undefined): string | null {
@@ -102,7 +76,7 @@ export function VenueCard({
   const tags = pickVenueTags(venue)
 
   return (
-    <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:border-primary/70 hover:shadow-xl hover:shadow-black/25 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50">
+    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/70 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
       {/* Save Button (elevated above stretched link, not nested inside <a>) */}
       <div className="absolute right-3 top-3 z-20">
         <FavoriteButton venueId={venue.id} variant="icon" label={venue.name} />
@@ -125,17 +99,7 @@ export function VenueCard({
             />
           </>
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-            <div
-              aria-hidden="true"
-              className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/20 bg-hotpink/10 shadow-inner"
-            >
-              <VenueTypeIcon venueType={venue.venue_type} />
-            </div>
-            <span className="text-xs font-medium uppercase tracking-wider text-hotpink/75">
-              {typeLabel}
-            </span>
-          </div>
+          <FallbackArt kind="venue" type={venue.venue_type} label={typeLabel} />
         )}
 
         {/* Top-left badges over media */}
@@ -177,7 +141,7 @@ export function VenueCard({
           </h3>
 
           <div className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <span className="line-clamp-1">{locationLabel}</span>
           </div>
 

@@ -29,10 +29,11 @@ export function PageHero({
   return (
     <section
       className={cn(
-        'relative overflow-hidden border-b border-border bg-gradient-to-br from-night via-night-soft to-forest',
+        'relative overflow-hidden border-b border-border bg-night',
         className
       )}
     >
+      <div aria-hidden className="hero-wash pointer-events-none absolute inset-0" />
       {showMap && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
           <div

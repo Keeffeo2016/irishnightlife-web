@@ -542,7 +542,7 @@ function PlannerWizardContent() {
                     <span
                       className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                         isCurrent
-                          ? 'bg-hotpink text-white ring-2 ring-hotpink/40'
+                          ? 'bg-hotpink text-night ring-2 ring-hotpink/40'
                           : done
                             ? 'bg-hotpink/25 text-hotpink'
                             : 'bg-card text-muted-foreground'
