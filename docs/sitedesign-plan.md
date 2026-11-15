@@ -1,5 +1,17 @@
 # Site design refresh plan
 
+Owner decisions, 14 Nov 2026. Defaults from this plan:
+
+1. Shamrock `#13E09D` is the Tonight, Live, and Free colour. `--color-mint` stays pink.
+2. Map tiles stay on OpenStreetMap, darkened with a CSS filter. CARTO waits on terms.
+3. Headings use Bricolage Grotesque only. No Anton.
+4. A venue can still be created with no photo. Phase 2.
+5. The homepage photo, when built, uses the first featured event, then the venue image, then fallback art. No video.
+6. The Tonight rail, when built, does not autoplay.
+7. Every solid pink fill uses Night Ink text.
+
+Phase 1 is the implementation that follows. Phase 2 is still a plan.
+
 Plan only. No visual changes ship with this file.
 
 The owner’s note is that the site looks very flat. Checked against `main` at `01e61ae`. The research report’s contrast maths hold. A few of its “missing” features are already built, and its proposed surface steps are as flat as the colours they replace. This plan follows the code.

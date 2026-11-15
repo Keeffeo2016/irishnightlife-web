@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,7 +51,7 @@ export function CompleteVenueForm({ email }: { email: string }) {
       <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-hotpink/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MapPin className="h-10 w-10 text-primary" />
+            <BrandLogo className="h-16" />
           </div>
           <CardTitle className="text-2xl text-foreground">Add your venue</CardTitle>
           <p className="text-muted-foreground">

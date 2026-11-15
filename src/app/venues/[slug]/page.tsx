@@ -22,6 +22,7 @@ import { createClient } from '@/lib/supabase/server'
 import { viewerManagesVenue } from '@/lib/venue-access'
 import { BackToPlanner } from '@/components/BackToPlanner'
 import { plannerPlanHref, preservePlannerOrigin } from '@/lib/planner'
+import { FallbackArt } from '@/components/FallbackArt'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { FavoriteButton } from '@/components/FavoriteButton'
@@ -334,11 +335,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                 className="object-cover"
               />
             ) : (
-              <div className="absolute inset-0 flex items-end p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-hotpink">
-                  {typeLabel}
-                </p>
-              </div>
+              <FallbackArt kind="venue" type={venue.venue_type} label={typeLabel} />
             )}
             <div
               className="absolute inset-0 bg-gradient-to-t from-night via-night/40 to-night/10"

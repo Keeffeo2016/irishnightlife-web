@@ -329,7 +329,7 @@ function VenuesBrowser() {
                   aria-pressed={active}
                   className={`min-h-9 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
                     active
-                      ? 'border-hotpink bg-hotpink text-white shadow-sm'
+                      ? 'border-hotpink bg-hotpink text-night shadow-sm'
                       : 'border-border bg-card/80 text-foreground/85 hover:border-hotpink/60 hover:text-hotpink'
                   }`}
                 >

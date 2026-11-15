@@ -98,7 +98,7 @@ function ViewModeToggle({
         aria-pressed={view === 'grid'}
         className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
           view === 'grid'
-            ? 'bg-hotpink text-white shadow-xs'
+            ? 'bg-hotpink text-night shadow-xs'
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
@@ -111,7 +111,7 @@ function ViewModeToggle({
         aria-pressed={view === 'map'}
         className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
           view === 'map'
-            ? 'bg-hotpink text-white shadow-xs'
+            ? 'bg-hotpink text-night shadow-xs'
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
@@ -452,7 +452,7 @@ function EventsBrowser() {
                     aria-pressed={active}
                     className={`min-h-9 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
                       active
-                        ? 'border-hotpink bg-hotpink text-white shadow-sm'
+                        ? 'border-hotpink bg-hotpink text-night shadow-sm'
                         : 'border-border bg-card/80 text-foreground/85 hover:border-hotpink/60 hover:text-hotpink'
                     }`}
                   >

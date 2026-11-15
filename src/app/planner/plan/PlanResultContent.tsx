@@ -683,7 +683,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                     className={`relative z-10 mt-6 hidden h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition-colors sm:flex ${
                       checked
                         ? 'bg-primary/20 text-primary ring-2 ring-primary'
-                        : 'bg-hotpink text-white shadow-md shadow-hotpink/20'
+                        : 'bg-hotpink text-night shadow-md shadow-hotpink/20'
                     }`}
                   >
                     {index + 1}
@@ -700,7 +700,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
                       {/* Top Bar: Stop Badge, Event Type, Genre, and Sorted Toggle */}
                       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="bg-hotpink text-white font-bold">
+                          <Badge className="bg-hotpink text-night font-bold">
                             Stop {index + 1}
                           </Badge>
                           <Badge className="border border-hotpink/30 bg-hotpink/10 text-hotpink">

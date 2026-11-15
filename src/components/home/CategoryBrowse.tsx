@@ -42,10 +42,10 @@ const CATEGORIES = [
 
 export function CategoryBrowse() {
   return (
-    <section aria-labelledby="browse-categories-heading" className="border-b border-border">
+    <section aria-labelledby="browse-categories-heading" className="band-wash">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-6 max-w-2xl">
-          <h2 id="browse-categories-heading" className="text-2xl font-bold text-foreground md:text-3xl">
+          <h2 id="browse-categories-heading" className="text-3xl font-bold text-foreground md:text-4xl">
             Browse by category
           </h2>
           <p className="mt-2 text-muted-foreground">

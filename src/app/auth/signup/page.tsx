@@ -3,7 +3,8 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { AuthDivider, SocialAuthButtons } from '@/components/auth/SocialAuthButtons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -79,7 +80,7 @@ function SignupForm() {
       <Card className="w-full max-w-md bg-card border-border shadow-2xl shadow-hotpink/10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MapPin className="h-10 w-10 text-primary" />
+            <BrandLogo className="h-16" />
           </div>
           <CardTitle className="text-2xl text-foreground">Create your account</CardTitle>
           <p className="text-muted-foreground">Join Ireland&apos;s nightlife discovery platform</p>
@@ -106,7 +107,7 @@ function SignupForm() {
               onClick={() => setAccountType('consumer')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'consumer'
-                  ? 'bg-hotpink text-white font-semibold'
+                  ? 'bg-hotpink text-night font-semibold'
                   : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >
@@ -117,7 +118,7 @@ function SignupForm() {
               onClick={() => setAccountType('venue')}
               className={`flex-1 py-3 rounded-lg font-medium transition ${
                 accountType === 'venue'
-                  ? 'bg-hotpink text-white font-semibold'
+                  ? 'bg-hotpink text-night font-semibold'
                   : 'bg-muted text-muted-foreground hover:bg-secondary'
               }`}
             >

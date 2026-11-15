@@ -7,6 +7,7 @@ import { Icon } from 'leaflet'
 import { ExternalLink, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { syncLeafletView } from '@/lib/leaflet-map'
+import { DARK_MAP_CLASS, MAP_TILE_ATTRIBUTION, MAP_TILE_URL } from '@/lib/map-tiles'
 import { detailHrefFromPlan } from '@/lib/planner'
 
 export interface PlanMapVenue {
@@ -203,7 +204,7 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
 
       {/* Interactive Map when coordinates are present */}
       {validVenues.length > 0 ? (
-        <div className="relative h-[380px] w-full sm:h-[420px]">
+        <div className={`relative h-[380px] w-full sm:h-[420px] ${DARK_MAP_CLASS}`}>
           <MapContainer
             key={mapEpoch}
             center={mapCenter}
@@ -213,8 +214,8 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
           >
             <MapViewport center={mapCenter} zoom={mapZoom} onUnavailable={rebuildMap} />
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution={MAP_TILE_ATTRIBUTION}
+              url={MAP_TILE_URL}
             />
 
             {validVenues.map(venue => {
@@ -293,7 +294,7 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
                 className="flex items-start justify-between gap-3 rounded-xl border border-border/80 bg-card p-3 text-xs"
               >
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-hotpink text-[11px] font-bold text-white">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-hotpink text-[11px] font-bold text-night">
                     {stopNumber}
                   </span>
                   <div className="min-w-0">

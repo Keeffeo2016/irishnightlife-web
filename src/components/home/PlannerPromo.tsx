@@ -5,15 +5,15 @@ import { cn } from 'cn'
 
 export function PlannerPromo() {
   return (
-    <section aria-labelledby="planner-promo-heading" className="border-b border-border">
+    <section aria-labelledby="planner-promo-heading">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-night-soft via-card to-forest px-6 py-10 sm:px-10 md:py-12">
+        <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card px-6 py-10 sm:px-10 md:py-12">
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-hotpink/15 blur-3xl motion-reduce:hidden"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,61,129,0.16),transparent_55%)]"
           />
           <div className="relative max-w-2xl">
-            <h2 id="planner-promo-heading" className="text-2xl font-bold text-white md:text-3xl">
+            <h2 id="planner-promo-heading" className="text-3xl font-bold text-foreground md:text-4xl">
               Not Sure Where to Go?
             </h2>
             <p className="mt-3 text-base text-foreground/80 md:text-lg">

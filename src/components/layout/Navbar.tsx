@@ -1,10 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { createClient } from '@/lib/supabase/client'
 
 const LINKS = [
@@ -74,14 +74,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center" onClick={close}>
-            <Image
-              src="/brand/logo-nav.png"
-              alt="IrishNightlife.ie"
-              width={832}
-              height={220}
-              priority
-              className="h-[53px] w-auto"
-            />
+            <BrandLogo priority className="h-12" />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
@@ -125,7 +118,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light transition"
+                  className="inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-night hover:bg-hotpink-light transition"
                 >
                   Get Started
                 </Link>
@@ -187,7 +180,7 @@ export function Navbar() {
                 <Link
                   href="/auth/signup"
                   onClick={close}
-                  className="flex-1 inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-white hover:bg-hotpink-light"
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-hotpink px-4 py-2 text-sm font-semibold text-night hover:bg-hotpink-light"
                 >
                   Get Started
                 </Link>

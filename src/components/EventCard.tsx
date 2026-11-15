@@ -1,19 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Calendar,
-  Clock,
-  Disc3,
-  HelpCircle,
-  MapPin,
-  Mic2,
-  Music,
-  Sparkles,
-  Tag,
-  Trophy,
-} from 'lucide-react'
+import { Calendar, Clock, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { FallbackArt } from '@/components/FallbackArt'
 import { FavoriteButton } from '@/components/FavoriteButton'
 
 export interface EventCardEvent {
@@ -29,6 +19,7 @@ export interface EventCardEvent {
   is_free: boolean
   music_genre: string
   image_url?: string | null
+  is_featured?: boolean
   venues: {
     id?: string
     name: string
@@ -68,26 +59,6 @@ export function eventTypeLabel(eventType: string | null | undefined): string {
   return eventType
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
-}
-
-function EventTypeIcon({ eventType }: { eventType: string }) {
-  const normalized = eventType.trim().toLowerCase()
-  switch (normalized) {
-    case 'live_music':
-      return <Music className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'dj':
-      return <Disc3 className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'comedy':
-      return <Mic2 className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'quiz':
-      return <HelpCircle className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'sports':
-      return <Trophy className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    case 'special_offer':
-      return <Tag className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-    default:
-      return <Sparkles className="h-7 w-7 text-hotpink/80" aria-hidden="true" />
-  }
 }
 
 function hasNumericPrice(value: number | null | undefined): value is number {
@@ -195,7 +166,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
   const locationLabel = formatVenueLocation(event.venues)
 
   return (
-    <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:border-primary/70 hover:shadow-xl hover:shadow-black/25 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50">
+    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/70 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
       {/* Save Button (elevated above stretched link, not nested inside <a>) */}
       <div className="absolute right-3 top-3 z-20">
         <FavoriteButton eventId={event.id} variant="icon" label={event.title} />
@@ -218,17 +189,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
             />
           </>
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-            <div
-              aria-hidden="true"
-              className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl border border-hotpink/20 bg-hotpink/10 shadow-inner"
-            >
-              <EventTypeIcon eventType={event.event_type} />
-            </div>
-            <span className="text-xs font-medium tracking-wider uppercase text-hotpink/75">
-              { event.venues.name }
-            </span>
-          </div>
+          <FallbackArt kind="event" type={event.event_type} label={event.venues.name} />
         )}
 
         {/* Top-left badges over media */}
@@ -236,6 +197,9 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           <Badge className="border border-hotpink/30 bg-night/85 text-hotpink backdrop-blur-sm">
             {typeLabel}
           </Badge>
+          {event.is_featured ? (
+            <Badge className="border border-amber/40 bg-amber text-night">Featured</Badge>
+          ) : null}
           {showGenre ? (
             <Badge
               variant="outline"
@@ -249,7 +213,11 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
         {/* Bottom-left date/time pill over media */}
         <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between gap-2">
           <div className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-night/85 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-            <span className="inline-flex items-center gap-1 text-hotpink">
+            <span
+              className={`inline-flex items-center gap-1 ${
+                dateLabel === 'Tonight' ? 'text-shamrock' : 'text-muted-foreground'
+              }`}
+            >
               <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
               {dateLabel}
             </span>
@@ -270,8 +238,8 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
             <span
               className={`rounded-lg px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur-sm ${
                 event.is_free
-                  ? 'border border-hotpink/40 bg-hotpink text-white'
-                  : 'border border-white/15 bg-night/90 text-white'
+                  ? 'border border-shamrock/40 bg-shamrock text-night'
+                  : 'border border-white/15 bg-night/90 text-foreground'
               }`}
             >
               {price}
@@ -293,7 +261,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           </h3>
 
           <div className="mb-3 flex items-start gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <p className="line-clamp-1">
               <span className="font-medium text-foreground/90">{event.venues.name}</span>
               <span aria-hidden="true" className="mx-1.5 text-muted-foreground/70">

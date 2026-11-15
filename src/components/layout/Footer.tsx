@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from 'cn'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { shouldShowMobileNav } from '@/lib/mobile-nav'
 
 export function Footer() {
@@ -21,12 +21,9 @@ export function Footer() {
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
             <Link href="/" className="mb-4 inline-block">
-              <Image
-                src="/brand/logo.png"
+              <BrandLogo
                 alt="IrishNightlife.ie — Discover what's happening tonight"
-                width={832}
-                height={220}
-                className="h-[77px] w-auto"
+                className="h-20"
               />
             </Link>
             <p className="text-sm text-muted-foreground">
