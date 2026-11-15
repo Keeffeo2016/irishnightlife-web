@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { FormEvent, useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -11,6 +10,7 @@ import { HeroAccent } from '@/components/layout/PageHero'
 import { IRISH_COUNTIES, PROVINCES } from '@/lib/counties'
 import { EVENT_TYPES } from '@/lib/venue-profile'
 import { eventsSearchHref } from '@/components/home/types'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { cn } from 'cn'
 
 const EVENT_TYPE_OPTIONS = [
@@ -64,14 +64,7 @@ export function HomeHero({ county, onCountyChange }: HomeHeroProps) {
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-3 flex justify-center">
-            <Image
-              src="/brand/wordmark.png"
-              alt="IrishNightlife"
-              width={600}
-              height={160}
-              priority
-              className="h-[58px] w-auto"
-            />
+            <BrandLogo priority alt="IrishNightlife" className="h-20 sm:h-24" />
           </div>
           <h1 className="mb-4 text-balance text-[clamp(2rem,6vw,3.75rem)] font-bold leading-[1.1] text-white">
             Find Your Next <HeroAccent>Night Out</HeroAccent>

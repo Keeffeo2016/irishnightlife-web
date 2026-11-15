@@ -1,10 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { createClient } from '@/lib/supabase/client'
 
 const LINKS = [
@@ -74,14 +74,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center" onClick={close}>
-            <Image
-              src="/brand/wordmark.png"
-              alt="IrishNightlife.ie"
-              width={1024}
-              height={341}
-              priority
-              className="h-12 w-auto sm:h-14"
-            />
+            <BrandLogo priority className="h-12" />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">

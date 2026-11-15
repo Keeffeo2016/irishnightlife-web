@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description:
     "Ireland's nightlife discovery platform. Find live music, events, and the best nights out in Dublin, Cork, Galway and beyond.",
   openGraph: {
-    images: [{ url: "/brand/logo-original.jpg", width: 1024, height: 490 }],
+    images: [{ url: "/brand/og.png", width: 1200, height: 630, alt: "IrishNightlife.ie" }],
   },
 };
 
