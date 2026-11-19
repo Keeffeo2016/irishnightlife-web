@@ -210,7 +210,7 @@ function VenuesBrowser() {
 
   const heroSubtitle = useMemo(() => {
     if (filters.type === PUBS_BARS_KEY) {
-      return 'Browse verified pubs and bars across Ireland — real venues, no paid rankings.'
+      return 'Browse verified pubs and bars across Ireland - real venues, no paid rankings.'
     }
     return 'Explore verified pubs, bars, nightclubs, live music stages, and restaurants across Ireland.'
   }, [filters.type])

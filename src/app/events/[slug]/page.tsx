@@ -160,7 +160,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   const { slug } = await params
   const loaded = await loadEvent(slug)
   if (!loaded?.publiclyVisible) {
-    return { title: 'Event — IrishNightlife.ie' }
+    return { title: 'Event - IrishNightlife.ie' }
   }
 
   const { event, venue } = loaded
@@ -172,7 +172,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   const image = absoluteImage(pickImage(event.image_url, venue.images))
 
   return {
-    title: `${event.title} — IrishNightlife.ie`,
+    title: `${event.title} - IrishNightlife.ie`,
     description,
     alternates: { canonical },
     openGraph: {

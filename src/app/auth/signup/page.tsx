@@ -28,6 +28,7 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [acceptedLegal, setAcceptedLegal] = useState(false)
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -42,6 +43,10 @@ function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!acceptedLegal) {
+      setError('Please agree to the Terms of Use and Privacy Policy to continue.')
+      return
+    }
     setLoading(true)
     setError(null)
     setSuccess(null)
@@ -126,9 +131,42 @@ function SignupForm() {
             </button>
           </div>
 
+          <div className="mb-6 flex items-start gap-3">
+            <input
+              id="signup-legal"
+              type="checkbox"
+              checked={acceptedLegal}
+              onChange={(e) => {
+                setAcceptedLegal(e.target.checked)
+                if (e.target.checked) setError(null)
+              }}
+              className="mt-1 h-4 w-4 shrink-0 rounded border-border accent-hotpink"
+            />
+            <label htmlFor="signup-legal" className="text-sm leading-relaxed text-muted-foreground">
+              I agree to the{' '}
+              <Link href="/terms" className="text-primary hover:underline font-medium">
+                Terms of Use
+              </Link>{' '}
+              and acknowledge the{' '}
+              <Link href="/privacy" className="text-primary hover:underline font-medium">
+                Privacy Policy
+              </Link>
+              .
+            </label>
+          </div>
+
           {accountType === 'consumer' && (
             <>
-              <SocialAuthButtons intent="signup" nextPath="/" />
+              <SocialAuthButtons
+                intent="signup"
+                nextPath="/"
+                disabled={!acceptedLegal}
+              />
+              {!acceptedLegal ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Accept the Terms and Privacy Policy above to continue with Google or Apple.
+                </p>
+              ) : null}
               <AuthDivider label="or use email" />
             </>
           )}
@@ -282,7 +320,7 @@ function SignupForm() {
               variant="brand"
               className="w-full py-6"
               size="lg"
-              disabled={loading}
+              disabled={loading || !acceptedLegal}
             >
               {loading ? (
                 <>

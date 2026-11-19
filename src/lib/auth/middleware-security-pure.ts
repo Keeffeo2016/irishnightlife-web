@@ -1,5 +1,5 @@
 /**
- * Pure security helpers for middleware — no Next.js dependency.
+ * Pure security helpers for middleware - no Next.js dependency.
  * Safe to import from test files.
  */
 
@@ -23,6 +23,9 @@ export const PUBLIC_PATHS = [
   '/venues',
   '/planner',
   '/for-venues',
+  '/privacy',
+  '/terms',
+  '/cookies',
   '/auth/login',
   '/auth/signup',
   '/auth/callback',

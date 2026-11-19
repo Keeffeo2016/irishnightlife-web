@@ -207,7 +207,7 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
   const { slug } = await params
   const loaded = await loadVenue(slug)
   if (!loaded?.publiclyVisible) {
-    return { title: 'Venue — IrishNightlife.ie' }
+    return { title: 'Venue - IrishNightlife.ie' }
   }
 
   const { venue } = loaded
@@ -217,12 +217,12 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
   const typeLabel = venueTypeLabel(venue.venue_type) || 'Venue'
   const description =
     venue.description?.trim() ||
-    `${venue.name} — verified ${typeLabel.toLowerCase()}${place ? ` in ${place}` : ''} on IrishNightlife.ie.`
+    `${venue.name} - verified ${typeLabel.toLowerCase()}${place ? ` in ${place}` : ''} on IrishNightlife.ie.`
   const validImages = extractValidImages(venue.images)
   const firstImage = absoluteImage(validImages[0])
 
   return {
-    title: `${venue.name} — IrishNightlife.ie`,
+    title: `${venue.name} - IrishNightlife.ie`,
     description,
     alternates: { canonical },
     openGraph: {
@@ -571,7 +571,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
                   >
                     <Image
                       src={src}
-                      alt={`${venue.name} — photo ${index + 1}`}
+                      alt={`${venue.name} - photo ${index + 1}`}
                       fill
                       sizes="(max-width: 640px) 100vw, 50vw"
                       className="object-cover"
@@ -749,7 +749,7 @@ export default async function VenuePage({ params, searchParams }: VenuePageProps
               </dl>
             ) : null}
 
-            {/* Social Links — only rendered when actually stored on the venue */}
+            {/* Social Links - only rendered when actually stored on the venue */}
             {instagramUrl || facebookUrl ? (
               <div className="border-t border-border pt-4">
                 <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

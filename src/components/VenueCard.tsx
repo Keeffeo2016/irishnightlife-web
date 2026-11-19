@@ -76,14 +76,14 @@ export function VenueCard({
   const tags = pickVenueTags(venue)
 
   return (
-    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/70 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
+    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
       {/* Save Button (elevated above stretched link, not nested inside <a>) */}
       <div className="absolute right-3 top-3 z-20">
         <FavoriteButton venueId={venue.id} variant="icon" label={venue.name} />
       </div>
 
       {/* 16:9 Media / Branded Header */}
-      <div className="relative aspect-video w-full shrink-0 overflow-hidden border-b border-border/60 bg-gradient-to-br from-night via-night-soft to-forest">
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden border-b border-border/60 bg-gradient-to-br from-night via-night-soft to-forest">
         {imageUrl ? (
           <>
             <Image

@@ -7,16 +7,18 @@ import { CategoryBrowse } from '@/components/home/CategoryBrowse'
 import { HomeEventSection } from '@/components/home/HomeEventSection'
 import { DiscoverVenues } from '@/components/home/DiscoverVenues'
 import { PlannerPromo } from '@/components/home/PlannerPromo'
-import { CountyExplore } from '@/components/home/CountyExplore'
+import { LocationSelector } from '@/components/home/LocationSelector'
+import { TonightRail } from '@/components/home/TonightRail'
 import {
   eventsSearchHref,
   isSameLocalDay,
+  resolveHeroBackdrop,
   type HomeEvent,
   type HomeVenue,
 } from '@/components/home/types'
 
 const FEATURED_CAP = 6
-const TONIGHT_CAP = 6
+const TONIGHT_CAP = 8
 const UPCOMING_CAP = 6
 const VENUE_CAP = 6
 
@@ -163,7 +165,7 @@ export default function HomePage() {
     fetchVenues()
   }, [selectedCounty])
 
-  const { featured, tonight, upcoming } = useMemo(() => {
+  const { featured, tonight, upcoming, hero } = useMemo(() => {
     const featuredEvents = events.filter((event) => event.is_featured).slice(0, FEATURED_CAP)
     const featuredIds = new Set(featuredEvents.map((event) => event.id))
     const tonightEvents = events.filter((event) => isSameLocalDay(event.start_time)).slice(0, TONIGHT_CAP)
@@ -175,6 +177,7 @@ export default function HomePage() {
       featured: featuredEvents,
       tonight: tonightEvents,
       upcoming: upcomingEvents,
+      hero: resolveHeroBackdrop(events),
     }
   }, [events])
 
@@ -184,8 +187,32 @@ export default function HomePage() {
     selectedCounty === 'All Ireland' ? '/venues' : `/venues?county=${encodeURIComponent(selectedCounty)}`
 
   return (
-    <div className="flex flex-col overflow-x-hidden bg-background">
-      <HomeHero county={selectedCounty} onCountyChange={setSelectedCounty} />
+    <div className="flex flex-col overflow-x-hidden bg-background pb-20 md:pb-0">
+      <HomeHero
+        county={selectedCounty}
+        onCountyChange={setSelectedCounty}
+        tonightCount={tonight.length}
+        heroImageUrl={hero.imageUrl}
+        eventsLoading={eventsLoading}
+      />
+
+      <LocationSelector selectedCounty={selectedCounty} onSelectCounty={setSelectedCounty} />
+
+      <TonightRail
+        events={tonight}
+        loading={eventsLoading}
+        countyLabel={countyLabel}
+        emptyTitle="Nothing listed for tonight"
+        emptyDescription={
+          selectedCounty === 'All Ireland'
+            ? 'No verified venues have published a night that starts today. Browse upcoming events instead.'
+            : `No nights listed in ${selectedCounty} for today. Check upcoming events, or try another county.`
+        }
+        emptyActionHref={eventsCountyHref}
+        emptyActionLabel="See upcoming events"
+        seeAllHref={tonight.length > 0 ? eventsCountyHref : null}
+      />
+
       <CategoryBrowse />
 
       {!eventsLoading && featured.length > 0 ? (
@@ -199,27 +226,6 @@ export default function HomePage() {
           seeAllHref={eventsCountyHref}
         />
       ) : null}
-
-      <HomeEventSection
-        id="tonight"
-        title="Happening Tonight"
-        description={
-          events.length >= 50
-            ? `Tonight's listings ${countyLabel}. Showing from the next 50 upcoming nights — use See all for the full events list.`
-            : `Tonight's listings ${countyLabel}.`
-        }
-        events={tonight}
-        loading={eventsLoading}
-        emptyTitle="Nothing listed for tonight"
-        emptyDescription={
-          selectedCounty === 'All Ireland'
-            ? 'No verified venues have published a night that starts today. Browse upcoming events instead.'
-            : `No nights listed in ${selectedCounty} for today. Check upcoming events, or try another county.`
-        }
-        emptyActionHref={eventsCountyHref}
-        emptyActionLabel="See upcoming events"
-        seeAllHref={tonight.length > 0 ? eventsCountyHref : null}
-      />
 
       <HomeEventSection
         id="upcoming"
@@ -246,8 +252,6 @@ export default function HomePage() {
       />
 
       <PlannerPromo />
-
-      <CountyExplore selectedCounty={selectedCounty} onSelectCounty={setSelectedCounty} />
     </div>
   )
 }

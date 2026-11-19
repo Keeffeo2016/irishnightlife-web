@@ -388,7 +388,7 @@ function PlanResultView({ queryKey }: { queryKey: string }) {
     try {
       if (typeof navigator.share === 'function') {
         await navigator.share({
-          title: 'My Night Plan — IrishNightlife.ie',
+          title: 'My Night Plan - IrishNightlife.ie',
           text: narrative || 'Check out this night plan on IrishNightlife.ie',
           url: shareUrl,
         })

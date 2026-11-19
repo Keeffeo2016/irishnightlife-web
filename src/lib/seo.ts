@@ -13,6 +13,9 @@ export const SITEMAP_STATIC_PATHS = [
   '/venues',
   '/planner',
   '/for-venues',
+  '/privacy',
+  '/terms',
+  '/cookies',
 ] as const
 
 export function resolveAppOrigin(raw = process.env.NEXT_PUBLIC_APP_URL): string {
@@ -27,7 +30,7 @@ export function resolveAppOrigin(raw = process.env.NEXT_PUBLIC_APP_URL): string 
       // fall through to localhost
     }
   }
-  // NEXT_PUBLIC_APP_URL unset/invalid — match siteOrigin helpers
+  // NEXT_PUBLIC_APP_URL unset/invalid - match siteOrigin helpers
   return 'http://localhost:3000'
 }
 

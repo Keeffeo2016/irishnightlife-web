@@ -523,7 +523,7 @@ function EventTable({ events }: { events: BoardEvent[] }) {
                   {live ? (
                     <Link href={`/events/${event.slug}`} className="text-primary hover:underline">View</Link>
                   ) : (
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-muted-foreground">-</span>
                   )}
                 </td>
               </tr>
@@ -552,7 +552,7 @@ function UserTable({ users }: { users: BoardUser[] }) {
         <tbody>
           {users.map((account) => (
             <tr key={account.id} className="border-b border-border last:border-0">
-              <td className="py-3 pr-4 font-medium text-foreground">{account.full_name || '—'}</td>
+              <td className="py-3 pr-4 font-medium text-foreground">{account.full_name || '-'}</td>
               <td className="py-3 pr-4 text-foreground/90">{account.email}</td>
               <td className="py-3 pr-4 text-foreground/90">{roleLabel(account.role)}</td>
               <td className="py-3 text-foreground/90 whitespace-nowrap">{formatDate(account.created_at)}</td>

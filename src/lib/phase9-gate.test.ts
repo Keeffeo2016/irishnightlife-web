@@ -44,6 +44,9 @@ test('sitemap lists static public routes only (no invented slugs)', () => {
     '/venues',
     '/planner',
     '/for-venues',
+    '/privacy',
+    '/terms',
+    '/cookies',
   ])
   for (const path of SITEMAP_STATIC_PATHS) {
     assert.equal(path.includes('/events/'), false)

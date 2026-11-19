@@ -1,42 +1,42 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { Mic2, Music2, PartyPopper, Store, UtensilsCrossed, CalendarDays } from 'lucide-react'
 
 const CATEGORIES = [
   {
     label: 'Live Music',
     href: '/events?type=live_music',
     description: 'Bands and sessions',
-    icon: Music2,
+    image: '/home/vibe-live-music.jpg',
   },
   {
-    label: 'DJs & Club Nights',
+    label: 'DJs & Clubs',
     href: '/events?type=dj',
-    description: 'DJ sets and club nights',
-    icon: PartyPopper,
+    description: 'Sets and late nights',
+    image: '/home/vibe-dj-clubs.jpg',
   },
   {
     label: 'Comedy',
     href: '/events?type=comedy',
     description: 'Stand-up and shows',
-    icon: Mic2,
+    image: '/home/vibe-comedy.jpg',
   },
   {
     label: 'Pubs & Bars',
     href: '/venues?types=pub,bar',
-    description: 'Browse pubs and bars',
-    icon: Store,
+    description: 'Verified locals',
+    image: '/home/vibe-pubs-bars.jpg',
   },
   {
     label: 'Restaurants',
     href: '/venues?type=restaurant',
-    description: 'Dining venues',
-    icon: UtensilsCrossed,
+    description: 'Dinner before the gig',
+    image: '/home/vibe-restaurants.jpg',
   },
   {
     label: 'All Events',
     href: '/events',
     description: 'Everything upcoming',
-    icon: CalendarDays,
+    image: '/home/vibe-all-events.jpg',
   },
 ] as const
 
@@ -44,37 +44,44 @@ export function CategoryBrowse() {
   return (
     <section aria-labelledby="browse-categories-heading" className="band-wash">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-6 max-w-2xl">
+        <div className="mb-8 max-w-2xl">
           <h2 id="browse-categories-heading" className="text-3xl font-bold text-foreground md:text-4xl">
-            Browse by category
+            Discover by vibe
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Jump straight into the nights and venues we actually list.
+            Jump into the nights and venues we actually list.
           </p>
         </div>
 
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon
-            return (
-              <li key={category.href + category.label}>
-                <Link
-                  href={category.href}
-                  className="group flex h-full flex-col gap-3 rounded-xl border border-border bg-card/60 p-4 transition-colors hover:border-primary hover:bg-card focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-                    <Icon className="size-5" aria-hidden="true" />
+        <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+          {CATEGORIES.map((category) => (
+            <li key={category.href + category.label}>
+              <Link
+                href={category.href}
+                className="group relative flex h-full min-h-[9.5rem] flex-col justify-end overflow-hidden rounded-2xl border border-border focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:min-h-[11rem]"
+              >
+                <Image
+                  src={category.image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span
+                  aria-hidden
+                  className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/25 transition-colors group-hover:from-night group-hover:via-night/60"
+                />
+                <span className="relative p-4 md:p-5">
+                  <span className="block text-base font-semibold text-white md:text-lg">
+                    {category.label}
                   </span>
-                  <span>
-                    <span className="block font-semibold text-foreground group-hover:text-primary">
-                      {category.label}
-                    </span>
-                    <span className="mt-1 block text-xs text-muted-foreground">{category.description}</span>
+                  <span className="mt-1 block text-xs text-white/70 md:text-sm">
+                    {category.description}
                   </span>
-                </Link>
-              </li>
-            )
-          })}
+                </span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </section>

@@ -50,12 +50,12 @@
 }
 
 /*
-  Stitch design system palette — hot pink / electric violet / midnight purple.
+  Stitch design system palette - hot pink / electric violet / midnight purple.
   Inspired by Resident Advisor, Spotify, and DICE.
   Prefer semantic tokens (bg-background, text-foreground, bg-primary) in new work.
 */
 @theme {
-  /* Legacy aliases — remap mint/night to new palette for gradual migration */
+  /* Legacy aliases - remap mint/night to new palette for gradual migration */
   --color-night: #0b0a12;
   --color-night-soft: #16141f;
   --color-mint: #ff3d81;
@@ -112,6 +112,7 @@
   - #0B0A12 on #FFB547: 11.2:1. White on #FFB547 is 1.76:1.
 */
 :root {
+  color-scheme: dark;
   --background: #0b0a12;
   --foreground: #f5f3fa;
   --surface: #16141f;
@@ -146,7 +147,7 @@
   --sidebar-border: #3a3552;
   --sidebar-ring: #ff3d81;
 
-  /* Type scale — Bricolage Grotesque for headings, Geist for body */
+  /* Type scale - Bricolage Grotesque for headings, Geist for body */
   --text-display: clamp(2.5rem, 5vw, 4rem);
   --text-h1: clamp(2rem, 3.5vw, 2.75rem);
   --text-h2: clamp(1.5rem, 2.5vw, 2rem);
@@ -238,7 +239,7 @@
   }
 }
 
-/* Neon glow utilities — Stitch design system */
+/* Neon glow utilities - Stitch design system */
 @layer utilities {
   .glow-pink {
     box-shadow: 0 0 20px rgba(255, 61, 129, 0.4),
@@ -270,14 +271,20 @@
   .band-wash {
     background-color: var(--surface);
     background-image:
-      radial-gradient(ellipse at top, rgba(255, 61, 129, 0.16), transparent 55%),
-      radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.12), transparent 50%);
+      radial-gradient(ellipse at top, rgba(255, 61, 129, 0.1), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.06), transparent 50%);
   }
 
   .hero-wash {
     background-image:
-      radial-gradient(ellipse 55% 50% at 12% 18%, rgba(255, 61, 129, 0.16), transparent 62%),
-      radial-gradient(ellipse 48% 46% at 88% 78%, rgba(139, 92, 246, 0.12), transparent 60%);
+      radial-gradient(ellipse 55% 50% at 12% 18%, rgba(255, 61, 129, 0.12), transparent 62%),
+      radial-gradient(ellipse 48% 46% at 88% 78%, rgba(139, 92, 246, 0.08), transparent 60%);
+  }
+
+  .hero-cinematic-wash {
+    background-image:
+      radial-gradient(ellipse 50% 45% at 15% 20%, rgba(255, 61, 129, 0.14), transparent 60%),
+      linear-gradient(to top, rgba(11, 10, 18, 0.35), transparent 40%);
   }
 
   .card-lift {
@@ -287,7 +294,8 @@
   .card-lift:hover {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 0 24px rgba(255, 61, 129, 0.28) !important;
+      0 12px 28px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(255, 61, 129, 0.2) !important;
   }
 
   .dark-map-tiles .leaflet-tile-pane {
@@ -298,10 +306,16 @@
     .hero-wash {
       animation: hero-drift 28s ease-in-out infinite alternate;
     }
+
+    .hero-cinematic-media {
+      animation: hero-cinematic-ken 32s ease-in-out infinite alternate;
+      will-change: transform;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-wash,
+    .hero-cinematic-media,
     .card-lift,
     .card-lift:hover {
       animation: none !important;
@@ -319,6 +333,15 @@
   }
 }
 
+@keyframes hero-cinematic-ken {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.08) translate3d(-1.5%, -1%, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -329,4 +352,70 @@
     scroll-behavior: auto !important;
   }
 
+}
+
+/* Tonight Planner step transitions (View Transitions API) */
+.planner-step-card {
+  view-transition-name: planner-step;
+}
+
+@keyframes planner-slide-out-left {
+  to {
+    transform: translateX(-12%);
+    opacity: 0;
+  }
+}
+
+@keyframes planner-slide-in-right {
+  from {
+    transform: translateX(12%);
+    opacity: 0;
+  }
+}
+
+@keyframes planner-slide-out-right {
+  to {
+    transform: translateX(12%);
+    opacity: 0;
+  }
+}
+
+@keyframes planner-slide-in-left {
+  from {
+    transform: translateX(-12%);
+    opacity: 0;
+  }
+}
+
+::view-transition-group(planner-step) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html:active-view-transition-type(forward)::view-transition-old(planner-step) {
+  animation-name: planner-slide-out-left;
+}
+
+html:active-view-transition-type(forward)::view-transition-new(planner-step) {
+  animation-name: planner-slide-in-right;
+}
+
+html:active-view-transition-type(back)::view-transition-old(planner-step) {
+  animation-name: planner-slide-out-right;
+}
+
+html:active-view-transition-type(back)::view-transition-new(planner-step) {
+  animation-name: planner-slide-in-left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planner-step-card {
+    view-transition-name: none;
+  }
+
+  ::view-transition-group(planner-step),
+  ::view-transition-old(planner-step),
+  ::view-transition-new(planner-step) {
+    animation: none !important;
+  }
 }

@@ -21,14 +21,19 @@ const labels: Record<'signin' | 'signup', Record<OAuthProvider, string>> = {
 export function SocialAuthButtons({
   intent,
   nextPath,
+  disabled = false,
 }: {
   intent: 'signin' | 'signup'
   nextPath: string
+  disabled?: boolean
 }) {
   const [pending, setPending] = useState<OAuthProvider | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const blocked = disabled || pending !== null
 
   const start = async (provider: OAuthProvider) => {
+    if (disabled) return
+
     setPending(provider)
     setError(null)
 
@@ -57,7 +62,7 @@ export function SocialAuthButtons({
         variant="outline"
         className="w-full py-6 bg-card text-foreground border-border hover:bg-background"
         size="lg"
-        disabled={pending !== null}
+        disabled={blocked}
         onClick={() => start('google')}
       >
         {pending === 'google' ? (
@@ -72,7 +77,7 @@ export function SocialAuthButtons({
         variant="outline"
         className="w-full py-6 bg-black text-white border-black hover:bg-neutral-800 hover:text-white"
         size="lg"
-        disabled={pending !== null}
+        disabled={blocked}
         onClick={() => start('apple')}
       >
         {pending === 'apple' ? (

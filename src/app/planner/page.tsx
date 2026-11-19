@@ -1,6 +1,8 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlarmClock,
@@ -44,6 +46,7 @@ import {
 } from '@/lib/planner'
 
 const TOTAL_STEPS = 5
+const AUTO_ADVANCE_MS = 480
 
 type StepId = 1 | 2 | 3 | 4 | 5
 type SlideDirection = 'forward' | 'back'
@@ -53,6 +56,7 @@ interface Choice {
   label: string
   badge?: string
   icon: LucideIcon
+  imageSrc: string
   description: string
   reaction: string
   recap: string
@@ -73,6 +77,7 @@ const WHO_OPTIONS: Choice[] = [
     id: 'solo',
     label: 'Solo',
     icon: User,
+    imageSrc: '/planner/choices/who-solo.jpg',
     description: 'Heading out on your own tonight',
     reaction: "Flying solo. We'll keep it welcoming and easy.",
     recap: 'heading out solo',
@@ -81,6 +86,7 @@ const WHO_OPTIONS: Choice[] = [
     id: 'date',
     label: 'Date Night',
     icon: Heart,
+    imageSrc: '/planner/choices/who-date.jpg',
     description: 'Somewhere with a bit of atmosphere for two',
     reaction: "Date night. We'll keep it close and atmospheric.",
     recap: 'a date night',
@@ -89,6 +95,7 @@ const WHO_OPTIONS: Choice[] = [
     id: 'friends',
     label: 'Friends',
     icon: Users,
+    imageSrc: '/planner/choices/who-friends.jpg',
     description: 'Small crew of 3 to 5',
     reaction: "The crew's out. Grand.",
     recap: 'out with friends',
@@ -97,6 +104,7 @@ const WHO_OPTIONS: Choice[] = [
     id: 'group',
     label: 'Big Group',
     icon: UsersRound,
+    imageSrc: '/planner/choices/who-group.jpg',
     description: 'Six or more out together',
     reaction: "Big group. We'll find spots with room for everyone.",
     recap: 'a big group',
@@ -105,6 +113,7 @@ const WHO_OPTIONS: Choice[] = [
     id: 'tourist',
     label: 'Visiting',
     icon: Compass,
+    imageSrc: '/planner/choices/who-tourist.jpg',
     description: 'Exploring local music, pubs, and culture',
     reaction: "Welcome! We'll show you the best local spots.",
     recap: 'visiting and exploring',
@@ -116,14 +125,16 @@ const OCCASION_OPTIONS: Choice[] = [
     id: 'none',
     label: 'Nothing Special',
     icon: Beer,
+    imageSrc: '/planner/choices/occasion-none.jpg',
     description: 'Just a proper night out',
-    reaction: 'No occasion needed — just a good night out.',
+    reaction: 'No occasion needed - just a good night out.',
     recap: 'no special occasion',
   },
   {
     id: 'birthday',
     label: 'Birthday',
     icon: Cake,
+    imageSrc: '/planner/choices/occasion-birthday.jpg',
     description: 'Celebrating another year',
     reaction: "Happy birthday! We'll line up a lively run of stops.",
     recap: 'a birthday celebration',
@@ -132,6 +143,7 @@ const OCCASION_OPTIONS: Choice[] = [
     id: 'hen',
     label: 'Hen Party',
     icon: Crown,
+    imageSrc: '/planner/choices/occasion-hen.jpg',
     description: 'Hen-friendly spots with plenty of energy',
     reaction: "Hen party. We'll only pick venues that welcome groups.",
     recap: 'a hen party',
@@ -140,6 +152,7 @@ const OCCASION_OPTIONS: Choice[] = [
     id: 'stag',
     label: 'Stag Party',
     icon: Trophy,
+    imageSrc: '/planner/choices/occasion-stag.jpg',
     description: 'Stag-friendly pubs, bars, and late rooms',
     reaction: "Stag night. We'll keep it lively and group-ready.",
     recap: 'a stag party',
@@ -148,6 +161,7 @@ const OCCASION_OPTIONS: Choice[] = [
     id: 'anniversary',
     label: 'Anniversary',
     icon: Gem,
+    imageSrc: '/planner/choices/occasion-anniversary.jpg',
     description: 'Marking a milestone together',
     reaction: "Anniversary. We'll make it feel special.",
     recap: 'an anniversary',
@@ -156,6 +170,7 @@ const OCCASION_OPTIONS: Choice[] = [
     id: 'leaving',
     label: 'Leaving Do',
     icon: HandMetal,
+    imageSrc: '/planner/choices/occasion-leaving.jpg',
     description: 'Giving someone a proper send-off',
     reaction: "Leaving do. We'll send them off right.",
     recap: 'a leaving do',
@@ -167,6 +182,7 @@ const VIBE_OPTIONS: Choice[] = [
     id: 'chill',
     label: 'Chill & Cozy',
     icon: Coffee,
+    imageSrc: '/planner/choices/vibe-chill.jpg',
     description: 'Relaxed pubs, acoustic corners, and good chat',
     reaction: 'Easy does it. Low lights, good pints, and great chat.',
     recap: 'keeping it chill',
@@ -175,14 +191,16 @@ const VIBE_OPTIONS: Choice[] = [
     id: 'wild',
     label: 'High Energy',
     icon: Flame,
+    imageSrc: '/planner/choices/vibe-wild.jpg',
     description: 'Busy dancefloors, DJs, and late finishes',
-    reaction: "Grand — we're going out out.",
+    reaction: "Grand - we're going out out.",
     recap: 'high energy',
   },
   {
     id: 'cultural',
     label: 'Live & Cultural',
     icon: Music,
+    imageSrc: '/planner/choices/vibe-cultural.jpg',
     description: 'Trad sessions, live gigs, comedy, and local arts',
     reaction: 'Something with a bit of soul and live character.',
     recap: 'live music and culture',
@@ -191,6 +209,7 @@ const VIBE_OPTIONS: Choice[] = [
     id: 'romantic',
     label: 'Intimate & Warm',
     icon: Heart,
+    imageSrc: '/planner/choices/vibe-romantic.jpg',
     description: 'Candlelit corners, jazz, and unhurried drinks',
     reaction: "Keep it close. We'll find a warm, intimate spot.",
     recap: 'an intimate vibe',
@@ -199,8 +218,9 @@ const VIBE_OPTIONS: Choice[] = [
     id: 'surprise',
     label: 'Surprise Me',
     icon: Sparkles,
+    imageSrc: '/planner/choices/vibe-surprise.jpg',
     description: 'Eclectic picks and hidden gems worth discovering',
-    reaction: 'You trust us — we love an eclectic route.',
+    reaction: 'You trust us - we love an eclectic route.',
     recap: 'a surprise mix',
   },
 ]
@@ -211,8 +231,9 @@ const BUDGET_OPTIONS: Choice[] = [
     label: 'Easy on the Wallet',
     badge: '€ · Under €20',
     icon: Wallet,
+    imageSrc: '/planner/choices/budget-budget.jpg',
     description: 'Free gigs and low-cover nights under €20',
-    reaction: "Minding the wallet — plenty of great free and low-cover options.",
+    reaction: 'Minding the wallet - plenty of great free and low-cover options.',
     recap: 'under €20 per person',
   },
   {
@@ -220,6 +241,7 @@ const BUDGET_OPTIONS: Choice[] = [
     label: 'Mid-Range',
     badge: '€€ · €20–€50',
     icon: Banknote,
+    imageSrc: '/planner/choices/budget-moderate.jpg',
     description: 'Ticketed shows and a comfortable night out (€20–€50)',
     reaction: 'A sensible splash. Opens up great ticketed gigs.',
     recap: 'a €20–€50 budget',
@@ -229,8 +251,9 @@ const BUDGET_OPTIONS: Choice[] = [
     label: 'All Out',
     badge: '€€€ · €50+',
     icon: Gem,
+    imageSrc: '/planner/choices/budget-splurge.jpg',
     description: 'Big nights, headline shows, and no holding back (€50+)',
-    reaction: "Tonight's the night — we'll include headline options.",
+    reaction: "Tonight's the night - we'll include headline options.",
     recap: 'an all-out €50+ budget',
   },
 ]
@@ -240,7 +263,8 @@ const TOMORROW_OPTIONS: Choice[] = [
     id: 'nothing',
     label: 'Lie-In Tomorrow',
     icon: Moon,
-    description: 'No plans in the morning — happy to stay out late',
+    imageSrc: '/planner/choices/tomorrow-nothing.jpg',
+    description: 'No plans in the morning - happy to stay out late',
     reaction: 'Lie-in secured. Late-night stops are on the table.',
     recap: 'a lie-in tomorrow',
   },
@@ -248,7 +272,8 @@ const TOMORROW_OPTIONS: Choice[] = [
     id: 'early',
     label: 'Early Start',
     icon: AlarmClock,
-    description: 'Up before 9am — wrap up at a sensible hour',
+    imageSrc: '/planner/choices/tomorrow-early.jpg',
+    description: 'Up before 9am - wrap up at a sensible hour',
     reaction: "Early start noted. We'll keep the finish time sensible.",
     recap: 'an early start tomorrow',
   },
@@ -256,7 +281,8 @@ const TOMORROW_OPTIONS: Choice[] = [
     id: 'hungover',
     label: 'Easy Sunday / Recovery',
     icon: Sunrise,
-    description: 'Taking it handy tomorrow — wrap up around midnight',
+    imageSrc: '/planner/choices/tomorrow-hungover.jpg',
+    description: 'Taking it handy tomorrow - wrap up around midnight',
     reaction: 'Recovery day planned. No super-late finishes.',
     recap: 'a recovery day tomorrow',
   },
@@ -318,6 +344,65 @@ const STEPS: PlannerStep[] = [
   },
 ]
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function pulseChoiceTile(element: HTMLElement) {
+  if (prefersReducedMotion() || typeof element.animate !== 'function') return
+  element.animate(
+    [
+      { transform: 'scale(1)', filter: 'brightness(1)' },
+      { transform: 'scale(1.025)', filter: 'brightness(1.12)' },
+      { transform: 'scale(1)', filter: 'brightness(1)' },
+    ],
+    { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+  )
+}
+
+function pulseProgressMark(element: HTMLElement | null) {
+  if (!element || prefersReducedMotion() || typeof element.animate !== 'function') return
+  element.animate(
+    [
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.18)' },
+      { transform: 'scale(1)' },
+    ],
+    { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+  )
+}
+
+function runViewTransition(update: () => void, direction: SlideDirection) {
+  if (prefersReducedMotion() || typeof document === 'undefined') {
+    update()
+    return
+  }
+
+  const doc = document as Document & {
+    startViewTransition?: (
+      callbackOrOptions:
+        | (() => void)
+        | { update: () => void; types?: string[] }
+    ) => { finished: Promise<void> }
+  }
+
+  if (typeof doc.startViewTransition !== 'function') {
+    update()
+    return
+  }
+
+  const type = direction === 'forward' ? 'forward' : 'back'
+  try {
+    doc.startViewTransition({
+      update,
+      types: [type],
+    })
+  } catch {
+    doc.startViewTransition(update)
+  }
+}
+
 function buildRecap(context: PlannerContextValues): string | null {
   const who = OPTIONS.who.find(option => option.id === context.who)?.recap
   const occasion = OPTIONS.occasion.find(option => option.id === context.occasion)?.recap
@@ -347,7 +432,7 @@ function ChoiceGrid({
   options: Choice[]
   selected: string
   columns: 2 | 3
-  onSelect: (id: string) => void
+  onSelect: (id: string, element: HTMLButtonElement) => void
 }) {
   return (
     <div
@@ -357,53 +442,65 @@ function ChoiceGrid({
     >
       {options.map(option => {
         const active = selected === option.id
-        const OptionIcon = option.icon
 
         return (
           <button
             key={option.id}
             type="button"
             aria-pressed={active}
-            onClick={() => onSelect(option.id)}
-            className={`group relative flex flex-col justify-between rounded-2xl border p-5 text-left transition-all motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${
+            onClick={event => onSelect(option.id, event.currentTarget)}
+            className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${
               active
-                ? 'border-primary bg-primary/12 shadow-lg shadow-black/25 ring-1 ring-primary/50'
+                ? 'border-primary bg-primary/12 shadow-lg shadow-black/30 ring-1 ring-primary/50'
                 : 'border-border bg-card hover:border-primary/60 hover:bg-card/90'
             }`}
           >
-            <div>
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <span
-                  aria-hidden="true"
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors motion-reduce:transition-none ${
-                    active
-                      ? 'border-primary/50 bg-primary text-primary-foreground'
-                      : 'border-hotpink/20 bg-hotpink/10 text-hotpink group-hover:border-hotpink/40'
-                  }`}
-                >
-                  <OptionIcon className="h-5 w-5" />
-                </span>
+            <span className="relative block aspect-[16/10] w-full overflow-hidden bg-night">
+              <Image
+                src={option.imageSrc}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                className={`object-cover transition-transform duration-500 motion-reduce:transition-none ${
+                  active
+                    ? 'scale-105 brightness-110'
+                    : 'scale-100 group-hover:scale-105'
+                }`}
+              />
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-night via-night/35 to-transparent"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,61,129,0.28),transparent_55%)]"
+              />
 
-                {active ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-primary/20 px-2.5 py-1 text-xs font-semibold text-hotpink-light">
-                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                    Selected
-                  </span>
-                ) : option.badge ? (
+              {active ? (
+                <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full border border-primary/50 bg-night/80 px-2.5 py-1 text-xs font-semibold text-hotpink-light backdrop-blur-sm">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  Selected
+                </span>
+              ) : option.badge ? (
+                <span className="absolute top-3 right-3">
                   <Badge
                     variant="outline"
-                    className="border-border/80 bg-night/60 text-xs text-muted-foreground"
+                    className="border-border/80 bg-night/70 text-xs text-muted-foreground backdrop-blur-sm"
                   >
                     {option.badge}
                   </Badge>
-                ) : null}
-              </div>
+                </span>
+              ) : null}
+            </span>
 
-              <h3 className="mb-1 text-lg font-bold text-foreground">{option.label}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {option.description}
-              </p>
-            </div>
+            <span className="flex flex-1 flex-col justify-between p-4 sm:p-5">
+              <span>
+                <h3 className="mb-1 text-lg font-bold text-foreground">{option.label}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {option.description}
+                </p>
+              </span>
+            </span>
           </button>
         )
       })}
@@ -414,6 +511,8 @@ function ChoiceGrid({
 function PlannerWizardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const advanceTimerRef = useRef<number | null>(null)
+  const progressRefs = useRef<Partial<Record<StepId, HTMLSpanElement | null>>>({})
 
   const [context, setContext] = useState<PlannerContextValues>(() =>
     parsePlannerSearchParams(searchParams)
@@ -423,6 +522,26 @@ function PlannerWizardContent() {
   )
   const [direction, setDirection] = useState<SlideDirection>('forward')
   const [reaction, setReaction] = useState<string | null>(null)
+  const [useCssFallbackMotion, setUseCssFallbackMotion] = useState(true)
+
+  const clearAdvanceTimer = () => {
+    if (advanceTimerRef.current !== null) {
+      window.clearTimeout(advanceTimerRef.current)
+      advanceTimerRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    const supportsViewTransition =
+      typeof document !== 'undefined' &&
+      'startViewTransition' in document &&
+      !prefersReducedMotion()
+    setUseCssFallbackMotion(!supportsViewTransition)
+
+    return () => {
+      clearAdvanceTimer()
+    }
+  }, [])
 
   const current = STEPS[step - 1]
   if (!current) return null
@@ -433,7 +552,6 @@ function PlannerWizardContent() {
   const answered = STEPS.filter(item => Boolean(context[item.field]))
   const StepIcon = current.icon
 
-  // Determine the highest step a user can jump to (any answered step or the first unanswered step)
   const firstUnansweredId =
     STEPS.find(item => !context[item.field])?.id ?? TOTAL_STEPS
 
@@ -442,19 +560,48 @@ function PlannerWizardContent() {
     return Boolean(context[STEPS[targetId - 1].field]) || targetId <= firstUnansweredId
   }
 
-  const jumpTo = (next: StepId) => {
-    setDirection(next > step ? 'forward' : 'back')
+  const jumpTo = (next: StepId, nextContext: PlannerContextValues = context) => {
+    clearAdvanceTimer()
+    const nextDirection: SlideDirection = next > step ? 'forward' : 'back'
     const field = STEPS[next - 1].field
-    const selectedId = context[field]
+    const selectedId = nextContext[field]
     const existingOption = OPTIONS[field].find(item => item.id === selectedId)
-    setReaction(existingOption?.reaction ?? null)
-    setStep(next)
+
+    runViewTransition(() => {
+      flushSync(() => {
+        setDirection(nextDirection)
+        setReaction(existingOption?.reaction ?? null)
+        setStep(next)
+      })
+    }, nextDirection)
+
+    window.requestAnimationFrame(() => {
+      pulseProgressMark(progressRefs.current[next] ?? null)
+    })
   }
 
-  const handleSelect = (field: PlannerFieldKey, value: string) => {
-    setContext(prev => ({ ...prev, [field]: value }))
+  const handleSelect = (
+    field: PlannerFieldKey,
+    value: string,
+    element: HTMLButtonElement
+  ) => {
+    clearAdvanceTimer()
+    pulseChoiceTile(element)
+
+    const nextContext = { ...context, [field]: value }
+    setContext(nextContext)
     const option = OPTIONS[field].find(item => item.id === value)
     setReaction(option?.reaction ?? null)
+
+    const isLastStep = step === TOTAL_STEPS
+    if (isLastStep || prefersReducedMotion()) return
+
+    advanceTimerRef.current = window.setTimeout(() => {
+      const nextStep = STEPS.find(item => item.id === step + 1)
+      if (nextStep) {
+        jumpTo(nextStep.id, nextContext)
+      }
+    }, AUTO_ADVANCE_MS)
   }
 
   const handleContinue = () => {
@@ -473,20 +620,27 @@ function PlannerWizardContent() {
   }
 
   const handleReset = () => {
-    setContext({
+    clearAdvanceTimer()
+    const empty: PlannerContextValues = {
       who: '',
       occasion: '',
       vibe: '',
       budget: '',
       tomorrow: '',
-    })
-    setDirection('back')
-    setReaction(null)
-    setStep(1)
+    }
+    runViewTransition(() => {
+      flushSync(() => {
+        setContext(empty)
+        setDirection('back')
+        setReaction(null)
+        setStep(1)
+      })
+    }, 'back')
   }
 
   const handleGeneratePlan = () => {
     if (!allComplete) return
+    clearAdvanceTimer()
     router.push(buildPlannerResultHref(context))
   }
 
@@ -510,7 +664,8 @@ function PlannerWizardContent() {
         <nav aria-label="Planner progress" className="mx-auto max-w-3xl">
           <div className="mb-3 flex items-center justify-between text-xs font-medium text-muted-foreground">
             <span>
-              Step {step} of {TOTAL_STEPS}: <strong className="text-white">{current.label}</strong>
+              Step {step} of {TOTAL_STEPS}:{' '}
+              <strong className="text-white">{current.label}</strong>
             </span>
             <span>
               {answered.length} of {TOTAL_STEPS} answered
@@ -529,7 +684,7 @@ function PlannerWizardContent() {
                     disabled={!clickable}
                     onClick={() => jumpTo(item.id)}
                     aria-label={`Step ${item.id}: ${item.label}${done ? ' (completed)' : ''}`}
-                    className={`flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-2.5 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-100 ${
+                    className={`flex w-full flex-col items-center gap-1.5 rounded-xl border px-1.5 py-2 sm:gap-2 sm:px-2 sm:py-2.5 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-100 ${
                       isCurrent
                         ? 'border-hotpink bg-hotpink/15 text-white'
                         : done
@@ -540,6 +695,9 @@ function PlannerWizardContent() {
                     }`}
                   >
                     <span
+                      ref={node => {
+                        progressRefs.current[item.id] = node
+                      }}
                       className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                         isCurrent
                           ? 'bg-hotpink text-night ring-2 ring-hotpink/40'
@@ -555,7 +713,7 @@ function PlannerWizardContent() {
                       )}
                     </span>
                     <span
-                      className={`text-[11px] leading-tight sm:text-xs ${
+                      className={`hidden text-[11px] leading-tight sm:block sm:text-xs ${
                         isCurrent ? 'font-semibold text-white' : 'text-muted-foreground'
                       }`}
                     >
@@ -570,8 +728,12 @@ function PlannerWizardContent() {
       </PageHero>
 
       <main className="flex-1">
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-          {/* Interactive Summary Chips for Answered Steps */}
+        <div className="relative mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-6 -z-10 mx-auto h-[28rem] max-w-3xl rounded-[2.5rem] bg-[radial-gradient(ellipse_at_center,rgba(255,61,129,0.12),transparent_68%)]"
+          />
+
           {answered.length > 0 ? (
             <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border/80 bg-card/60 px-4 py-3">
               <div className="flex flex-wrap items-center gap-2">
@@ -584,7 +746,6 @@ function PlannerWizardContent() {
                   )
                   if (!option) return null
                   const isCurrent = step === item.id
-                  const ChipIcon = option.icon
 
                   return (
                     <button
@@ -599,7 +760,15 @@ function PlannerWizardContent() {
                           : 'border-border bg-night/70 text-foreground hover:border-primary/60'
                       }`}
                     >
-                      <ChipIcon className="h-3.5 w-3.5 text-hotpink" aria-hidden="true" />
+                      <span className="relative h-4 w-4 overflow-hidden rounded-full">
+                        <Image
+                          src={option.imageSrc}
+                          alt=""
+                          fill
+                          sizes="16px"
+                          className="object-cover"
+                        />
+                      </span>
                       <span>
                         {item.label}: <strong>{option.label}</strong>
                       </span>
@@ -621,8 +790,14 @@ function PlannerWizardContent() {
 
           <Card
             key={step}
-            className={`border-border bg-card/80 shadow-xl animate-in fade-in-0 duration-200 motion-reduce:animate-none ${
-              direction === 'forward' ? 'slide-in-from-right-2' : 'slide-in-from-left-2'
+            className={`planner-step-card border-border bg-card/80 shadow-xl ${
+              useCssFallbackMotion
+                ? `animate-in fade-in-0 duration-200 motion-reduce:animate-none ${
+                    direction === 'forward'
+                      ? 'slide-in-from-right-2'
+                      : 'slide-in-from-left-2'
+                  }`
+                : ''
             }`}
           >
             <CardContent className="p-6 sm:p-8">
@@ -645,7 +820,10 @@ function PlannerWizardContent() {
 
                 <div className="mt-4 min-h-[2.5rem]" aria-live="polite" role="status">
                   {reaction ? (
-                    <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-hotpink-light">
+                    <p
+                      key={reaction}
+                      className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-hotpink-light animate-in fade-in-0 zoom-in duration-200 motion-reduce:animate-none"
+                    >
                       <Check className="h-4 w-4 text-hotpink" aria-hidden="true" />
                       <span>{reaction}</span>
                     </p>
@@ -657,10 +835,9 @@ function PlannerWizardContent() {
                 options={OPTIONS[current.field]}
                 selected={currentSelection}
                 columns={current.columns}
-                onSelect={id => handleSelect(current.field, id)}
+                onSelect={(id, element) => handleSelect(current.field, id, element)}
               />
 
-              {/* Step Navigation Bar */}
               <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-border/80 pt-6 sm:flex-row sm:items-center">
                 <div>
                   {step > 1 ? (
@@ -711,7 +888,9 @@ function PlannerWizardContent() {
               {allComplete && recap ? (
                 <div className="mt-6 rounded-xl border border-hotpink/25 bg-hotpink/10 p-4 text-center">
                   <p className="text-sm text-foreground/90">
-                    <strong className="font-semibold text-hotpink-light">Tonight&apos;s brief: </strong>
+                    <strong className="font-semibold text-hotpink-light">
+                      Tonight&apos;s brief:{' '}
+                    </strong>
                     {recap}
                   </p>
                 </div>

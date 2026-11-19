@@ -79,7 +79,11 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-6">
             {links.map((link) => {
-              const active = isVenue && isVenueLinkActive(pathname, link.href)
+              const active = isVenue
+                ? isVenueLinkActive(pathname, link.href)
+                : link.href === '/'
+                  ? pathname === '/'
+                  : pathname === link.href || pathname.startsWith(`${link.href}/`)
               return (
                 <Link
                   key={link.href}
@@ -139,7 +143,11 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2">
             {links.map((link) => {
-              const active = isVenue && isVenueLinkActive(pathname, link.href)
+              const active = isVenue
+                ? isVenueLinkActive(pathname, link.href)
+                : link.href === '/'
+                  ? pathname === '/'
+                  : pathname === link.href || pathname.startsWith(`${link.href}/`)
               return (
                 <Link
                   key={link.href}

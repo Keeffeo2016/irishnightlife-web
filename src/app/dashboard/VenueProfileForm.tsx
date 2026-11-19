@@ -213,12 +213,12 @@ export function VenueProfileForm({
             {venue.is_verified ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/15 px-3 py-0.5 text-xs font-medium text-hotpink">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                <span>Verified — Live on public directory</span>
+                <span>Verified - Live on public directory</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-0.5 text-xs font-medium text-amber-200">
                 <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                <span>Awaiting approval — Hidden from public directory</span>
+                <span>Awaiting approval - Hidden from public directory</span>
               </span>
             )}
           </div>

@@ -27,7 +27,7 @@ const bricolage = Bricolage_Grotesque({
 // Prefer NEXT_PUBLIC_APP_URL when valid http(s); otherwise localhost (matches siteOrigin helpers).
 export const metadata: Metadata = {
   metadataBase: resolveMetadataBase(),
-  title: "IrishNightlife.ie — Find Your Night",
+  title: "IrishNightlife.ie - Find Your Night",
   description:
     "Ireland's nightlife discovery platform. Find live music, events, and the best nights out in Dublin, Cork, Galway and beyond.",
   openGraph: {

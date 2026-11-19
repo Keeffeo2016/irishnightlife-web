@@ -22,7 +22,7 @@ export function DiscoverVenues({ venues, loading = false, county, seeAllHref }: 
             <p className="mt-2 text-muted-foreground">
               Verified venues
               {county !== 'All Ireland' ? ` in ${county}` : ' across Ireland'}
-              — real places, no fake rankings.
+              - real places, no fake rankings.
             </p>
           </div>
           <Link

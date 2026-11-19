@@ -188,7 +188,7 @@ export default function PlanMapInner({ venues, detailQuery = '' }: PlanMapProps)
           <h2 className="text-lg font-bold text-white">Your Route Tonight</h2>
           <p className="text-sm text-muted-foreground">
             {validVenues.length === 0
-              ? 'Map coordinates are not listed for these stops yet — see venue addresses below.'
+              ? 'Map coordinates are not listed for these stops yet - see venue addresses below.'
               : partialCoordinates
                 ? `Showing ${validVenues.length} of ${venues.length} stops with map coordinates`
                 : `${validVenues.length} ${validVenues.length === 1 ? 'stop' : 'stops'} plotted in itinerary order`}

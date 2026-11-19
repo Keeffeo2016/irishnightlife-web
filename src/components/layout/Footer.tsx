@@ -18,11 +18,11 @@ export function Footer() {
       )}
     >
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           <div>
             <Link href="/" className="mb-4 inline-block">
               <BrandLogo
-                alt="IrishNightlife.ie — Discover what's happening tonight"
+                alt="IrishNightlife.ie - Discover what's happening tonight"
                 className="h-20"
               />
             </Link>
@@ -51,6 +51,14 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/auth/login" className="text-muted-foreground hover:text-hotpink">Sign in</Link></li>
               <li><Link href="/auth/signup" className="text-muted-foreground hover:text-hotpink">Get started</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-3 font-semibold text-hotpink">Legal</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/privacy" className="text-muted-foreground hover:text-hotpink">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-muted-foreground hover:text-hotpink">Terms of Use</Link></li>
+              <li><Link href="/cookies" className="text-muted-foreground hover:text-hotpink">Cookie Notice</Link></li>
             </ul>
           </div>
         </div>

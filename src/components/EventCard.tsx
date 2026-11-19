@@ -156,7 +156,15 @@ function shouldShowMusicGenre(eventType: string, musicGenre: string | null | und
   )
 }
 
-export function EventCard({ event, href }: { event: EventCardEvent; href?: string }) {
+export function EventCard({
+  event,
+  href,
+  variant = 'default',
+}: {
+  event: EventCardEvent
+  href?: string
+  variant?: 'default' | 'poster'
+}) {
   const price = formatEventPrice(event)
   const imageUrl = resolveCardImage(event)
   const typeLabel = eventTypeLabel(event.event_type)
@@ -164,16 +172,62 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
   const dateLabel = formatEventDate(event.start_time)
   const timeLabel = formatEventTime(event.start_time)
   const locationLabel = formatVenueLocation(event.venues)
+  const detailHref = href ?? `/events/${event.slug}`
+
+  if (variant === 'poster') {
+    return (
+      <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/70 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
+        <div className="absolute right-2.5 top-2.5 z-20">
+          <FavoriteButton eventId={event.id} variant="icon" label={event.title} />
+        </div>
+
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-br from-night via-night-soft to-forest">
+          {imageUrl ? (
+            <>
+              <Image
+                src={imageUrl}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 72vw, 256px"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night via-night/50 to-transparent"
+              />
+            </>
+          ) : (
+            <FallbackArt kind="event" type={event.event_type} label={event.venues.name} />
+          )}
+
+          <div className="absolute left-3 top-3 z-10">
+            <Badge className="border border-shamrock/40 bg-shamrock text-night">Tonight</Badge>
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-4">
+            <p className="font-mono text-xs tracking-wide text-foreground/80">
+              {timeLabel || dateLabel}
+              {price ? ` · ${price}` : ''}
+            </p>
+            <h3 className="line-clamp-2 text-lg font-bold leading-snug text-white transition-colors group-hover:text-hotpink-light">
+              <Link href={detailHref} className="outline-none after:absolute after:inset-0">
+                {event.title}
+              </Link>
+            </h3>
+            <p className="line-clamp-1 text-sm text-foreground/75">{event.venues.name}</p>
+          </div>
+        </div>
+      </Card>
+    )
+  }
 
   return (
-    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/70 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
-      {/* Save Button (elevated above stretched link, not nested inside <a>) */}
+    <Card className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 motion-reduce:transform-none motion-reduce:transition-none">
       <div className="absolute right-3 top-3 z-20">
         <FavoriteButton eventId={event.id} variant="icon" label={event.title} />
       </div>
 
-      {/* 16:9 Media / Branded Header */}
-      <div className="relative aspect-video w-full shrink-0 overflow-hidden border-b border-border/60 bg-gradient-to-br from-night via-night-soft to-forest">
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden border-b border-border/60 bg-gradient-to-br from-night via-night-soft to-forest">
         {imageUrl ? (
           <>
             <Image
@@ -192,8 +246,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           <FallbackArt kind="event" type={event.event_type} label={event.venues.name} />
         )}
 
-        {/* Top-left badges over media */}
-        <div className=" absolute left-3 top-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-wrap items-center gap-1.5">
+        <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-wrap items-center gap-1.5">
           <Badge className="border border-hotpink/30 bg-night/85 text-hotpink backdrop-blur-sm">
             {typeLabel}
           </Badge>
@@ -210,7 +263,6 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           ) : null}
         </div>
 
-        {/* Bottom-left date/time pill over media */}
         <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between gap-2">
           <div className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-night/85 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
             <span
@@ -226,7 +278,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
                 <span aria-hidden="true" className="text-muted-foreground">
                   ·
                 </span>
-                <span className="inline-flex items-center gap-1 text-foreground/90">
+                <span className="inline-flex items-center gap-1 font-mono text-foreground/90">
                   <Clock className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
                   {timeLabel}
                 </span>
@@ -248,14 +300,10 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
         </div>
       </div>
 
-      {/* Card Body */}
       <CardContent className="flex flex-1 flex-col justify-between p-5">
         <div>
           <h3 className="mb-1.5 line-clamp-2 text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary">
-            <Link
-              href={href ?? `/events/${event.slug}`}
-              className="outline-none after:absolute after:inset-0"
-            >
+            <Link href={detailHref} className="outline-none after:absolute after:inset-0">
               {event.title}
             </Link>
           </h3>
@@ -272,9 +320,7 @@ export function EventCard({ event, href }: { event: EventCardEvent; href?: strin
           </div>
 
           {event.description ? (
-            <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-              {event.description}
-            </p>
+            <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{event.description}</p>
           ) : null}
         </div>
 

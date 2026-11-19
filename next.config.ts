@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   images: {
     // Hostname is derived from NEXT_PUBLIC_SUPABASE_URL at config time.
-    // If unset, no remote host is allowed — set the env before production builds.
+    // If unset, no remote host is allowed - set the env before production builds.
     remotePatterns: supabasePattern ? [supabasePattern] : [],
   },
   turbopack: {
